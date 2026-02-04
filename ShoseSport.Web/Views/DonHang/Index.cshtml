@@ -1,0 +1,540 @@
+
+@model List<FurryFriends.Web.ViewModels.DonHangKhachHangViewModel>
+
+@{
+    ViewData["Title"] = "Quản lý đơn hàng - FuryFriend";
+}
+
+@section Styles {
+    <link rel="stylesheet" href="~/css/donhang.css" />
+}
+
+<!-- Hero Section -->
+<section class="hero-section py-20 text-white">
+    <div class="container mx-auto px-4 relative z-10">
+        <div class="text-center">
+            <h1 class="text-5xl md:text-6xl font-bold mb-6">
+                Quản Lý Đơn Hàng
+            </h1>
+            <p class="text-xl md:text-2xl mb-8 opacity-90 max-w-3xl mx-auto">
+                Theo dõi trạng thái và lịch sử đơn hàng của bạn
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Main Content -->
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto px-4">
+        <!-- Filter Section -->
+        <div class="filter-section">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold text-gray-800">Bộ Lọc Đơn Hàng</h3>
+                <div class="text-sm text-gray-600">
+                    Tổng: <span class="font-semibold">@Model.Count</span> đơn hàng
+                </div>
+            </div>
+            <div class="filter-grid">
+                <div class="filter-group">
+                    <label class="filter-label">Trạng thái</label>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="0">Chờ duyệt</option>
+                        <option value="1">Đã duyệt</option>
+                        <option value="2">Đang giao</option>
+                        <option value="3">Đã giao</option>
+                        <option value="4">Đã hủy</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Sắp xếp</label>
+                    <select class="filter-select" id="sortFilter">
+                        <option value="date-desc">Mới nhất</option>
+                        <option value="date-asc">Cũ nhất</option>
+                        <option value="amount-desc">Giá trị cao</option>
+                        <option value="amount-asc">Giá trị thấp</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label class="filter-label">Thời gian</label>
+                    <select class="filter-select" id="timeFilter">
+                        <option value="">Tất cả</option>
+                        <option value="7">7 ngày qua</option>
+                        <option value="30">30 ngày qua</option>
+                        <option value="90">3 tháng qua</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Orders Grid -->
+        @if (Model == null || !Model.Any())
+        {
+            <div class="empty-state fade-in">
+                <div class="empty-icon">📦</div>
+                <h3 class="empty-title">Chưa có đơn hàng nào</h3>
+                <p class="empty-description">
+                    Bạn chưa có đơn hàng nào. Hãy khám phá các sản phẩm tuyệt vời của chúng tôi!
+                </p>
+                <a asp-controller="SanPhamKhachHang" asp-action="Index" class="btn-modern btn-primary">
+                    <i class="fas fa-shopping-bag"></i>
+                    Mua sắm ngay
+                </a>
+            </div>
+        }
+        else
+        {
+            <div class="order-grid" id="ordersGrid">
+                @foreach (var order in Model)
+                {
+                    <div class="order-card fade-in" 
+                         data-status="@order.TrangThai" 
+                         data-date="@order.NgayTao.Ticks" 
+                         data-amount="@order.TongTienSauKhiGiam"
+                         onclick="window.location.href='@Url.Action("Details", "DonHang", new { id = order.HoaDonId })'">
+                        
+                        <div class="order-header">
+                            <div class="order-id">
+                                Đơn hàng #@order.HoaDonId.ToString().Substring(0, 8).ToUpper()
+                                @if (order.LoaiHoaDon == "BanTaiQuay")
+                                {
+                                    <span class="order-type-badge order-type-offline">
+                                        <i class="fas fa-store me-1"></i>Khách tại quầy
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span class="order-type-badge order-type-online">
+                                        <i class="fas fa-globe me-1"></i>Online
+                                    </span>
+                                }
+                            </div>
+                            <div class="order-date">
+                                @order.NgayTao.ToString("dd/MM/yyyy HH:mm")
+                            </div>
+                            <div class="order-status @GetStatusClass(order.TrangThai)">
+                                @order.TrangThaiText
+                            </div>
+                        </div>
+
+                        <div class="order-content">
+                            <div class="order-summary">
+                                <div class="summary-item">
+                                    <i class="fas fa-boxes"></i>
+                                    <div class="summary-label">Sản phẩm</div>
+                                    <div class="summary-value">@order.ChiTiets.Sum(c => c.SoLuong)</div>
+                                </div>
+                                <div class="summary-item">
+                                    <i class="fas fa-credit-card"></i>
+                                    <div class="summary-label">Thanh toán</div>
+                                    <div class="summary-value">
+                                        @if (order.LoaiHoaDon == "BanTaiQuay")
+                                        {
+                                            <span class="text-success fw-semibold">Đã thanh toán</span>
+                                        }
+                                        else
+                                        {
+                                            @order.HinhThucThanhToan
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                            @if (!string.IsNullOrEmpty(order.ThongTinVoucherLucMua))
+                            {
+                                <div class="voucher-info mb-3">
+                                    <div class="d-flex align-items-center gap-2 mb-2">
+                                        <i class="fas fa-ticket-alt text-success"></i>
+                                        <span class="text-success fw-semibold">Đã áp dụng voucher</span>
+                                    </div>
+                                    <div class="text-sm text-muted">@order.ThongTinVoucherLucMua</div>
+                                </div>
+                            }
+
+                            <div class="order-products">
+                                <div class="products-header">
+                                    <i class="fas fa-list"></i>
+                                    Sản phẩm đã mua
+                                </div>
+                                @{
+                                    var displayProducts = order.ChiTiets.Take(2);
+                                    var remainingCount = order.ChiTiets.Count - 2;
+                                }
+                                @foreach (var product in displayProducts)
+                                {
+                                    <div class="product-preview">
+                                        @{ 
+                                            // ✅ Sử dụng ảnh snapshot nếu có, fallback sang ảnh hiện tại
+                                            string imgLink = null; 
+                                            var snapshotImg = product.AnhSanPhamLucMua ?? string.Empty;
+                                            var currentImg = product.AnhSanPham ?? string.Empty;
+                                            var dd = !string.IsNullOrWhiteSpace(snapshotImg) ? snapshotImg : currentImg;
+                                            
+                                            if (!string.IsNullOrWhiteSpace(dd)) { 
+                                                if (dd.StartsWith("http", StringComparison.OrdinalIgnoreCase)) 
+                                                    imgLink = dd; 
+                                                else if (dd.Contains("/")) 
+                                                    imgLink = "https://localhost:7289/" + dd.TrimStart('/'); 
+                                                else 
+                                                    imgLink = $"https://localhost:7289/images/{System.IO.Path.GetFileName(dd)}"; 
+                                            } 
+                                        }
+                                        @if (!string.IsNullOrEmpty(imgLink)) 
+                                        {
+                                            <img src="@imgLink" class="product-image" alt="@(product.TenSanPhamLucMua ?? product.TenSanPham)" />
+                                        }
+                                        else
+                                        {
+                                            <div class="product-image-placeholder">
+                                                <i class="fas fa-image text-muted"></i>
+                                            </div>
+                                        }
+                                        <div class="product-info">
+                                            <div class="product-name" title="@(product.TenSanPhamLucMua ?? product.TenSanPham)">
+                                                @(product.TenSanPhamLucMua ?? product.TenSanPham)
+                                            </div>
+                                            <div class="product-details">
+                                                @(product.MauSacLucMua ?? product.MauSac) • @(product.KichCoLucMua ?? product.KichCo)
+                                            </div>
+                                        </div>
+                                        <div class="product-quantity">
+                                            @product.SoLuong
+                                        </div>
+                                    </div>
+                                }
+                                @if (remainingCount > 0)
+                                {
+                                    <div class="more-products">
+                                        +@remainingCount sản phẩm khác
+                                    </div>
+                                }
+                            </div>
+
+                            <div class="order-actions-container">
+                            <div class="order-actions">
+                                <div class="total-price">
+                                    @order.TongTienSauKhiGiam.ToString("N0") VNĐ
+                                </div>
+                                
+                                   
+                              
+                                
+                                <!-- ✅ Nút hủy đơn hàng - chỉ hiển thị khi "Chờ duyệt" hoặc "Đã duyệt" -->
+                                @if (order.TrangThai == 0 || order.TrangThai == 1)
+                                {
+                                    <button class="btn-modern btn-danger cancel-order-btn" 
+                                            data-order-id="@order.HoaDonId"
+                                            onclick="event.stopPropagation(); confirmCancelOrder('@order.HoaDonId')">
+                                        <i class="fas fa-times"></i>
+                                        Hủy đơn
+                                    </button>
+                                }
+                                
+                                    <!-- ✅ Nút xem chi tiết - luôn hiển thị -->
+                                <a asp-action="Details" asp-route-id="@order.HoaDonId" 
+                                   class="btn-modern btn-primary" 
+                                   onclick="event.stopPropagation()">
+                                    <i class="fas fa-eye"></i>
+                                    Chi tiết
+                                </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const statusFilter = document.getElementById('statusFilter');
+        const sortFilter = document.getElementById('sortFilter');
+        const timeFilter = document.getElementById('timeFilter');
+        const ordersGrid = document.getElementById('ordersGrid');
+
+        function applyFilters() {
+            const cards = Array.from(document.querySelectorAll('.order-card'));
+            const selectedStatus = statusFilter.value;
+            const selectedSort = sortFilter.value;
+            const selectedTime = timeFilter.value;
+
+            // Filter by status
+            let filteredCards = cards.filter(card => {
+                if (!selectedStatus) return true;
+                return card.dataset.status === selectedStatus;
+            });
+
+            // Filter by time
+            if (selectedTime) {
+                const daysAgo = parseInt(selectedTime);
+                const cutoffDate = new Date();
+                cutoffDate.setDate(cutoffDate.getDate() - daysAgo);
+                const cutoffTicks = cutoffDate.getTime() * 10000 + 621355968000000000; // Convert to .NET ticks
+
+                filteredCards = filteredCards.filter(card => {
+                    const cardDate = parseInt(card.dataset.date);
+                    return cardDate >= cutoffTicks;
+                });
+            }
+
+            // Sort cards
+            filteredCards.sort((a, b) => {
+                switch (selectedSort) {
+                    case 'date-asc':
+                        return parseInt(a.dataset.date) - parseInt(b.dataset.date);
+                    case 'date-desc':
+                        return parseInt(b.dataset.date) - parseInt(a.dataset.date);
+                    case 'amount-asc':
+                        return parseFloat(a.dataset.amount) - parseFloat(b.dataset.amount);
+                    case 'amount-desc':
+                        return parseFloat(b.dataset.amount) - parseFloat(a.dataset.amount);
+                    default:
+                        return parseInt(b.dataset.date) - parseInt(a.dataset.date);
+                }
+            });
+
+            // Hide all cards first
+            cards.forEach(card => card.style.display = 'none');
+
+            // Show filtered and sorted cards
+            if (filteredCards.length === 0) {
+                ordersGrid.innerHTML = `
+                    <div class="empty-state fade-in" style="grid-column: 1 / -1;">
+                        <div class="empty-icon">🔍</div>
+                        <h3 class="empty-title">Không tìm thấy đơn hàng</h3>
+                        <p class="empty-description">
+                            Không có đơn hàng nào phù hợp với bộ lọc đã chọn.
+                        </p>
+                    </div>
+                `;
+            } else {
+                // Restore original grid
+                ordersGrid.innerHTML = '';
+                filteredCards.forEach(card => {
+                    card.style.display = 'block';
+                    ordersGrid.appendChild(card);
+                });
+            }
+        }
+
+        statusFilter.addEventListener('change', applyFilters);
+        sortFilter.addEventListener('change', applyFilters);
+        timeFilter.addEventListener('change', applyFilters);
+    });
+
+    // ✅ Hàm xác nhận hủy đơn hàng
+    function confirmCancelOrder(orderId) {
+        // ✅ Tạo custom confirmation dialog đẹp hơn
+        const confirmDialog = document.createElement('div');
+        confirmDialog.className = 'custom-confirm-dialog';
+        confirmDialog.innerHTML = `
+            <div class="confirm-dialog-overlay"></div>
+            <div class="confirm-dialog-content">
+                <div class="confirm-dialog-header">
+                    <div class="confirm-dialog-icon">⚠️</div>
+                    <h3 class="confirm-dialog-title">Xác nhận hủy đơn hàng</h3>
+                </div>
+                <div class="confirm-dialog-body">
+                    <p>Bạn có chắc chắn muốn hủy đơn hàng này?</p>
+                    <div class="confirm-dialog-warning">
+                        <strong>Lưu ý:</strong>
+                        <ul>
+                            <li>✅ Số lượng sản phẩm sẽ được cộng lại vào kho</li>
+                            <li>❌ Hành động này không thể hoàn tác</li>
+                            <li>🔄 Đơn hàng sẽ chuyển sang trạng thái "Đã hủy"</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="confirm-dialog-actions">
+                    <button class="btn-modern btn-secondary" onclick="closeConfirmDialog()">
+                        <i class="fas fa-times"></i>
+                        Hủy bỏ
+                    </button>
+                    <button class="btn-modern btn-danger" onclick="proceedCancelOrder('${orderId}')">
+                        <i class="fas fa-check"></i>
+                        Xác nhận hủy
+                    </button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(confirmDialog);
+        
+        // Hiển thị với animation
+        setTimeout(() => {
+            confirmDialog.classList.add('show');
+        }, 10);
+    }
+
+    // ✅ Hàm đóng dialog xác nhận
+    function closeConfirmDialog() {
+        const dialog = document.querySelector('.custom-confirm-dialog');
+        if (dialog) {
+            dialog.classList.remove('show');
+            setTimeout(() => dialog.remove(), 300);
+        }
+    }
+
+    // ✅ Hàm thực hiện hủy đơn hàng sau khi xác nhận
+    function proceedCancelOrder(orderId) {
+        closeConfirmDialog();
+        cancelOrder(orderId);
+    }
+
+    // ✅ Hàm thực hiện hủy đơn hàng
+    async function cancelOrder(orderId) {
+        try {
+            // Hiển thị loading
+            const cancelBtn = document.querySelector(`[data-order-id="${orderId}"]`);
+            const originalText = cancelBtn.innerHTML;
+            cancelBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang hủy...';
+            cancelBtn.disabled = true;
+
+            // Gọi API hủy đơn hàng
+            const response = await fetch(`/DonHang/HuyDonHang?hoaDonId=${orderId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            const result = await response.json();
+
+            if (result.success) {
+                // ✅ Hủy thành công
+                showNotification('✅ ' + result.message, 'success');
+                
+                // Cập nhật trạng thái đơn hàng trên UI
+                setTimeout(() => {
+                    location.reload(); // Reload để cập nhật trạng thái
+                }, 1500);
+            } else {
+                // ❌ Hủy thất bại
+                showNotification('❌ ' + result.message, 'error');
+                
+                // Khôi phục nút
+                cancelBtn.innerHTML = originalText;
+                cancelBtn.disabled = false;
+            }
+        } catch (error) {
+            console.error('Error canceling order:', error);
+            showNotification('❌ Lỗi khi hủy đơn hàng. Vui lòng thử lại!', 'error');
+            
+            // Khôi phục nút
+            const cancelBtn = document.querySelector(`[data-order-id="${orderId}"]`);
+            cancelBtn.innerHTML = originalText;
+            cancelBtn.disabled = false;
+        }
+    }
+
+    // ✅ Hàm hiển thị thông báo đẹp
+    function showNotification(message, type = 'info') {
+        // Xóa thông báo cũ nếu có
+        const existingNotification = document.querySelector('.notification-toast');
+        if (existingNotification) {
+            existingNotification.remove();
+        }
+
+        // ✅ Icon và title theo loại thông báo
+        const icons = {
+            success: '✅',
+            error: '❌',
+            warning: '⚠️',
+            info: 'ℹ️'
+        };
+
+        const titles = {
+            success: 'Thành công!',
+            error: 'Lỗi!',
+            warning: 'Cảnh báo!',
+            info: 'Thông báo'
+        };
+
+        // Tạo thông báo mới với icon và title
+        const notification = document.createElement('div');
+        notification.className = `notification-toast notification-${type}`;
+        notification.innerHTML = `
+            <div class="notification-content">
+                <div class="notification-header">
+                    <span class="notification-icon">${icons[type]}</span>
+                    <span class="notification-title">${titles[type]}</span>
+                </div>
+                <div class="notification-message">${message}</div>
+                <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+            </div>
+        `;
+
+        // Thêm vào body
+        document.body.appendChild(notification);
+
+        // Hiển thị với animation slide-in
+        setTimeout(() => {
+            notification.classList.add('slide-in');
+            notification.classList.add('show');
+        }, 10);
+
+        // Tự động ẩn sau 6 giây (tăng thời gian hiển thị)
+        setTimeout(() => {
+            notification.classList.add('slide-out');
+            notification.classList.remove('show');
+            setTimeout(() => notification.remove(), 300);
+        }, 6000);
+    }
+
+    // Hủy đơn hàng
+    function confirmCancelOrder(orderId) {
+        if (confirm('Bạn có chắc chắn muốn hủy đơn hàng này?')) {
+            cancelOrder(orderId);
+        }
+    }
+
+ 
+
+    // ✅ Toast notifications đẹp mắt
+    function showSuccessToast(message) {
+        showToast(message, 'success');
+    }
+
+    function showErrorToast(message) {
+        showToast(message, 'error');
+    }
+
+    function showToast(message, type = 'info') {
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.innerHTML = `
+            <div class="toast-icon">
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+            </div>
+            <div class="toast-message">${message}</div>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        // Trigger animation
+        setTimeout(() => toast.classList.add('show'), 100);
+        
+        // Auto remove
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => document.body.removeChild(toast), 300);
+        }, 3000);
+    }
+</script>
+
+@functions {
+    public string GetStatusClass(int status)
+    {
+        return status switch
+        {
+            0 => "status-pending",
+            1 => "status-approved",
+            2 => "status-shipping",
+            3 => "status-delivered",
+            4 => "status-cancelled",
+            _ => "status-pending"
+        };
+    }
+}

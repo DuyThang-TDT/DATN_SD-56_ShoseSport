@@ -1,0 +1,131 @@
+@model FurryFriends.API.Models.HoaDon
+@{
+    ViewData["Title"] = "Tra cứu đơn hàng";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body p-5">
+                    <h2 class="text-center mb-4 fw-bold text-primary">Tra Cứu Đơn Hàng</h2>
+                    
+                    <form method="post" class="mb-5">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="hoaDonId" name="hoaDonId" placeholder="Mã đơn hàng" value="@ViewBag.HoaDonId" required>
+                                    <label for="hoaDonId">Mã đơn hàng (UUID)</label>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control" id="sdt" name="sdt" placeholder="Số điện thoại" value="@ViewBag.Sdt" required>
+                                    <label for="sdt">Số điện thoại</label>
+                                </div>
+                            </div>
+                            <div class="col-12 text-center mt-3">
+                                <button type="submit" class="btn btn-primary px-5 py-2 rounded-pill fw-bold">
+                                    <i class="fas fa-search me-2"></i> Tra cứu
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+
+                    @if (ViewBag.Error != null)
+                    {
+                        <div class="alert alert-danger rounded-3">
+                            <i class="fas fa-exclamation-circle me-2"></i> @ViewBag.Error
+                        </div>
+                    }
+
+                    @if (Model != null)
+                    {
+                        <div class="order-result mt-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3 border-bottom pb-2">
+                                <h4 class="fw-bold mb-0">Chi tiết đơn hàng</h4>
+                                <span class="badge bg-@GetStatusColor(Model.TrangThai) fs-6">@GetStatusText(Model.TrangThai)</span>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <p><strong>Ngày đặt:</strong> @Model.NgayTao.ToString("dd/MM/yyyy HH:mm")</p>
+                                    <p><strong>Khách hàng:</strong> @Model.TenCuaKhachHang</p>
+                                    <p><strong>SĐT:</strong> @Model.SdtCuaKhachHang</p>
+                                    <p><strong>Địa chỉ:</strong> @Model.DiaChiGiaoHangLucMua</p>
+                                </div>
+                                <div class="col-md-6 text-end">
+                                     <p><strong>Tổng tiền:</strong> <span class="text-danger fw-bold fs-5">@Model.TongTienSauKhiGiam.ToString("N0") VNĐ</span></p>
+                                     <p><strong>Thanh toán:</strong> @Model.LoaiHoaDon</p>
+                                </div>
+                            </div>
+
+                            @if (Model.HoaDonChiTiets != null && Model.HoaDonChiTiets.Any())
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-hover align-middle">
+                                        <thead class="table-light">
+                                            <tr>
+                                                <th>Sản phẩm</th>
+                                                <th class="text-center">Số lượng</th>
+                                                <th class="text-end">Đơn giá</th>
+                                                <th class="text-end">Thành tiền</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var item in Model.HoaDonChiTiets)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <div class="fw-bold">@item.TenSanPhamLucMua</div>
+                                                        <small class="text-muted">Màu: @item.MauSacLucMua | Size: @item.KichCoLucMua</small>
+                                                    </td>
+                                                    <td class="text-center">@item.SoLuongSanPham</td>
+                                                    <td class="text-end">@(item.GiaLucMua?.ToString("N0") ?? "0")</td>
+                                                    <td class="text-end">@(((item.GiaLucMua ?? 0) * item.SoLuongSanPham).ToString("N0"))</td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <p class="text-muted text-center">Không có chi tiết sản phẩm.</p>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@functions {
+    public string GetStatusText(int status)
+    {
+        return status switch
+        {
+            0 => "Chờ duyệt",
+            1 => "Đã duyệt",
+            2 => "Đang giao",
+            3 => "Đã giao",
+            4 => "Đã hủy",
+            5 => "Đã thanh toán",
+            _ => "Không xác định"
+        };
+    }
+    public string GetStatusColor(int status)
+    {
+        return status switch
+        {
+            0 => "warning",
+            1 => "info",
+            2 => "primary",
+            3 => "success",
+            4 => "danger",
+            5 => "success",
+            _ => "secondary"
+        };
+    }
+}

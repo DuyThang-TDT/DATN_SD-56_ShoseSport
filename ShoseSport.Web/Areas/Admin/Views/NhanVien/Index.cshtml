@@ -1,0 +1,215 @@
+﻿@model IEnumerable<FurryFriends.API.Models.NhanVien>
+
+@{
+    ViewData["Title"] = "Danh sách nhân viên";
+}
+
+@if (TempData["success"] != null)
+{
+    <div class="alert alert-success">@TempData["success"]</div>
+}
+@if (TempData["error"] != null)
+{
+    <div class="alert alert-danger">@TempData["error"]</div>
+}
+
+<div class="top-bar" style="padding-left: 50px;">
+    <h1>@ViewData["Title"]</h1>
+    <div class="top-bar-actions">
+        <a asp-action="Create" class="btn btn-primary">
+            <i class="fas fa-plus"></i>
+            Thêm mới
+        </a>
+    </div>
+</div>
+<nav aria-label="breadcrumb" class="mb-3" style="padding-left: 50px;">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+        <li class="breadcrumb-item active">Quản lý nhân viên</li>
+    </ol>
+</nav>
+
+<div class="row mb-4 g-3">
+    <div class="col-md-4">
+        <div class="bg-white shadow rounded p-4 border-start border-primary border-4">
+            <h6 class="text-muted">Tổng số nhân viên</h6>
+            <h3 class="fw-bold text-primary">@ViewBag.TotalCount</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="bg-white shadow rounded p-4 border-start border-success border-4">
+            <h6 class="text-muted">Đang hoạt động</h6>
+            <h3 class="fw-bold text-success">@ViewBag.ActiveCount</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="bg-white shadow rounded p-4 border-start border-secondary border-4">
+            <h6 class="text-muted">Ngừng hoạt động</h6>
+            <h3 class="fw-bold text-secondary">@ViewBag.InactiveCount</h3>
+        </div>
+    </div>
+</div>
+
+<div class="container mb-4" id="filterContainer">
+    <div class="card shadow-sm p-3 mb-3" style="border-radius: 12px;">
+        <div class="row align-items-center mb-2">
+            <div class="col-auto">
+                <span class="fs-5 fw-semibold"><i class="fas fa-filter me-2"></i>Bộ lọc</span>
+            </div>
+        </div>
+        <div class="row align-items-end g-3">
+            <div class="col-md-2">
+                <label for="filterTrangThai" class="form-label mb-1">Trạng thái</label>
+                <select id="filterTrangThai" class="form-select">
+                    <option value="">Tất cả</option>
+                    <option value="Hoạt động">Hoạt động</option>
+                    <option value="Không hoạt động">Không hoạt động</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="filterChucVu" class="form-label mb-1">Chức vụ</label>
+                <select id="filterChucVu" class="form-select">
+                    <option value="">Tất cả</option>
+                    @foreach (var cv in Model.Select(x => x.ChucVu?.TenChucVu).Distinct())
+                    {
+                        if (!string.IsNullOrEmpty(cv))
+                        {
+                            <option value="@cv">@cv</option>
+                        }
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="filterGioiTinh" class="form-label mb-1">Giới tính</label>
+                <select id="filterGioiTinh" class="form-select">
+                    <option value="">Tất cả</option>
+                    <option value="Nam">Nam</option>
+                    <option value="Nữ">Nữ</option>
+                    <option value="Khác">Khác</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label for="filterNgaySinhTu" class="form-label mb-1">Ngày sinh từ</label>
+                <input type="date" id="filterNgaySinhTu" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label for="filterNgaySinhDen" class="form-label mb-1">Ngày sinh đến</label>
+                <input type="date" id="filterNgaySinhDen" class="form-control" />
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="table-container" style="margin-left: 10px; margin-right: 40px;">
+    <div class="table-responsive" id="nhanVienTableContainer">
+        <table id="nhanVienTable" class="table table-bordered table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Họ và tên</th>
+                    <th>Ngày sinh</th>
+                    <th>Địa chỉ</th>
+                    <th>SĐT</th>
+                    <th>Email</th>
+                    <th>Giới tính</th>
+                    <th>Chức vụ</th>
+                    <th>Tài khoản</th>
+                    <th>Trạng thái</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.HoVaTen</td>
+                        <td>@item.NgaySinh.ToString("dd/MM/yyyy")</td>
+                        <td>@item.DiaChi</td>
+                        <td>@item.SDT</td>
+                        <td>@item.Email</td>
+                        <td>@item.GioiTinh</td>
+                        <td>@(item.ChucVu != null ? item.ChucVu.TenChucVu : "N/A")</td>
+                        <td>@(item.TaiKhoan != null ? item.TaiKhoan.UserName : "N/A")</td>
+                        <td class="status-cell">
+                            @if (item.TrangThai)
+                            {
+                                <span class="badge bg-success">Hoạt động</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Không hoạt động</span>
+                            }
+                        </td>
+                        <td>
+                            <a asp-action="Edit" asp-route-id="@item.NhanVienId" class="btn btn-sm btn-warning me-1 action-btn"><i class="fas fa-edit"></i></a>
+                            <button type="button" class="btn btn-sm btn-warning action-btn toggle-status-btn" 
+                                    data-id="@item.NhanVienId" 
+                                    data-controller="NhanVien"
+                                    data-area="Admin"
+                                    data-current-status="@item.TrangThai.ToString().ToLower()"
+                                    title="@(item.TrangThai ? "Vô hiệu hóa" : "Kích hoạt")">
+                                <i class="@(item.TrangThai ? "fas fa-ban" : "fas fa-check")"></i>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin-toggle-status.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.js"></script>
+    <script>
+        $(document).ready(function () {
+            if (window.adminLoading) {
+                window.adminLoading.showTableLoading('#nhanVienTableContainer');
+            }
+            // DataTable
+            var table = $('#nhanVienTable').DataTable({
+                language: { url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/vi.json' },
+                responsive: true,
+                order: [[1, 'asc']],
+                initComplete: function () {
+                    if (window.adminLoading) {
+                        window.adminLoading.hideTableLoading('#nhanVienTableContainer');
+                    }
+                }
+            });
+            // Custom filter
+            $('#filterTrangThai, #filterChucVu, #filterGioiTinh, #filterNgaySinhTu, #filterNgaySinhDen').on('change', function () {
+                table.draw();
+            });
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                var trangThai = $('#filterTrangThai').val();
+                var chucVu = $('#filterChucVu').val();
+                var gioiTinh = $('#filterGioiTinh').val();
+                var ngayTu = $('#filterNgaySinhTu').val();
+                var ngayDen = $('#filterNgaySinhDen').val();
+                var rowTrangThai = $(table.row(dataIndex).node()).find('td:eq(8)').text().trim();
+                var rowChucVu = data[6];
+                var rowGioiTinh = data[5];
+                var rowNgaySinh = data[1];
+                // Trạng thái
+                if (trangThai && !rowTrangThai.includes(trangThai)) return false;
+                // Chức vụ
+                if (chucVu && rowChucVu !== chucVu) return false;
+                // Giới tính
+                if (gioiTinh && rowGioiTinh !== gioiTinh) return false;
+                // Ngày sinh
+                if (ngayTu && moment(rowNgaySinh, 'DD/MM/YYYY').format('YYYY-MM-DD') < ngayTu) return false;
+                if (ngayDen && moment(rowNgaySinh, 'DD/MM/YYYY').format('YYYY-MM-DD') > ngayDen) return false;
+                return true;
+            });
+            $('.action-btn').on('click', function (e) {
+                if (window.adminLoading) {
+                    // window.adminLoading.showLoadingWithMessage('Đang xử lý...');
+                }
+            });
+        });
+    </script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.min.css" />
+}

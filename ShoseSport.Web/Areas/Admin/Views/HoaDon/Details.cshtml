@@ -1,0 +1,352 @@
+
+@model FurryFriends.API.Models.HoaDon
+
+@{
+    ViewData["Title"] = "Chi tiết hóa đơn";
+}
+
+<div class="top-bar" style="padding-left: 50px;">
+    <h1>@ViewData["Title"]</h1>
+</div>
+<nav aria-label="breadcrumb" class="mb-3" style="padding-left: 50px;">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Quản lý hóa đơn</a></li>
+        <li class="breadcrumb-item active">Chi tiết</li>
+    </ol>
+</nav>
+<div class="form-container" style="margin-left: 10px; margin-right: 40px;">
+    <div class="card mb-4 shadow-sm" style="border-radius: 16px;">
+        <div class="card-header d-flex justify-content-between align-items-center bg-white" style="border-radius: 16px 16px 0 0; border-bottom: 1px solid #eee;">
+            <div class="fw-bold fs-5">
+                <i class="fas fa-file-invoice me-2"></i>
+                Thông tin hóa đơn
+            </div>
+            <div>
+                <a href="https://localhost:7289/api/HoaDon/@Model.HoaDonId/pdf" class="btn btn-success action-btn me-2" target="_blank">
+                    <i class="fas fa-file-pdf"></i> Xuất PDF
+                </a>
+                <a href="@Url.Action("Index", "HoaDon", new { area = "Admin" })" class="btn btn-secondary action-btn">
+                    <i class="fas fa-arrow-left"></i> Quay lại
+                </a>
+            </div>
+        </div>
+        <div class="card-body bg-light" style="border-radius: 0 0 16px 16px;">
+            @if (TempData["error"] != null)
+            {
+                <div class="alert alert-danger">
+                    @TempData["error"]
+                </div>
+            }
+            <div class="row mb-4 g-4">
+                <div class="col-md-6">
+                    <div class="border rounded-3 p-3 bg-white h-100">
+                        <div class="fw-semibold fs-6 mb-2"><i class="fas fa-user me-2 text-primary"></i>Thông tin khách hàng</div>
+                        <table class="table table-bordered mb-0 align-middle">
+                            <tr>
+                                <th class="bg-light" style="width: 140px;">Tên khách hàng</th>
+                                <td>@Model.TenCuaKhachHang</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Số điện thoại</th>
+                                <td>@Model.SdtCuaKhachHang</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Email</th>
+                                <td>@Model.EmailCuaKhachHang</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Địa chỉ</th>
+                                <td>
+                                    @{
+                                        // ✅ Ưu tiên hiển thị snapshot địa chỉ giao hàng lúc mua
+                                        if (!string.IsNullOrWhiteSpace(Model.DiaChiGiaoHangLucMua))
+                                        {
+                                            <div class="text-success">
+                                                <i class="fas fa-check-circle me-1"></i>
+                                                <strong>Địa chỉ giao hàng:</strong><br/>
+                                                @Model.DiaChiGiaoHangLucMua
+                                            </div>
+                                        }
+                                        else if (Model.DiaChiGiaoHang != null)
+                                        {
+                                            var diaChi = Model.DiaChiGiaoHang;
+                                            <div class="text-info">
+                                                <i class="fas fa-info-circle me-1"></i>
+                                                <strong>Địa chỉ từ hệ thống:</strong><br/>
+                                                @diaChi.TenDiaChi @if(!string.IsNullOrWhiteSpace(diaChi.MoTa)){<text>- @diaChi.MoTa</text>} , @diaChi.PhuongXa, @diaChi.ThanhPho
+                                            </div>
+                                        }
+                                        else
+                                        {
+                                            <div class="text-warning">
+                                                <i class="fas fa-exclamation-triangle me-1"></i>
+                                                <span class="text-muted">Bán tại quầy không giao hàng</span>
+                                            </div>
+                                        }
+                                    }
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="border rounded-3 p-3 bg-white h-100">
+                        <div class="fw-semibold fs-6 mb-2"><i class="fas fa-receipt me-2 text-success"></i>Thông tin hóa đơn</div>
+                        <table class="table table-bordered mb-0 align-middle">
+                            <tr>
+                                <th class="bg-light" style="width: 140px;">Mã hóa đơn</th>
+                                <td class="fw-bold">@Model.HoaDonId.ToString().Substring(0, 8).ToUpper()</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Ngày tạo</th>
+                                <td>@Model.NgayTao.ToString("dd/MM/yyyy HH:mm")</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Loại hóa đơn</th>
+                                <td>
+                                    @if (Model.LoaiHoaDon == "BanTaiQuay")
+                                    {
+                                        <span class="badge bg-primary">Bán tại quầy</span>
+                                    }
+                                    else if (Model.LoaiHoaDon == "Online")
+                                    {
+                                        <span class="badge bg-success">Online</span>
+                                    }
+                                    else if (Model.LoaiHoaDon == "GiaoHang")
+                                    {
+                                        <span class="badge bg-info">Giao hàng</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">@Model.LoaiHoaDon</span>
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Ngày nhận hàng</th>
+                                <td>@(Model.NgayNhanHang?.ToString("dd/MM/yyyy") ?? "Chưa cập nhật")</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Hình thức thanh toán</th>
+                                <td>
+                                    @if (Model.LoaiHoaDon == "BanTaiQuay")
+                                    {
+                                        <span class="text-success fw-bold">Đã thanh toán</span>
+                                    }
+                                    else
+                                    {
+                                        @Model.HinhThucThanhToan?.TenHinhThuc
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Trạng thái</th>
+                                <td>
+                                    @switch (Model.TrangThai)
+                                    {
+                                        case 0:
+                                            <span class="badge bg-warning text-dark">Chờ xác nhận</span>
+                                            ; break;
+                                        case 1:
+
+                                            <span class="badge bg-info text-white">Đã xác nhận</span>
+                                            ; break;
+                                        case 2:
+
+                                            <span class="badge bg-primary">Đang giao</span>
+                                            ; break;
+                                        case 3:
+
+                                            <span class="badge bg-success">Hoàn thành</span>
+                                            ; break;
+                                        case 4:
+
+                                            <span class="badge bg-danger">Đã hủy</span>
+                                            ; break;
+                                        case 7:
+
+                                            <span class="badge bg-success">Hoàn thành</span>
+                                            ; break;
+                                        default:
+
+                                            <span class="badge bg-secondary">Không xác định</span>
+                                            ; break;
+                                    }
+                                </td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Ghi chú</th>
+                                <td>@(string.IsNullOrEmpty(Model.GhiChu) ? "Không có" : Model.GhiChu)</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Người tạo hóa đơn</th>
+                                <td>
+                                    @{
+                                        string nguoiTaoHoaDon = "Chưa xác định";
+                                        if (Model.LoaiHoaDon == "BanTaiQuay")
+                                        {
+                                            nguoiTaoHoaDon = Model.NhanVien?.HoVaTen ?? "Chưa xác định";
+                                        }
+                                        else if (Model.LoaiHoaDon == "Online" || Model.LoaiHoaDon == "GiaoHang")
+                                        {
+                                            nguoiTaoHoaDon = "Hệ thống";
+                                        }
+                                    }
+                                    @nguoiTaoHoaDon
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="fw-semibold fs-5 mb-2 mt-4"><i class="fas fa-box-open me-2 text-warning"></i>Chi tiết sản phẩm</div>
+            <div class="table-responsive rounded-3">
+                <table class="table table-bordered align-middle bg-white" style="border-radius: 8px; overflow: hidden;">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="min-width:220px;">Sản phẩm</th>
+                            <th class="text-center" style="min-width:140px;">Loại</th>
+                            <th class="text-center">Đơn giá</th>
+                            <th class="text-center">Số lượng</th>
+                            <th class="text-center">Thành tiền</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.HoaDonChiTiets)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        @{
+                                            // ✅ Sử dụng ảnh snapshot nếu có, fallback sang ảnh hiện tại
+                                            string imgLink = null;
+                                            var snapshotImg = item.AnhSanPhamLucMua ?? string.Empty;
+                                            var currentImg = item.SanPhamChiTiet?.Anh?.DuongDan ?? string.Empty;
+                                            var dd = !string.IsNullOrWhiteSpace(snapshotImg) ? snapshotImg : currentImg;
+
+                                            if (!string.IsNullOrWhiteSpace(dd)) {
+                                                if (dd.StartsWith("http", StringComparison.OrdinalIgnoreCase))
+                                                    imgLink = dd;
+                                                else if (dd.Contains("/"))
+                                                    imgLink = "https://localhost:7289/" + dd.TrimStart('/');
+                                                else
+                                                    imgLink = $"https://localhost:7289/images/{System.IO.Path.GetFileName(dd)}";
+                                            }
+                                        }
+                                        @if (!string.IsNullOrEmpty(imgLink)) {<img src="@imgLink" alt="@(item.TenSanPhamLucMua ?? "Sản phẩm")" class="me-2" style="width: 48px; height: 48px; object-fit: cover; border-radius: 6px; border: 1px solid #eee;">} else {<div class="me-2" style="width: 48px; height: 48px; background-color: #f0f0f0; border-radius: 6px; display: flex; align-items: center; justify-content: center;"><i class="fas fa-image text-muted"></i></div>}
+                                        <div>
+                                            <div class="fw-semibold">@(item.TenSanPhamLucMua ?? "N/A")</div>
+                                            @if (!string.IsNullOrEmpty(item.ThuongHieuLucMua))
+                                            {
+                                                <small class="text-muted">@item.ThuongHieuLucMua</small>
+                                            }
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-light text-dark border">@(item.MauSacLucMua ?? "N/A")</span>
+                                    <span class="badge bg-light text-dark border">@(item.KichCoLucMua ?? "N/A")</span>
+                                </td>
+                                <td class="text-center">@((item.GiaLucMua ?? item.Gia).ToString("N0"))đ</td>
+                                <td class="text-center">@item.SoLuongSanPham</td>
+                                <td class="text-center fw-bold">@(((item.GiaLucMua ?? item.Gia) * item.SoLuongSanPham).ToString("N0"))đ</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="table-light">
+                        <tr>
+                            <td colspan="4" class="text-end fw-semibold">Tổng tiền hàng:</td>
+                            <td class="fw-bold">@Model.TongTien.ToString("N0")đ</td>
+                        </tr>
+                        @{ 
+                            // ✅ Tính toán phí ship và giảm giá
+                            var phuPhi = 0m; // Phí ship
+                            
+                            // ✅ Kiểm tra có giao hàng không: LoaiHoaDon == "GiaoHang" HOẶC có địa chỉ giao hàng
+                            var coGiaoHang = Model.LoaiHoaDon == "GiaoHang" || !string.IsNullOrEmpty(Model.DiaChiGiaoHangLucMua);
+                            
+                            // ✅ Tính phí ship: 30k nếu đơn dưới 500k và có giao hàng
+                            // Sử dụng tổng tiền sau giảm giá để tính phí ship (như GioHang)
+                            var tongTienSauGiam = Model.TongTienSauKhiGiam;
+                            if (coGiaoHang && tongTienSauGiam < 500000m)
+                            {
+                                phuPhi = 30000m;
+                            }
+                            
+                            // ✅ Tính giảm giá voucher: Tổng tiền hàng - (Tổng tiền sau giảm - Phí ship)
+                            var voucherDiscount = Math.Max(0m, Model.TongTien - (Model.TongTienSauKhiGiam - phuPhi));
+                        }
+                        
+                        @* ✅ Hiển thị phí ship cho đơn giao hàng *@
+                        @if (coGiaoHang)
+                        {
+                            <tr>
+                                <td colspan="4" class="text-end fw-semibold">Phí vận chuyển:</td>
+                                <td class="fw-bold">@phuPhi.ToString("N0")đ</td>
+                            </tr>
+                        }
+                        @if (!string.IsNullOrEmpty(Model.ThongTinVoucherLucMua))
+                        {
+                            <tr>
+                                <td colspan="4" class="text-end fw-semibold text-success">
+                                    <div>
+                                        <i class="fas fa-ticket-alt me-1"></i>
+                                        Voucher áp dụng:
+                                    </div>
+                                    <small class="text-muted">@Model.ThongTinVoucherLucMua</small>
+                                </td>
+                                <td class="fw-bold text-success">
+                                    -@voucherDiscount.ToString("N0")đ
+                                </td>
+                            </tr>
+                        }
+                        else if (Model.Voucher != null)
+                        {
+                            <tr>
+                                <td colspan="4" class="text-end fw-semibold text-success">
+                                    <div>
+                                        <i class="fas fa-ticket-alt me-1"></i>
+                                        Giảm giá (@Model.Voucher.TenVoucher):
+                                    </div>
+                                    <small class="text-muted">Giảm @Model.Voucher.PhanTramGiam% (tối đa @Model.Voucher.GiaTriGiamToiDa?.ToString("N0")đ)</small>
+                                </td>
+                                <td class="fw-bold text-success">-@voucherDiscount.ToString("N0")đ</td>
+                            </tr>
+                        }
+                        <tr>
+                            <td colspan="4" class="text-end fs-5 fw-bold text-primary">Thành tiền:</td>
+                            <td class="fs-5 fw-bold text-primary">@(Model.TongTienSauKhiGiam.ToString("N0"))đ</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Xử lý click cho các button
+            $('.action-btn').on('click', function(e) {
+                var $btn = $(this);
+                var originalText = $btn.html();
+                var href = $btn.attr('href');
+
+
+
+                // Nếu là link PDF, mở trong tab mới
+                if (href.includes('/pdf')) {
+                    window.open(href, '_blank');
+                    setTimeout(function() {
+                        $btn.html(originalText);
+                        $btn.prop('disabled', false);
+                    }, 1000);
+                } else {
+                    // Nếu là link khác, chuyển hướng ngay lập tức
+                    window.location.href = href;
+                }
+            });
+        });
+    </script>
+}

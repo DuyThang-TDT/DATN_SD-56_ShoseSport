@@ -1,0 +1,392 @@
+@model IEnumerable<FurryFriends.API.Models.DTO.SanPhamDTO>
+@using Microsoft.AspNetCore.Mvc.Rendering
+@using FurryFriends.Web.Helpers
+
+@{
+    ViewData["Title"] = "Quản lý sản phẩm";
+    var totalCount = Model.Count();
+    var activeCount = Model.Count(x => x.TrangThai);
+    var inactiveCount = totalCount - activeCount;
+}
+
+@if (TempData["success"] != null)
+{
+    <div class="alert alert-success">@TempData["success"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">@TempData["Error"]</div>
+}
+
+<div class="container-fluid px-4 py-4">
+    <div class="row mb-4 g-3">
+        <div class="col-md-4">
+            <div class="bg-white shadow rounded p-4 border-start border-primary border-4">
+                <h6 class="text-muted">Tổng số sản phẩm</h6>
+                <h3 class="fw-bold text-primary">@totalCount</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="bg-white shadow rounded p-4 border-start border-success border-4">
+                <h6 class="text-muted">Đang hoạt động</h6>
+                <h3 class="fw-bold text-success">@activeCount</h3>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="bg-white shadow rounded p-4 border-start border-secondary border-4">
+                <h6 class="text-muted">Ngừng bán</h6>
+                <h3 class="fw-bold text-secondary">@inactiveCount</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="fw-bold">@ViewData["Title"]</h4>
+        @if (Context.Session.CanCreate())
+        {
+            <a asp-area="Admin" asp-controller="SanPham" asp-action="Create" class="btn btn-lg btn-primary shadow">
+                <i class="fas fa-plus me-2"></i>Thêm mới
+            </a>
+        }
+    </div>
+
+    <div class="card shadow-sm p-4 mb-4 border-0">
+        <h5 class="mb-3"><i class="fas fa-filter me-2"></i> Bộ lọc nâng cao</h5>
+        <div class="row g-3">
+            <div class="col-md-2">
+                <label class="form-label">Trạng thái</label>
+                <select id="filterTrangThai" class="form-select">
+                    <option value="">Tất cả</option>
+                    <option value="true">Đang hoạt động</option>
+                    <option value="false">Không hoạt động</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Loại sản phẩm</label>
+                <select id="filterLoai" class="form-select">
+                    <option value="">Tất cả</option>
+                    <option value="DoAn">Đồ ăn</option>
+                    <option value="DoDung">Đồ dùng</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Thương hiệu</label>
+                <select id="filterThuongHieu" class="form-select">
+                    <option value="">Tất cả</option>
+                    @foreach (var th in (ViewBag.DanhSachThuongHieu as List<FurryFriends.API.Models.DTO.ThuongHieuDTO> ?? new List<FurryFriends.API.Models.DTO.ThuongHieuDTO>()))
+                    {
+                        var text = th.TrangThai ? th.TenThuongHieu : th.TenThuongHieu + " (Ngưng hoạt động)";
+                        <option value="@text">@text</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Chất liệu</label>
+                <select id="filterChatLieu" class="form-select">
+                    <option value="">Tất cả</option>
+                    @foreach (var cl in (ViewBag.DanhSachChatLieu as List<FurryFriends.API.Models.DTO.ChatLieuDTO> ?? new List<FurryFriends.API.Models.DTO.ChatLieuDTO>()))
+                    {
+                        var text = cl.TrangThai ? cl.TenChatLieu : cl.TenChatLieu + " (Ngưng hoạt động)";
+                        <option value="@text">@text</option>
+                    }
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Thành phần</label>
+                <select id="filterThanhPhan" class="form-select">
+                    <option value="">Tất cả</option>
+                    @foreach (var tp in (ViewBag.DanhSachThanhPhan as List<FurryFriends.API.Models.DTO.ThanhPhanDTO> ?? new List<FurryFriends.API.Models.DTO.ThanhPhanDTO>()))
+                    {
+                        var text = tp.TrangThai ? tp.TenThanhPhan : tp.TenThanhPhan + " (Ngưng hoạt động)";
+                        <option value="@text">@text</option>
+                    }
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm" id="sanPhamTableContainer">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table id="sanPhamTable" class="table table-hover align-middle">
+                    <thead class="table-light">
+                        <tr>
+                            <th>STT</th>
+                            <th>Tên sản phẩm</th>
+                            <th>Loại</th>
+                            <th>Chất liệu</th>
+                            <th>Thành phần</th>
+                            <th>Thương hiệu</th>
+                            <th>Ngày tạo</th>
+                            <th>Hạn sử dụng</th>
+                            <th>Trạng thái</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @{
+                            int stt = 1;
+                        }
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td>@stt</td>
+                              
+                                <td>@item.TenSanPham</td>
+                                <td>
+                                    <span class="d-none loai-goc">@item.LoaiSanPham</span>
+                                    @(item.LoaiSanPham == "DoAn" ? "Đồ ăn" : "Đồ dùng")
+                                </td>
+                                <td>
+                                    @if (item.ChatLieuIds != null && item.TenChatLieus != null && item.ChatLieuIds.Count == item.TenChatLieus.Count && item.ChatLieuIds.Count > 0)
+                                    {
+                                        var danhSachChatLieu = ViewBag.DanhSachChatLieu as List<FurryFriends.API.Models.DTO.ChatLieuDTO>;
+                                        var chatLieuNames = new List<string>();
+                                        for (int i = 0; i < item.ChatLieuIds.Count; i++)
+                                        {
+                                            var id = item.ChatLieuIds[i];
+                                            var ten = item.TenChatLieus[i];
+                                            var cl = danhSachChatLieu?.FirstOrDefault(x => x.ChatLieuId == id);
+                                            var display = (cl != null && !cl.TrangThai) ? $"{ten} (Ngưng hoạt động)" : ten;
+                                            chatLieuNames.Add(display);
+                                        }
+                                        <span class="chat-lieu-text">@string.Join(", ", chatLieuNames)</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted chat-lieu-text">Không có</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (item.ThanhPhanIds != null && item.TenThanhPhans != null && item.ThanhPhanIds.Count == item.TenThanhPhans.Count && item.ThanhPhanIds.Count > 0)
+                                    {
+                                        var danhSachThanhPhan = ViewBag.DanhSachThanhPhan as List<FurryFriends.API.Models.DTO.ThanhPhanDTO>;
+                                        var thanhPhanNames = new List<string>();
+                                        for (int i = 0; i < item.ThanhPhanIds.Count; i++)
+                                        {
+                                            var id = item.ThanhPhanIds[i];
+                                            var ten = item.TenThanhPhans[i];
+                                            var tp = danhSachThanhPhan?.FirstOrDefault(x => x.ThanhPhanId == id);
+                                            var display = (tp != null && !tp.TrangThai) ? $"{ten} (Ngưng hoạt động)" : ten;
+                                            thanhPhanNames.Add(display);
+                                        }
+                                        <span class="thanh-phan-text">@string.Join(", ", thanhPhanNames)</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted thanh-phan-text">Không có</span>
+                                    }
+                                </td>
+                                <td>
+                                    @{
+                                        var thuongHieuId = item.ThuongHieuId;
+                                        var danhSachThuongHieu = ViewBag.DanhSachThuongHieu as List<FurryFriends.API.Models.DTO.ThuongHieuDTO>;
+                                        var th = danhSachThuongHieu?.FirstOrDefault(x => x.ThuongHieuId == thuongHieuId);
+                                        if (th != null)
+                                        {
+                                            var text = th.TrangThai ? th.TenThuongHieu : th.TenThuongHieu + " (Ngưng hoạt động)";
+                                            <span class="thuong-hieu-text">@text</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="thuong-hieu-text">@item.TenThuongHieu</span>
+                                        }
+                                    }
+                                </td>
+                                <td>@item.NgayTao.ToString("dd/MM/yyyy")</td>
+                                <td>@(item.HanSuDung?.ToString("dd/MM/yyyy") ?? "Không có")</td>
+                                <td class="status-cell">
+                                    @if (item.TrangThai)
+                                    {
+                                        <span class="badge bg-success">Đang hoạt động</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-secondary">Không hoạt động</span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        @if (Context.Session.CanEdit())
+                                        {
+                                            <a asp-area="Admin" asp-controller="SanPham" asp-action="Edit" asp-route-id="@item.SanPhamId" class="btn btn-sm btn-outline-primary action-btn" title="Chỉnh sửa">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        }
+                                        
+                                    </div>
+                                </td>
+                            </tr>
+                            stt++;
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @Html.AntiForgeryToken()
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.min.css" />
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script>
+    <script>
+$(document).ready(function () {
+    if (window.adminLoading) {
+        window.adminLoading.showTableLoading('#sanPhamTableContainer');
+    }
+    var table = $('#sanPhamTable').DataTable({
+        language: { url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/vi.json' },
+        responsive: true,
+        pageLength: 10,
+        lengthMenu: [[10, 25, 50, -1], [10, 25, 50, "Tất cả"]],
+        order: [[1, 'asc']],
+        // Sửa lại targets: bảng có 9 cột (index 0-8), cột "Hành động" là index 8
+        columnDefs: [{ orderable: false, targets: [0, 8] }],
+        initComplete: function () {
+            if (window.adminLoading) {
+                window.adminLoading.hideTableLoading('#sanPhamTableContainer');
+            }
+        }
+    });
+
+    // Lọc theo dropdown và ngày
+    $('#filterTrangThai, #filterLoai, #filterThuongHieu, #filterChatLieu, #filterThanhPhan').on('change', function () {
+        table.draw();
+    });
+
+    $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+        if (settings.nTable.id !== 'sanPhamTable') return true;
+
+        var trangThai = $('#filterTrangThai').val();
+        var loai = $('#filterLoai').val();
+        var thuongHieu = $('#filterThuongHieu').val();
+        var chatLieu = $('#filterChatLieu').val();
+        var thanhPhan = $('#filterThanhPhan').val();
+
+        var rowTrangThai = $(table.row(dataIndex).node()).find('td:eq(7) .badge').text().trim();
+        var rowLoaiGoc = $(table.row(dataIndex).node()).find('.loai-goc').text().trim();
+        var rowThuongHieu = $(table.row(dataIndex).node()).find('.thuong-hieu-text').text().trim();
+        var rowChatLieu = $(table.row(dataIndex).node()).find('.chat-lieu-text').text().trim();
+        var rowThanhPhan = $(table.row(dataIndex).node()).find('.thanh-phan-text').text().trim();
+
+        // Debug logging
+        console.log('=== FILTER DEBUG ===');
+        console.log('Filter values:', {
+            trangThai: trangThai,
+            loai: loai,
+            thuongHieu: thuongHieu,
+            chatLieu: chatLieu,
+            thanhPhan: thanhPhan
+        });
+        console.log('Row data:', {
+            rowTrangThai: rowTrangThai,
+            rowLoaiGoc: rowLoaiGoc,
+            rowThuongHieu: rowThuongHieu,
+            rowChatLieu: rowChatLieu,
+            rowThanhPhan: rowThanhPhan
+        });
+
+        // Trạng thái
+        if (trangThai && trangThai !== '' &&
+            ((trangThai === 'true' && rowTrangThai !== 'Đang hoạt động') ||
+                (trangThai === 'false' && rowTrangThai !== 'Không hoạt động'))) {
+            console.log('Filtered out by status');
+            return false;
+        }
+
+        // Loại
+        if (loai && loai !== '' && rowLoaiGoc !== loai) {
+            console.log('Filtered out by type');
+            return false;
+        }
+
+        // Thương hiệu - so sánh với tên thương hiệu
+        if (thuongHieu && thuongHieu !== '' && thuongHieu !== 'Tất cả') {
+            var thuongHieuText = $('#filterThuongHieu option:selected').text().trim();
+            var rowThuongHieuText = rowThuongHieu.trim();
+            console.log('Thương hiệu filter:', thuongHieuText, 'Row data:', rowThuongHieuText);
+            if (thuongHieuText !== rowThuongHieuText) {
+                console.log('Filtered out by brand - not match');
+                return false;
+            }
+        }
+
+        // Chất liệu - kiểm tra xem có chứa chất liệu được chọn không
+        if (chatLieu && chatLieu !== '' && chatLieu !== 'Tất cả') {
+            if (rowChatLieu === 'Không có') {
+                console.log('Filtered out by material - row has no material');
+                return false;
+            }
+            var chatLieuText = $('#filterChatLieu option:selected').text();
+            console.log('Chất liệu filter:', chatLieuText, 'Row data:', rowChatLieu);
+            // Tách các chất liệu bằng dấu phẩy và kiểm tra
+            var chatLieus = rowChatLieu.split(',').map(function(item) {
+                return item.trim();
+            });
+            console.log('Chất liệu array:', chatLieus);
+            // So sánh đơn giản
+            var found = chatLieus.some(function(item) {
+                return item.trim() === chatLieuText.trim();
+            });
+            if (!found) {
+                console.log('Filtered out by material - not found in array');
+                return false;
+            }
+        }
+
+        // Thành phần - kiểm tra xem có chứa thành phần được chọn không
+        if (thanhPhan && thanhPhan !== '' && thanhPhan !== 'Tất cả') {
+            if (rowThanhPhan === 'Không có') {
+                console.log('Filtered out by component - row has no component');
+                return false;
+            }
+            var thanhPhanText = $('#filterThanhPhan option:selected').text();
+            console.log('Thành phần filter:', thanhPhanText, 'Row data:', rowThanhPhan);
+            // Tách các thành phần bằng dấu phẩy và kiểm tra
+            var thanhPhans = rowThanhPhan.split(',').map(function(item) {
+                return item.trim();
+            });
+            console.log('Thành phần array:', thanhPhans);
+            // So sánh đơn giản
+            var found = thanhPhans.some(function(item) {
+                return item.trim() === thanhPhanText.trim();
+            });
+            if (!found) {
+                console.log('Filtered out by component - not found in array');
+                return false;
+            }
+        }
+
+        console.log('Row passed all filters');
+        return true;
+    });
+
+    
+});
+
+    </script>
+
+    <style>
+        /* Sát footer phân trang với bảng */
+        .dataTables_wrapper .dataTables_paginate {
+            margin-top: 0 !important;
+        }
+
+        .dataTables_wrapper .dataTables_info {
+            margin-bottom: 0 !important;
+        }
+
+        .dataTables_wrapper .row:last-child {
+            margin-bottom: 0 !important;
+        }
+        /* Thêm khoảng cách phía dưới bảng để không bị sát cuối trang */
+        #sanPhamTableContainer {
+            padding-bottom: 24px;
+        }
+    </style>
+}

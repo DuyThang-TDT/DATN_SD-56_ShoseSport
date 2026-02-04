@@ -1,0 +1,34 @@
+using FurryFriends.API.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+
+namespace FurryFriends.Web.Services.IService
+{
+    public interface IHoaDonService
+    {
+        Task<IEnumerable<HoaDon>> GetHoaDonListAsync();
+        Task<HoaDon> GetHoaDonByIdAsync(Guid hoaDonId);
+        Task<IEnumerable<HoaDon>> SearchHoaDonAsync(string keyword);
+        Task<byte[]> ExportHoaDonToPdfAsync(Guid hoaDonId);
+        Task<ApiResult> HuyDonHangAsync(Guid hoaDonId);
+        Task<ApiResult> CapNhatTrangThaiAsync(Guid hoaDonId, int trangThaiMoi);
+        Task<IEnumerable<HoaDon>> GetAllAsync();
+        Task<HoaDon> GetByIdAsync(Guid id);
+        Task<IEnumerable<HoaDonChiTiet>> GetChiTietHoaDonAsync(Guid hoaDonId);
+        
+        // ✅ Method mới cho quản lý đơn hàng - chỉ lấy hóa đơn trạng thái 0-5
+        Task<IEnumerable<HoaDon>> GetDonHangListAsync();
+        
+        // Dashboard methods
+        Task<int> GetTotalOrdersAsync();
+        Task<decimal> GetMonthlyRevenueAsync();
+        Task<List<object>> GetRevenueByMonthAsync();
+        Task<List<object>> GetRevenueByDayAsync();
+        Task<List<object>> GetRevenueByWeekAsync();
+        Task<List<object>> GetOrdersByStatusAsync();
+        Task<List<object>> GetRecentOrdersAsync(int count);
+
+        // Tra cứu đơn hàng
+        Task<HoaDon?> TraCuuDonHangAsync(Guid hoaDonId, string sdt);
+    }
+}

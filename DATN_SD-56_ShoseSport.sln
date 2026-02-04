@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35027.167
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShoseSport.API", "ShoseSport.API\ShoseSport.API.csproj", "{6F598A08-DFD6-7CE7-5B19-DCE4CBD4BBC5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ShoseSport.Web", "ShoseSport.Web\ShoseSport.Web.csproj", "{9455EC48-4529-CA83-199B-EF6337276280}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6F598A08-DFD6-7CE7-5B19-DCE4CBD4BBC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F598A08-DFD6-7CE7-5B19-DCE4CBD4BBC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F598A08-DFD6-7CE7-5B19-DCE4CBD4BBC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F598A08-DFD6-7CE7-5B19-DCE4CBD4BBC5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9455EC48-4529-CA83-199B-EF6337276280}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9455EC48-4529-CA83-199B-EF6337276280}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9455EC48-4529-CA83-199B-EF6337276280}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9455EC48-4529-CA83-199B-EF6337276280}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {27375C68-E48C-46B4-8742-1714EA08FC98}
+	EndGlobalSection
+EndGlobal

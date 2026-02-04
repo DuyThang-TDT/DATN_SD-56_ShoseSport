@@ -1,0 +1,303 @@
+﻿@model IEnumerable<FurryFriends.API.Models.KhachHang>
+@using FurryFriends.Web.Helpers
+
+@{
+    ViewData["Title"] = "Quản lý khách hàng";
+}
+
+@if (TempData["success"] != null)
+{
+    <div class="alert alert-success">@TempData["success"]</div>
+}
+@if (TempData["error"] != null)
+{
+    <div class="alert alert-danger">@TempData["error"]</div>
+}
+<div class="top-bar" style="padding-left: 50px;">
+    <h1>@ViewData["Title"]</h1>
+    <div class="top-bar-actions">
+        @if (Context.Session.CanCreate())
+        {
+            <a asp-action="Create" asp-controller="KhachHangs" class="btn btn-primary">
+                <i class="fas fa-plus"></i>
+                Thêm mới
+            </a>
+        }
+    </div>
+</div>
+<nav aria-label="breadcrumb" class="mb-3" style="padding-left: 50px;">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Home" asp-action="Index">Trang chủ</a></li>
+        <li class="breadcrumb-item active">Quản lý khách hàng</li>
+    </ol>
+</nav>
+<div class="row mb-4 g-3">
+    <div class="col-md-4">
+        <div class="bg-white shadow rounded p-4 border-start border-primary border-4">
+            <h6 class="text-muted">Tổng số khách hàng</h6>
+            <h3 class="fw-bold text-primary">@ViewBag.TotalCount</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="bg-white shadow rounded p-4 border-start border-success border-4">
+            <h6 class="text-muted">Đang hoạt động</h6>
+            <h3 class="fw-bold text-success">@ViewBag.ActiveCount</h3>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="bg-white shadow rounded p-4 border-start border-secondary border-4">
+            <h6 class="text-muted">Ngừng hoạt động</h6>
+            <h3 class="fw-bold text-secondary">@ViewBag.InactiveCount</h3>
+        </div>
+    </div>
+</div>
+<div class="container mb-4" id="filterContainer">
+    <div class="card shadow-sm p-3 mb-3" style="border-radius: 12px;">
+        <div class="row mb-2">
+            <div class="col-auto">
+                <span class="fs-5 fw-semibold"><i class="fas fa-filter me-2"></i>Bộ lọc</span>
+            </div>
+        </div>
+        <div class="row align-items-end g-3">
+            <div class="col-md-3">
+                <label for="filterTrangThai" class="form-label mb-1">Trạng thái</label>
+                <select id="filterTrangThai" class="form-select">
+                    <option value="">Tất cả trạng thái</option>
+                    <option value="Đang hoạt động">Đang hoạt động</option>
+                    <option value="Đã khóa">Đã khóa</option>
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="filterNgayTu" class="form-label mb-1">Từ ngày</label>
+                <input type="date" id="filterNgayTu" class="form-control" />
+            </div>
+            <div class="col-md-3">
+                <label for="filterNgayDen" class="form-label mb-1">Đến ngày</label>
+                <input type="date" id="filterNgayDen" class="form-control" />
+            </div>
+             
+        </div>
+    </div>
+</div>
+<div class="table-container table-responsive" id="khachHangTableContainer" style="margin-left: 10px; margin-right: 40px;">
+    <table id="khachHangTable" class="table table-bordered table-hover">
+        <thead class="table-light">
+            <tr>
+                <th>Khách hàng</th>
+                <th>Số điện thoại</th>
+                <th>Email</th>
+                <th>Điểm tích lũy</th>
+                <th>Ngày tham gia</th>
+                <th>Trạng thái</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <div class="d-flex align-items-center">
+                            <div class="avatar me-3">@item.TenKhachHang.Substring(0, 1).ToUpper()</div>
+                            <div>
+                                <div class="fw-bold">@item.TenKhachHang</div>
+                                <small class="text-muted">ID: @item.KhachHangId.ToString().Substring(0, 8)...</small>
+                            </div>
+                        </div>
+                    </td>
+                    <td>@item.SDT</td>
+                    <td>@item.EmailCuaKhachHang</td>
+                    <td><span class="badge bg-primary diem-value">@item.DiemKhachHang</span></td>
+                    <td>@item.NgayTaoTaiKhoan.ToString("yyyy-MM-dd")</td>
+                    <td class="status-cell">
+                        @if (item.TrangThai == 1)
+                        {
+                            <span class="badge bg-success">Đang hoạt động</span>
+                        }
+                        else if (item.TrangThai == 2)
+                        {
+                            <span class="badge bg-secondary">Đã khóa</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">Không xác định</span>
+                        }
+                    </td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <a asp-action="Details" asp-route-id="@item.KhachHangId" class="btn btn-info btn-sm action-btn" title="Xem chi tiết">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            @if (Context.Session.CanEdit())
+                            {
+                                <a asp-action="Edit" asp-route-id="@item.KhachHangId" class="btn btn-warning btn-sm action-btn">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                            }
+                            @if (Context.Session.CanDelete())
+                            {
+                                <button type="button" class="btn btn-warning btn-sm action-btn toggle-status-btn" 
+                                        data-id="@item.KhachHangId" 
+                                        data-controller="KhachHangs"
+                                        data-area="Admin"
+                                        data-current-status="@(item.TrangThai == 1 ? "1" : "2")"
+                                        title="@(item.TrangThai == 1 ? "Vô hiệu hóa" : "Kích hoạt")">
+                                    <i class="@(item.TrangThai == 1 ? "fas fa-ban" : "fas fa-check")"></i>
+                                </button>
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="~/js/admin-toggle-status.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.3.2/js/dataTables.bootstrap5.js"></script>
+    <style>
+        /* Khôi phục lại thanh slider bình thường */
+        .custom-range-slider input[type=range] {
+            -webkit-appearance: none;
+            width: 120px;
+            height: 6px;
+            background: linear-gradient(90deg, #E8F2FF 0%, #4A90E2 100%);
+            border-radius: 3px;
+            outline: none;
+            transition: background 0.3s;
+        }
+        .custom-range-slider input[type=range]:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #E8F2FF;
+        }
+        /* Chỉ thay thumb bằng ảnh ragedog.png */
+        .custom-range-slider input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: url('/images/ragedog.png') no-repeat center center !important;
+            background-size: cover !important;
+            border: none;
+            box-shadow: 0 2px 6px rgba(44,62,80,0.12);
+            cursor: pointer;
+            z-index: 3;
+        }
+        .custom-range-slider input[type=range]::-moz-range-thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: url('/images/ragedog.png') no-repeat center center !important;
+            background-size: cover !important;
+            border: none;
+            box-shadow: 0 2px 6px rgba(44,62,80,0.12);
+            cursor: pointer;
+            z-index: 3;
+        }
+        .custom-range-slider input[type=range]::-ms-thumb {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: url('/images/ragedog.png') no-repeat center center !important;
+            background-size: cover !important;
+            border: none;
+            box-shadow: 0 2px 6px rgba(44,62,80,0.12);
+            cursor: pointer;
+            z-index: 3;
+        }
+        /* --- CUSTOM: Căn đều tiêu đề bộ lọc trên cùng một hàng, đồng bộ với hóa đơn --- */
+        #filterContainer .row.align-items-end.g-3 {
+            display: flex;
+            align-items: flex-start !important;
+            gap: 0 !important;
+        }
+        #filterContainer .col-md-3 {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            justify-content: flex-start;
+            min-width: 180px;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        #filterContainer .form-label {
+            min-height: 24px;
+            display: flex;
+            align-items: flex-end;
+        }
+        #filterContainer .form-control, 
+        #filterContainer .form-select, 
+        #filterContainer .custom-range-slider {
+            margin-top: 4px;
+        }
+        /* --- END CUSTOM --- */
+        /* --- CUSTOM: Sát footer bảng với bảng, không bị cách ra --- */
+        #khachHangTableContainer {
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        .dataTables_wrapper .dataTables_paginate {
+            margin-bottom: 0 !important;
+            padding-bottom: 0 !important;
+        }
+        /* --- END CUSTOM --- */
+        /* --- CUSTOM: Tăng khoảng cách giữa bảng và footer phân trang, đồng bộ với nhân viên --- */
+        #khachHangTableContainer {
+            margin-bottom: 32px !important;
+        }
+        #khachHangTableContainer .dataTables_wrapper .dataTables_paginate {
+            margin-top: 24px !important;
+        }
+        /* --- END CUSTOM --- */
+    </style>
+    <script>
+        $(document).ready(function () {
+            if (window.adminLoading) {
+                window.adminLoading.showTableLoading('#khachHangTableContainer');
+            }
+            var table = $('#khachHangTable').DataTable({
+                language: { url: '//cdn.datatables.net/plug-ins/1.13.7/i18n/vi.json' },
+                responsive: true,
+                order: [[4, 'desc']],
+                initComplete: function () {
+                    if (window.adminLoading) {
+                        window.adminLoading.hideTableLoading('#khachHangTableContainer');
+                    }
+                }
+            });
+
+            // Filter
+            $('#filterTrangThai, #filterNgayTu, #filterNgayDen').on('change', function () {
+                table.draw();
+            });
+            // Custom search logic
+            $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
+                var trangThai = $('#filterTrangThai').val();
+                var ngayTu = $('#filterNgayTu').val();
+                var ngayDen = $('#filterNgayDen').val();
+                var rowNgay = data[4];
+                var rowTrangThai = $(table.row(dataIndex).node()).find('td:eq(5)').text().trim();
+                
+                // Trạng thái
+                if (trangThai && !rowTrangThai.includes(trangThai)) return false;
+                
+                // Ngày tham gia
+                if (ngayTu && rowNgay < ngayTu) return false;
+                if (ngayDen && rowNgay > ngayDen) return false;
+                
+                return true;
+            });
+            $('.action-btn').on('click', function (e) {
+                if (window.adminLoading) {
+                    // window.adminLoading.showLoadingWithMessage('Đang xử lý...');
+                }
+            });
+        });
+    </script>
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.3.2/css/dataTables.bootstrap5.min.css" />
+}

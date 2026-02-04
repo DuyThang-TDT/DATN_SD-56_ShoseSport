@@ -1,0 +1,533 @@
+﻿@using FurryFriends.API.Models.DTO.BanHang
+@using FurryFriends.Web.Helpers
+@model IEnumerable<FurryFriends.API.Models.DTO.BanHang.HoaDonBanHangDto>
+
+@{
+    ViewData["Title"] = "Quản lý bán hàng";
+    // ✅ Tách biệt danh sách theo yêu cầu mới
+    var hoaDonCho = Model?.Where(h => h.TrangThai == "Chua Thanh Toan" || h.TrangThai == "Offline ChuaThanhToan").OrderByDescending(h => h.NgayTao).ToList() ?? new List<HoaDonBanHangDto>();
+    
+    // ✅ Lịch sử giao dịch: BanTaiQuay với trạng thái 1,2,3,7,10
+    var lichSuHoaDon = Model?.Where(h => 
+        h.LoaiHoaDon == "BanTaiQuay" && // ✅ Chỉ BanTaiQuay
+        (h.TrangThai == "DaThanhToan" || h.TrangThai == "DangGiaoHang" || h.TrangThai == "DaGiaoHang" || 
+         h.TrangThai == "Offline DaThanhToan" || h.TrangThai == "Offline DaHuy") // ✅ Trạng thái 1,2,3,7,10
+    ).OrderByDescending(h => h.NgayTao).ToList() ?? new List<HoaDonBanHangDto>();
+
+    // ✅ Tính toán thống kê theo trạng thái mới
+    var today = DateTime.Now.Date; // Lấy ngày hiện tại của server
+    var successfulToday = lichSuHoaDon.Count(h => 
+        (h.TrangThai == "DaThanhToan" || h.TrangThai == "DangGiaoHang" || h.TrangThai == "DaGiaoHang" || h.TrangThai == "Offline DaThanhToan") && // ✅ Trạng thái 1,2,3,7 - hoàn thành
+        h.NgayTao.Date == today
+    );
+    var cancelledToday = lichSuHoaDon.Count(h => h.TrangThai == "Offline DaHuy" && h.NgayTao.Date == today); // ✅ Chỉ trạng thái 10 - hủy
+    
+    // ✅ Tính doanh thu dựa trên lịch sử giao dịch: Tất cả trạng thái đã thanh toán (1,2,3,7) trừ hủy
+    var revenueToday = lichSuHoaDon.Where(h => 
+        h.NgayTao.Date == today &&
+        (h.TrangThai == "DaThanhToan" || h.TrangThai == "DangGiaoHang" || h.TrangThai == "DaGiaoHang" || h.TrangThai == "Offline DaThanhToan") // ✅ Trạng thái 1,2,3,7 - đã thanh toán
+    ).Sum(h => {
+        // ✅ Trừ phí ship nếu có ship và không được freeship
+        decimal phiShip = 0;
+        if (!string.IsNullOrEmpty(h.DiaChiGiaoHangLucMua))
+        {
+            // Logic freeship: Đơn hàng trên 500k được freeship
+            var tongTienHang = h.ThanhTien;
+            phiShip = tongTienHang >= 500000m ? 0m : 30000m;
+        }
+        return h.ThanhTien - phiShip;
+    });
+}
+
+<div class="container-fluid py-4">
+    <!-- Tiêu đề và nút tạo mới -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="mb-0"><i class="fas fa-file-invoice-dollar me-2 text-primary"></i>@ViewData["Title"]</h2>
+
+        <div class="d-flex gap-2">
+            <!-- ✅ Nút sửa dữ liệu hóa đơn -->
+           
+            <a asp-action="TaoHoaDonMoi" class="btn btn-primary" id="btnTaoMoi" onclick="return confirm('Bạn có chắc chắn muốn tạo hóa đơn mới không?')">
+                <i class="fas fa-plus me-2"></i> Tạo Hóa Đơn Mới (Tại quầy)
+            </a>
+            <script>
+                document.getElementById('btnTaoMoi').addEventListener('click', function(e) {
+                    if (!confirm('Bạn có chắc chắn muốn tạo hóa đơn mới không?')) {
+                        e.preventDefault();
+                    }
+                });
+            </script>
+        </div>
+    </div>
+
+    <!-- Thống kê -->
+    <div class="row g-3 mb-4">
+        <div class="col-lg-3 col-md-6">
+            <div class="card shadow-sm border-start border-warning border-4 h-100">
+                <div class="card-body">
+                    <h6 class="text-muted mb-1">Hóa đơn chờ</h6>
+                    <h3 class="fw-bold text-warning mb-0">@hoaDonCho.Count()</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card shadow-sm border-start border-success border-4 h-100">
+                <div class="card-body">
+                    <h6 class="text-muted mb-1">Thành công hôm nay</h6>
+                    <h3 class="fw-bold text-success mb-0">@successfulToday</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card shadow-sm border-start border-danger border-4 h-100">
+                <div class="card-body">
+                    <h6 class="text-muted mb-1">Bị hủy hôm nay</h6>
+                    <h3 class="fw-bold text-danger mb-0">@cancelledToday</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="card shadow-sm border-start border-info border-4 h-100">
+                <div class="card-body">
+                    <h6 class="text-muted mb-1">Tổng doanh thu hôm nay</h6>
+                    <h3 class="fw-bold text-info mb-0">@revenueToday.ToString("N0") ₫</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Danh sách hóa đơn chờ -->
+    <div class="card shadow-sm border-0 mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0 text-warning"><i class="fas fa-clock me-2"></i>Hóa đơn đang chờ (@hoaDonCho.Count())</h5>
+        </div>
+        <div class="card-body p-0">
+            @if (hoaDonCho.Any())
+            {
+                <div class="list-group list-group-flush">
+                    @foreach (var item in hoaDonCho)
+                    {
+                        <a asp-action="Details" asp-route-id="@item.HoaDonId" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="fw-bold me-3">@item.MaHoaDon</span>
+                                <i class="fas fa-user me-1 text-muted"></i>
+                                <span>@(item.KhachHang?.TenKhachHang ?? "Khách lẻ")</span>
+                            </div>
+                            <div>
+                                <span class="me-4"><i class="far fa-calendar-alt me-2 text-muted"></i>@item.NgayTao.ToString("dd/MM/yyyy HH:mm")</span>
+                                <span class="badge bg-warning rounded-pill">Chờ thanh toán</span>
+                            </div>
+                        </a>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center p-4 text-muted">Chưa có hóa đơn nào đang chờ.</div>
+            }
+        </div>
+    </div>
+
+    <!-- Lịch sử hóa đơn (với bộ lọc) -->
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-light">
+            <h5 class="mb-0"><i class="fas fa-history me-2"></i>Lịch sử giao dịch</h5>
+        </div>
+        <div class="card-body p-4">
+            <!-- Bộ lọc -->
+            <div class="row g-2 mb-3 align-items-end">
+                <div class="col-lg-3 col-md-6 col-12 mb-2">
+                    <label for="searchInput" class="form-label small">Tìm theo mã HĐ, tên KH</label>
+                    <input type="text" id="searchInput" class="form-control form-control-sm" placeholder="Nhập từ khóa...">
+                </div>
+                <div class="col-lg-2 col-md-6 col-12 mb-2">
+                    <label for="statusFilter" class="form-label small">Trạng thái</label>
+                    <select id="statusFilter" class="form-select form-select-sm">
+                        <option value="">Tất cả trạng thái</option>
+                        <option value="DaThanhToan">Đã thanh toán</option>
+                        <option value="DangGiaoHang">Đang giao hàng</option>
+                        <option value="DaGiaoHang">Đã giao hàng</option>
+                        <option value="Offline DaThanhToan">Đã thanh toán (Tại Quầy)</option>
+                        <option value="Offline DaHuy">Đã hủy (Tại Quầy)</option>
+                    </select>
+                </div>
+                <div class="col-lg-4 col-md-6 col-12 mb-2">
+                    <label class="form-label small">Khoảng ngày tạo</label>
+                    <div class="input-group input-group-sm">
+                        <input type="date" id="startDate" class="form-control">
+                        <span class="input-group-text">đến</span>
+                        <input type="date" id="endDate" class="form-control">
+                    </div>
+                </div>
+                <div class="col-lg-1 col-md-6 col-12 mb-2 d-grid">
+                    <button id="resetFilters" class="btn btn-sm btn-outline-secondary">Reset</button>
+                </div>
+            </div>
+
+            <table class="table table-hover table-bordered" id="historyTable" style="width:100%">
+                <thead class="table-light">
+                    <tr>
+                        <th>Mã HĐ</th>
+                        <th>Khách Hàng</th>
+                        <th>Ngày Tạo</th>
+                        <th class="text-end">Thành Tiền</th>
+                        <th class="text-center">Trạng Thái</th>
+                        <th class="text-center">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (lichSuHoaDon.Any())
+                    {
+                        @foreach (var item in lichSuHoaDon)
+                        {
+                            <tr data-date="@item.NgayTao.ToString("yyyy-MM-dd")" data-status="@item.TrangThai">
+                                <td class="fw-bold">@item.MaHoaDon</td>
+                                <td>@(item.KhachHang?.TenKhachHang ?? "Khách lẻ")</td>
+                                <td>@item.NgayTao.ToString("dd/MM/yyyy HH:mm")</td>
+                                <td class="text-end fw-semibold text-success">@item.ThanhTien.ToString("N0") ₫</td>
+                                <td class="text-center">
+                                    @{
+                                        var (badgeClass, trangThaiText, icon) = item.TrangThai switch
+                                        {
+                                            "DaThanhToan" => ("status-delivered", "Đã thanh toán", "fas fa-check-circle"),
+                                            "Offline DaThanhToan" => ("status-delivered", "Đã thanh toán", "fas fa-check-circle"),
+                                            "DangGiaoHang" => ("status-shipping", "Đang giao hàng", "fas fa-truck"),
+                                            "DaGiaoHang" => ("status-delivered", "Đã giao hàng", "fas fa-home"),
+                                            "DaHuy" => ("status-cancelled", "Đã hủy", "fas fa-times-circle"),
+                                            "Offline DaHuy" => ("status-cancelled", "Đã hủy", "fas fa-times-circle"),
+                                            "ChuaThanhToan" => ("status-pending", "Chưa thanh toán", "fas fa-clock"),
+                                            "Offline ChuaThanhToan" => ("status-pending", "Chưa thanh toán", "fas fa-clock"),
+                                            _ => ("status-pending", item.TrangThai.Replace("Da", "Đã ").Replace("Toan", "toán").Replace("Huy", "hủy").Replace("GiaoHang", "giao hàng"), "fas fa-info-circle")
+                                        };
+                                    }
+                                    <span class="status-badge @badgeClass">
+                                        <i class="@icon me-1"></i>@trangThaiText
+                                    </span>
+                                </td>
+                                <td class="text-center">
+                                    <a class="btn btn-sm btn-outline-info" asp-action="Details" asp-route-id="@item.HoaDonId" title="Xem chi tiết">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+@section Styles {
+    <style>
+        /* ✅ CSS cho trạng thái đẹp hơn */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.3rem 0.7rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .status-badge:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+        
+        .status-pending {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+            border: 2px solid #f59e0b;
+        }
+        
+        .status-shipping {
+            background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+            color: white;
+            border: 2px solid #3b82f6;
+            box-shadow: 0 2px 8px rgba(59, 130, 246, 0.3);
+        }
+        
+        .status-delivered {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            border: 2px solid #10b981;
+            box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+        }
+        
+        .status-cancelled {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            color: white;
+            border: 2px solid #ef4444;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.3);
+        }
+
+        /* Responsive cho mobile */
+        @@media (max-width: 768px) {
+            .card-body {
+                padding: 1rem;
+            }
+            
+            .row.g-2 {
+                margin: 0;
+            }
+            
+            .col-lg-3, .col-lg-2, .col-lg-4, .col-lg-1,
+            .col-md-6, .col-12 {
+                padding: 0.25rem;
+            }
+            
+            .form-label.small {
+                font-size: 0.875rem;
+                margin-bottom: 0.25rem;
+            }
+            
+            .form-control-sm, .form-select-sm {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.875rem;
+            }
+            
+            .input-group-sm .form-control {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.875rem;
+            }
+            
+            .input-group-text {
+                padding: 0.5rem 0.75rem;
+                font-size: 0.875rem;
+            }
+            
+            .btn-sm {
+                padding: 0.5rem 1rem;
+                font-size: 0.875rem;
+            }
+            
+            /* DataTable responsive cho mobile */
+            .table-responsive {
+                font-size: 0.875rem;
+                overflow-x: auto;
+            }
+            
+            .table td, .table th {
+                padding: 0.5rem;
+                white-space: nowrap;
+                min-width: 100px;
+            }
+            
+            /* Ẩn một số cột không quan trọng trên mobile */
+            .table th:nth-child(3),
+            .table td:nth-child(3) {
+                display: none;
+            }
+            
+            /* DataTable controls responsive */
+            .dataTables_wrapper .dataTables_length,
+            .dataTables_wrapper .dataTables_filter {
+                margin-bottom: 0.5rem;
+            }
+            
+            .dataTables_wrapper .dataTables_length select,
+            .dataTables_wrapper .dataTables_filter input {
+                font-size: 0.875rem;
+                padding: 0.25rem 0.5rem;
+            }
+            
+            .dataTables_wrapper .dataTables_info,
+            .dataTables_wrapper .dataTables_paginate {
+                font-size: 0.875rem;
+                margin-top: 0.5rem;
+            }
+            
+            .dataTables_wrapper .dataTables_paginate .paginate_button {
+                padding: 0.25rem 0.5rem;
+                font-size: 0.875rem;
+            }
+        }
+        
+        @@media (max-width: 576px) {
+            .card-body {
+                padding: 0.75rem;
+            }
+            
+            .form-control-sm, .form-select-sm {
+                padding: 0.75rem;
+                font-size: 1rem;
+            }
+            
+            .input-group-sm .form-control {
+                padding: 0.75rem;
+                font-size: 1rem;
+            }
+            
+            .input-group-text {
+                padding: 0.75rem;
+                font-size: 1rem;
+            }
+            
+            .btn-sm {
+                padding: 0.75rem 1.5rem;
+                font-size: 1rem;
+            }
+            
+            /* DataTable responsive cho mobile nhỏ */
+            .table-responsive {
+                font-size: 0.8rem;
+            }
+            
+            .table td, .table th {
+                padding: 0.25rem;
+                min-width: 80px;
+            }
+            
+            /* Ẩn thêm cột trên mobile nhỏ */
+            .table th:nth-child(4),
+            .table td:nth-child(4),
+            .table th:nth-child(5),
+            .table td:nth-child(5) {
+                display: none;
+            }
+            
+            /* DataTable controls cho mobile nhỏ */
+            .dataTables_wrapper .dataTables_length,
+            .dataTables_wrapper .dataTables_filter {
+                text-align: center;
+                margin-bottom: 0.5rem;
+            }
+            
+            .dataTables_wrapper .dataTables_length select,
+            .dataTables_wrapper .dataTables_filter input {
+                width: 100%;
+                max-width: 200px;
+                margin: 0 auto;
+            }
+            
+            .dataTables_wrapper .dataTables_info {
+                text-align: center;
+                margin-bottom: 0.5rem;
+            }
+            
+            .dataTables_wrapper .dataTables_paginate {
+                text-align: center;
+            }
+            
+            .dataTables_wrapper .dataTables_paginate .paginate_button {
+                padding: 0.2rem 0.4rem;
+                font-size: 0.8rem;
+                margin: 0 0.1rem;
+            }
+        }
+    </style>
+}
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.css" />
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.js"></script>
+    
+    <!-- Barcode Scanner Library -->
+
+
+    <script>
+        $(document).ready(function() {
+            // Khởi tạo DataTable. Nó sẽ tự động hiển thị thông báo nếu bảng trống.
+            var table = $('#historyTable').DataTable({
+                language: {
+                    url: '//cdn.datatables.net/plug-ins/2.0.8/i18n/vi.json',
+                    emptyTable: "Không có giao dịch nào trong lịch sử"
+                },
+                order: [[2, 'desc']], // Sắp xếp theo cột Ngày Tạo (index 2) mới nhất
+                columnDefs: [
+                    {
+                        "orderable": false, // Vô hiệu hóa sắp xếp
+                        "targets": [5]      // Cho cột Thao tác (index 5)
+                    }
+                ]
+            });
+
+            // Lọc tùy chỉnh cho khoảng ngày và trạng thái
+            $.fn.dataTable.ext.search.push(
+                function(settings, data, dataIndex) {
+                    // Đảm bảo chỉ áp dụng cho bảng này
+                    if (settings.nTable.id !== 'historyTable') {
+                        return true;
+                    }
+
+                    var startDate = $('#startDate').val();
+                    var endDate = $('#endDate').val();
+                    var statusFilter = $('#statusFilter').val();
+
+                    // Lấy ngày và trạng thái từ thuộc tính data của thẻ <tr>
+                    var rowNode = table.row(dataIndex).node();
+                    var date = $(rowNode).data('date');
+                    var status = $(rowNode).data('status');
+
+                    // Kiểm tra lọc ngày
+                    var dateMatch = (startDate === "" || !startDate || date >= startDate) &&
+                                   (endDate === "" || !endDate || date <= endDate);
+
+                    // Kiểm tra lọc trạng thái
+                    var statusMatch = true;
+                    if (statusFilter) {
+                        statusMatch = status === statusFilter;
+                    }
+
+                    return dateMatch && statusMatch;
+                }
+            );
+
+            // Gắn sự kiện chung cho tất cả các input lọc
+            $('#searchInput, #statusFilter, #startDate, #endDate').on('keyup change', function() {
+                var searchTerm = $('#searchInput').val();
+                
+                // Lọc theo cột tìm kiếm (áp dụng cho tất cả các cột)
+                table.search(searchTerm).draw();
+            });
+
+            // Reset bộ lọc
+            $('#resetFilters').on('click', function() {
+                $('#searchInput').val('');
+                $('#statusFilter').val('');
+                $('#startDate').val('');
+                $('#endDate').val('');
+
+                // Xóa tất cả các bộ lọc và vẽ lại bảng
+                table.search('').columns().search('').draw();
+            });
+            
+            // ✅ Nút sửa dữ liệu hóa đơn
+            $('#fixInvoiceDataBtn').on('click', function() {
+                const btn = $(this);
+                const originalText = btn.html();
+                
+                btn.prop('disabled', true);
+                btn.html('<i class="fas fa-spinner fa-spin me-2"></i>Đang sửa...');
+                
+                $.ajax({
+                    url: 'https://localhost:7289/api/BanHang/fix-invoice-data',
+                    method: 'POST',
+                    success: function(response) {
+                        alert('Đã sửa dữ liệu hóa đơn thành công! Vui lòng tải lại trang.');
+                        location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        alert('Lỗi khi sửa dữ liệu: ' + error);
+                    },
+                    complete: function() {
+                        btn.prop('disabled', false);
+                        btn.html(originalText);
+                    }
+                });
+            });
+            
+
+        });
+    </script>
+}

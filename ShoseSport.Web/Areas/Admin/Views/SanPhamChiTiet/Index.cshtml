@@ -1,0 +1,146 @@
+@model IEnumerable<FurryFriends.API.Models.DTO.SanPhamChiTietDTO>
+@{
+    ViewData["Title"] = "Biến thể sản phẩm";
+    var tenSanPham = ViewBag.TenSanPham ?? "Không xác định";
+}
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css" />
+
+<div class="top-bar" style="padding-left: 50px;">
+    <h1>@ViewData["Title"]: <span class="text-primary">@tenSanPham</span></h1>
+    <div class="top-bar-actions">
+        <a asp-area="Admin" asp-controller="SanPham" asp-action="Index" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i>
+            Quay lại danh sách sản phẩm
+        </a>
+    </div>
+</div>
+
+<nav aria-label="breadcrumb" class="mb-3" style="padding-left: 50px;">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Trang chủ</a></li>
+        <li class="breadcrumb-item"><a asp-area="Admin" asp-action="Index" asp-controller="SanPham">Quản lý sản phẩm</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Quản lý biến thể</li>
+    </ol>
+</nav>
+
+
+<div class="container-fluid" style="padding-left: 50px; padding-right: 50px;">
+    <div class="card shadow-sm mt-3">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <h4 class="mb-0 text-primary"><i class="fas fa-box-open me-2"></i>Danh sách biến thể</h4>
+            <a asp-area="Admin" asp-controller="SanPhamChiTiet" asp-action="Create" asp-route-sanPhamId="@ViewBag.SanPhamId" class="btn btn-primary fw-bold">
+                <i class="fas fa-plus me-2"></i> Thêm biến thể mới
+            </a>
+        </div>
+        <div class="card-body">
+            <table id="spctTable" class="table table-hover table-bordered align-middle w-100" style="width:100%">
+                <thead class="table-light">
+                    <tr>
+                        <th class="text-center" style="width: 60px;">Ảnh</th>
+                        @* <th class="text-center" style="width: 80px;">Mã QR</th> *@
+                        <th>Hương Vị</th>
+                        <th>Kích cỡ</th>
+                        <th class="text-end">Giá</th>
+                        <th class="text-center">Số lượng</th>
+                        <th class="text-center">Hạn sử dụng</th>
+                        <th class="text-center">Trạng thái</th>
+                        <th>Mô tả</th>
+                        <th class="text-center" style="width: 120px;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model)
+                    {
+
+                        <tr>
+                            <td class="text-center">
+                                @if (!string.IsNullOrEmpty(item.DuongDan))
+                                {
+                                    <img src="https://localhost:7289@(item.DuongDan)" style="width:48px;height:48px;object-fit:cover;border-radius:8px;box-shadow:0 2px 6px #0000001a;" alt="Ảnh sản phẩm" />
+                                }
+                                else
+                                {
+                                    <div class="d-flex justify-content-center align-items-center bg-light" style="width:48px;height:48px;border-radius:8px;">
+                                        <i class="fas fa-image text-muted"></i>
+                                    </div>
+                                }
+                            </td>
+                            <td class="text-center">
+                                <canvas class="qr-code-canvas" data-value="@item.SanPhamChiTietId"></canvas>
+                            </td>
+                            <td>
+                                @{
+                                    var danhSachMauSac = ViewBag.DanhSachMauSac as IEnumerable<FurryFriends.API.Models.DTO.MauSacDTO>;
+                                    var ms = danhSachMauSac?.FirstOrDefault(x => x.MauSacId == item.MauSacId);
+                                    if (ms != null && !ms.TrangThai)
+                                    {
+                                        <span class="badge bg-light text-decoration-line-through border px-2 py-1">@item.TenMau</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-light text-dark border px-2 py-1">@item.TenMau</span>
+                                    }
+                                }
+                            </td>
+                            <td>
+                                @{
+                                    var danhSachKichCo = ViewBag.DanhSachKichCo as IEnumerable<FurryFriends.API.Models.DTO.KichCoDTO>;
+                                    var kc = danhSachKichCo?.FirstOrDefault(x => x.KichCoId == item.KichCoId);
+                                    if (kc != null && !kc.TrangThai)
+                                    {
+                                        <span class="badge bg-light text-decoration-line-through border px-2 py-1">@item.TenKichCo</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge bg-light text-dark border px-2 py-1">@item.TenKichCo</span>
+                                    }
+                                }
+                            </td>
+                            <td class="text-end fw-semibold text-danger">@item.Gia.ToString("N0") đ</td>
+                            <td class="text-center">@item.SoLuong</td>
+                            <td class="text-center">@(item.HanSuDung?.ToString("dd/MM/yyyy") ?? "Không có")</td>
+                            <td class="text-center">
+                                @if (item.TrangThai == 1)
+                                {
+                                    <span class="badge bg-success-subtle text-success-emphasis border border-success-subtle">Đang bán</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary-subtle text-secondary-emphasis border border-secondary-subtle">Ngưng bán</span>
+                                }
+                            </td>
+                            <td>@item.MoTa</td>
+                            <td class="text-center">
+                                <div class="btn-group">
+                                    <a asp-area="Admin" asp-controller="SanPhamChiTiet" asp-action="Edit" asp-route-id="@item.SanPhamChiTietId" class="btn btn-sm btn-outline-primary" title="Sửa">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form asp-area="Admin" asp-controller="SanPhamChiTiet" asp-action="DoiTrangThai" method="post" class="d-inline">
+                                        <input type="hidden" name="id" value="@item.SanPhamChiTietId" />
+                                        <input type="hidden" name="sanPhamId" value="@ViewBag.SanPhamId" />
+                                        <button type="submit" class="btn btn-sm @(item.TrangThai == 1 ? "btn-outline-secondary" : "btn-outline-success")"
+                                                title="@(item.TrangThai == 1 ? "Ngưng bán" : "Mở bán lại")">
+                                            <i class="fas @(item.TrangThai == 1 ? "fa-toggle-off" : "fa-toggle-on")"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.8/css/dataTables.bootstrap5.css" />
+    <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.js"></script>
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.bootstrap5.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
+   
+    </script>
+}

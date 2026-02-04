@@ -1,0 +1,367 @@
+﻿using FurryFriends.API.Models.DTO;
+using FurryFriends.Web.Services.IService;
+using FurryFriends.Web.ViewModels;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering; // Thêm using này
+using FurryFriends.Web.Filter;
+
+namespace FurryFriends.Web.Areas.Admin.Controllers 
+{ 
+
+[Area("Admin")]
+[AuthorizeAdminOnly]
+
+    public class SanPhamChiTietController : Controller
+    {
+        private readonly ISanPhamChiTietService _chiTietService;
+        private readonly IAnhService _anhService;
+        private readonly ISanPhamService _sanPhamService;
+        private readonly IKichCoService _kichCoService; // Thêm
+        private readonly IMauSacService _mauSacService; // Thêm
+        private readonly IThongBaoService _thongBaoService; // Thêm
+
+        public SanPhamChiTietController(
+            ISanPhamChiTietService chiTietService, 
+            IAnhService anhService,
+            ISanPhamService sanPhamService,
+            IKichCoService kichCoService, // Thêm
+            IMauSacService mauSacService, // Thêm
+            IThongBaoService thongBaoService)
+        {
+            _chiTietService = chiTietService;
+            _anhService = anhService;
+            _sanPhamService = sanPhamService;
+            _kichCoService = kichCoService; // Thêm
+            _mauSacService = mauSacService; // Thêm
+            _thongBaoService = thongBaoService;
+        }
+
+        // ------------ GET: Tạo chi tiết sản phẩm cho sản phẩm đã có ------------
+        [HttpGet]
+        public async Task<IActionResult> Create(Guid sanPhamId)
+        {
+            var allKichCo = await _kichCoService.GetAllAsync();
+            var kichCoList = new List<SelectListItem>();
+            foreach (var kc in allKichCo)
+            {
+                if (kc.TrangThai)
+                {
+                    kichCoList.Add(new SelectListItem { Value = kc.KichCoId.ToString(), Text = kc.TenKichCo });
+                }
+            }
+            ViewBag.KichCoList = kichCoList;
+            var allMauSac = await _mauSacService.GetAllAsync();
+            var mauSacList = new List<SelectListItem>();
+            foreach (var ms in allMauSac)
+            {
+                if (ms.TrangThai)
+                {
+                    mauSacList.Add(new SelectListItem { Value = ms.MauSacId.ToString(), Text = ms.TenMau });
+                }
+            }
+            ViewBag.MauSacList = mauSacList;
+            var anhList = await _anhService.GetAllAsync();
+            ViewBag.AnhList = new SelectList(anhList, "AnhId", "DuongDan");
+            var viewModel = new SanPhamChiTietCreateViewModel
+            {
+                SanPhamChiTietId = null,
+                SanPhamId = sanPhamId
+            };
+            ViewBag.SanPhamId = sanPhamId;
+            return View(viewModel);
+        }
+
+        // ------------ POST: Tạo chi tiết sản phẩm ------------
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create(Guid sanPhamId, SanPhamChiTietCreateViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                ViewBag.SanPhamId = sanPhamId;
+                return View(model);
+            }
+
+            var dto = new SanPhamChiTietDTO
+            {
+                SanPhamId = sanPhamId,
+                MauSacId = model.MauSacId,
+                KichCoId = model.KichCoId,
+                SoLuong = model.SoLuongTon,
+                Gia = model.GiaBan,
+                GiaNhap = model.GiaNhap, // ✅ Thêm mapping cho GiaNhap
+                AnhId = model.AnhId,
+                MoTa = model.MoTa
+            };
+
+            var result = await _chiTietService.CreateAsync(dto);
+            if (result.Data == null)
+            {
+                ModelState.AddModelError("", "Không thể tạo chi tiết sản phẩm.");
+                ViewBag.SanPhamId = sanPhamId;
+                return View(model);
+            }
+            var sanPham = await _sanPhamService.GetByIdAsync(sanPhamId);
+
+            // Tạo thông báo cho việc thêm chi tiết sản phẩm
+            var userName = HttpContext.Session.GetString("HoTen") ?? "Hệ thống";
+            await _thongBaoService.CreateAsync(new ThongBaoDTO
+            {
+                TieuDe = "Thêm biến thể sản phẩm",
+                NoiDung = $"Đã thêm biến thể mới cho sản phẩm '{sanPham?.TenSanPham ?? ""}': " +
+                          $"Màu sắc: '{model.MauSacId}', Kích cỡ: '{model.KichCoId}', " +
+                          $"Giá: {model.GiaBan}, Số lượng: {model.SoLuongTon}, Mô tả: '{model.MoTa}'",
+                Loai = "SanPhamChiTiet",
+                UserName = userName,
+                NgayTao = DateTime.Now,
+                DaDoc = false
+            });
+            return RedirectToAction("Index", new { sanPhamId = sanPhamId });
+        }
+
+        // ------------ POST: Cập nhật chi tiết sản phẩm ------------
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Guid id, SanPhamChiTietCreateViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var kichCoList = await _kichCoService.GetAllAsync();
+                var mauSacList = await _mauSacService.GetAllAsync();
+                var anhList = await _anhService.GetAllAsync();
+                ViewBag.KichCoList = new SelectList(kichCoList, "KichCoId", "TenKichCo", model.KichCoId);
+                ViewBag.MauSacList = new SelectList(mauSacList, "MauSacId", "TenMau", model.MauSacId);
+                ViewBag.AnhList = new SelectList(anhList, "AnhId", "DuongDan", model.AnhId);
+                ViewBag.SanPhamId = model.SanPhamId;
+                return View(model);
+            }
+
+            var dto = new SanPhamChiTietDTO
+            {
+                MauSacId = model.MauSacId,
+                KichCoId = model.KichCoId,
+                SoLuong = model.SoLuongTon,
+                Gia = model.GiaBan,
+                GiaNhap = model.GiaNhap, // ✅ Thêm mapping cho GiaNhap
+                MoTa = model.MoTa,
+                AnhId = model.AnhId,
+                TrangThai = model.TrangThai
+            };
+
+            var result = await _chiTietService.UpdateAsync(id, dto);
+            if (!result.Data)
+            {
+                ModelState.AddModelError("", "Không thể cập nhật chi tiết sản phẩm.");
+                var kichCoList = await _kichCoService.GetAllAsync();
+                var mauSacList = await _mauSacService.GetAllAsync();
+                var anhList = await _anhService.GetAllAsync();
+                ViewBag.KichCoList = new SelectList(kichCoList, "KichCoId", "TenKichCo", model.KichCoId);
+                ViewBag.MauSacList = new SelectList(mauSacList, "MauSacId", "TenMau", model.MauSacId);
+                ViewBag.AnhList = new SelectList(anhList, "AnhId", "DuongDan", model.AnhId);
+                ViewBag.SanPhamId = model.SanPhamId;
+                return View(model);
+            }
+
+            var sanPham = await _sanPhamService.GetByIdAsync(model.SanPhamId);
+            var oldChiTiet = await _chiTietService.GetByIdAsync(id);
+            var changes = new List<string>();
+            if (oldChiTiet.MauSacId != model.MauSacId)
+                changes.Add($"Màu sắc: '{oldChiTiet.MauSacId}' → '{model.MauSacId}'");
+            if (oldChiTiet.KichCoId != model.KichCoId)
+                changes.Add($"Kích cỡ: '{oldChiTiet.KichCoId}' → '{model.KichCoId}'");
+            if (oldChiTiet.Gia != model.GiaBan)
+                changes.Add($"Giá: {oldChiTiet.Gia} → {model.GiaBan}");
+            if (oldChiTiet.SoLuong != model.SoLuongTon)
+                changes.Add($"Số lượng: {oldChiTiet.SoLuong} → {model.SoLuongTon}");
+            if (oldChiTiet.MoTa != model.MoTa)
+                changes.Add($"Mô tả: '{oldChiTiet.MoTa}' → '{model.MoTa}'");
+            if (oldChiTiet.TrangThai != model.TrangThai)
+                changes.Add($"Trạng thái: {(oldChiTiet.TrangThai == 1 ? "Hoạt động" : "Ngưng")} → {(model.TrangThai == 1 ? "Hoạt động" : "Ngưng")}");
+            if (oldChiTiet.AnhId != model.AnhId)
+                changes.Add($"Ảnh: '{oldChiTiet.AnhId}' → '{model.AnhId}'");
+
+            // Tạo thông báo nếu có thay đổi
+            if (changes.Any())
+            {
+                var userName = HttpContext.Session.GetString("HoTen") ?? "Hệ thống";
+                await _thongBaoService.CreateAsync(new ThongBaoDTO
+                {
+                    TieuDe = "Cập nhật biến thể sản phẩm",
+                    NoiDung = $"Biến thể của sản phẩm '{sanPham?.TenSanPham ?? ""}' đã được chỉnh sửa: {string.Join(", ", changes)}",
+                    Loai = "SanPhamChiTiet",
+                    UserName = userName,
+                    NgayTao = DateTime.Now,
+                    DaDoc = false
+                });
+            }
+            return RedirectToAction("Index", new { sanPhamId = model.SanPhamId });
+        }
+
+        // POST: /SanPhamChiTiet/ToggleStatus/{id}
+        [HttpPost]
+        public async Task<IActionResult> ToggleStatus(Guid id)
+        {
+            try
+            {
+                var sanPhamChiTiet = await _chiTietService.GetByIdAsync(id);
+                if (sanPhamChiTiet == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy sản phẩm chi tiết." });
+                }
+
+                // Toggle trạng thái (chuyển từ int? sang bool)
+                sanPhamChiTiet.TrangThai = sanPhamChiTiet.TrangThai == 1 ? 0 : 1;
+                var updateResult = await _chiTietService.UpdateAsync(id, sanPhamChiTiet);
+                
+                if (updateResult.Data)
+                {
+                    var action = sanPhamChiTiet.TrangThai == 1 ? "kích hoạt" : "vô hiệu hóa";
+                    var message = $"Sản phẩm chi tiết '{sanPhamChiTiet.TenSanPham}' đã được {action} thành công.";
+
+                    // 🔔 Thêm thông báo
+                    var userName = HttpContext.Session.GetString("HoTen") ?? "Hệ thống";
+                    await _thongBaoService.CreateAsync(new ThongBaoDTO
+                    {
+                        TieuDe = sanPhamChiTiet.TrangThai == 1 ? "Kích hoạt sản phẩm chi tiết" : "Vô hiệu hóa sản phẩm chi tiết",
+                        NoiDung = $"Sản phẩm chi tiết '{sanPhamChiTiet.TenSanPham}' đã được {action}",
+                        Loai = "SanPhamChiTiet",
+                        UserName = userName,
+                        NgayTao = DateTime.Now,
+                        DaDoc = false
+                    });
+
+                    return Json(new { 
+                        success = true, 
+                        message = message,
+                        newStatus = sanPhamChiTiet.TrangThai == 1,
+                        statusText = sanPhamChiTiet.TrangThai == 1 ? "Đang hoạt động" : "Không hoạt động",
+                        statusClass = sanPhamChiTiet.TrangThai == 1 ? "bg-success" : "bg-secondary"
+                    });
+                }
+
+                return Json(new { success = false, message = "Cập nhật trạng thái thất bại!" });
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+            }
+        }
+
+        // GET: /SanPhamChiTiet/Delete/{id}
+        public async Task<IActionResult> Delete(Guid id, Guid sanPhamId)
+        {
+            var item = await _chiTietService.GetByIdAsync(id);
+            if (item == null)
+                return NotFound();
+
+            ViewBag.SanPhamId = sanPhamId;
+            return View(item);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> XoaNhanh(Guid id, Guid sanPhamId)
+        {
+            var chiTiet = await _chiTietService.GetByIdAsync(id);
+            if (chiTiet == null)
+            {
+                TempData["Error"] = "Không tìm thấy biến thể để xoá.";
+                return RedirectToAction("Index", new { sanPhamId });
+            }
+            chiTiet.TrangThai = 0; // Ngưng hoạt động
+            await _chiTietService.UpdateAsync(id, chiTiet);
+            TempData["Success"] = "Đã chuyển biến thể sang trạng thái Ngưng hoạt động.";
+            return RedirectToAction("Index", new { sanPhamId });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DoiTrangThai(Guid id, Guid sanPhamId)
+        {
+            var chiTiet = await _chiTietService.GetByIdAsync(id);
+            if (chiTiet == null)
+            {
+                TempData["Error"] = "Không tìm thấy biến thể để đổi trạng thái.";
+                return RedirectToAction("Index", new { sanPhamId });
+            }
+            chiTiet.TrangThai = (chiTiet.TrangThai == 1) ? 0 : 1;
+            await _chiTietService.UpdateAsync(id, chiTiet);
+            TempData["Success"] = "Đã đổi trạng thái biến thể thành công.";
+            return RedirectToAction("Index", new { sanPhamId });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Index(Guid sanPhamId)
+        {
+            var list = await _chiTietService.GetAllAsync();
+            var filtered = list.Where(x => x.SanPhamId == sanPhamId).ToList();
+            ViewBag.SanPhamId = sanPhamId;
+            // Lấy tên sản phẩm cha
+            var sanPham = await _sanPhamService.GetByIdAsync(sanPhamId);
+            ViewBag.TenSanPham = sanPham?.TenSanPham ?? "";
+            // Truyền danh sách kích cỡ, màu sắc cho view
+            ViewBag.DanhSachKichCo = await _kichCoService.GetAllAsync();
+            ViewBag.DanhSachMauSac = await _mauSacService.GetAllAsync();
+            return View(filtered);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(Guid id)
+        {
+            var chiTiet = await _chiTietService.GetByIdAsync(id);
+            if (chiTiet == null) return NotFound();
+            // Map DTO sang ViewModel
+            var viewModel = new SanPhamChiTietCreateViewModel
+            {
+                SanPhamChiTietId = chiTiet.SanPhamChiTietId,
+                SanPhamId = chiTiet.SanPhamId,
+                MauSacId = chiTiet.MauSacId,
+                KichCoId = chiTiet.KichCoId,
+                SoLuongTon = chiTiet.SoLuong,
+                GiaBan = chiTiet.Gia,
+                GiaNhap = chiTiet.GiaNhap, // ✅ Thêm mapping cho GiaNhap
+                MoTa = chiTiet.MoTa,
+                AnhId = chiTiet.AnhId,
+                TrangThai = chiTiet.TrangThai ?? 1,
+                DuongDan = chiTiet.DuongDan
+            };
+            // --- SỬA KÍCH CỠ ---
+            var allKichCo = await _kichCoService.GetAllAsync();
+            var kichCoList = new List<SelectListItem>();
+            foreach (var kc in allKichCo)
+            {
+                if (kc.TrangThai)
+                {
+                    kichCoList.Add(new SelectListItem { Value = kc.KichCoId.ToString(), Text = kc.TenKichCo });
+                }
+                else if (kc.KichCoId == viewModel.KichCoId)
+                {
+                    kichCoList.Add(new SelectListItem { Value = kc.KichCoId.ToString(), Text = kc.TenKichCo + " (Ngưng hoạt động)" });
+                }
+            }
+            ViewBag.KichCoList = kichCoList;
+            ViewBag.DanhSachKichCo = allKichCo.ToList();
+            // --- END SỬA KÍCH CỠ ---
+            // --- SỬA MÀU SẮC ---
+            var allMauSac = await _mauSacService.GetAllAsync();
+            var mauSacList = new List<SelectListItem>();
+            foreach (var ms in allMauSac)
+            {
+                if (ms.TrangThai)
+                {
+                    mauSacList.Add(new SelectListItem { Value = ms.MauSacId.ToString(), Text = ms.TenMau });
+                }
+                else if (ms.MauSacId == viewModel.MauSacId)
+                {
+                    mauSacList.Add(new SelectListItem { Value = ms.MauSacId.ToString(), Text = ms.TenMau + " (Ngưng hoạt động)" });
+                }
+            }
+            ViewBag.MauSacList = mauSacList;
+            ViewBag.DanhSachMauSac = allMauSac.ToList();
+            // --- END SỬA MÀU SẮC ---
+            var anhList = await _anhService.GetAllAsync();
+            ViewBag.AnhList = new SelectList(anhList, "AnhId", "DuongDan", viewModel.AnhId);
+            ViewBag.SanPhamId = chiTiet.SanPhamId;
+            return View(viewModel);
+        }
+
+    }
+}

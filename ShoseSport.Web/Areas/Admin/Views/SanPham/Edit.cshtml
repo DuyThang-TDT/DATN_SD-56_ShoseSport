@@ -1,0 +1,434 @@
+﻿@model FurryFriends.Web.ViewModels.SanPhamFullCreateViewModel
+@using Newtonsoft.Json;
+
+@{
+    ViewData["Title"] = "Chỉnh sửa sản phẩm";
+    // Chuyển đổi dữ liệu sang JSON để JavaScript sử dụng một cách an toàn
+    var kichCoJson = JsonConvert.SerializeObject((ViewBag.KichCoList as SelectList) ?? new SelectList(Enumerable.Empty<SelectListItem>()));
+    var mauSacJson = JsonConvert.SerializeObject((ViewBag.MauSacList as SelectList) ?? new SelectList(Enumerable.Empty<SelectListItem>()));
+    var chiTietListJson = JsonConvert.SerializeObject(Model.ChiTietList);
+}
+
+<style>
+    .profit-tooltip {
+        position: absolute !important;
+        background: white !important;
+        border: 2px solid #007bff !important;
+        border-radius: 0.5rem !important;
+        padding: 0.75rem !important;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+        z-index: 99999 !important;
+        min-width: 150px !important;
+        max-width: 200px !important;
+        pointer-events: none !important;
+        font-size: 0.875rem !important;
+    }
+</style>
+
+<div class="top-bar" style="padding-left: 50px;">
+    <h1>@ViewData["Title"]</h1>
+    <div class="top-bar-actions">
+        <a asp-area="Admin" asp-action="Index" asp-controller="SanPham" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Quay lại</a>
+    </div>
+</div>
+
+<nav aria-label="breadcrumb" class="mb-3" style="padding-left: 50px;">
+    <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Trang chủ</a></li>
+        <li class="breadcrumb-item"><a asp-area="Admin" asp-action="Index" asp-controller="SanPham">Quản lý sản phẩm</a></li>
+        <li class="breadcrumb-item active">Chỉnh sửa</li>
+    </ol>
+</nav>
+
+<div class="container-fluid" style="padding-left: 50px; padding-right: 50px;">
+    <form asp-controller="SanPham" asp-action="Edit" method="post" data-enable-notifications="true">
+        @Html.AntiForgeryToken()
+        <input type="hidden" asp-for="SanPham.SanPhamId" />
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger" role="alert" style="display: @(ViewData.ModelState.IsValid ? "none" : "block")"></div>
+        
+        <!-- Hiển thị thông báo lỗi từ ModelState -->
+        @if (!ViewData.ModelState.IsValid)
+        {
+            <div class="alert alert-danger" role="alert">
+                <ul class="mb-0">
+                    @foreach (var modelState in ViewData.ModelState.Values)
+                    {
+                        foreach (var error in modelState.Errors)
+                        {
+                            <li>@error.ErrorMessage</li>
+                        }
+                    }
+                </ul>
+            </div>
+        }
+
+        <!-- Thông tin sản phẩm cơ bản (Giữ nguyên cấu trúc của bạn, chỉ thêm các class cho checkbox) -->
+        <div class="card shadow mb-4">
+            <div class="card-header"><h5 class="card-title mb-0"><i class="fas fa-box me-2"></i>Thông tin sản phẩm</h5></div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-lg-6 mb-3"><label asp-for="SanPham.TenSanPham" class="form-label"><i class="fas fa-tag me-2"></i>Tên sản phẩm <span class="text-danger">*</span></label><input asp-for="SanPham.TenSanPham" class="form-control" /><span asp-validation-for="SanPham.TenSanPham" class="text-danger small"></span></div>
+                    <div class="col-lg-6 mb-3"><label asp-for="SanPham.LoaiSanPham" class="form-label"><i class="fas fa-list me-2"></i>Loại sản phẩm <span class="text-danger">*</span></label><select asp-for="SanPham.LoaiSanPham" class="form-select" onchange="toggleProperties()"><option value="">-- Chọn loại --</option><option value="DoAn">🍽️ Đồ Ăn</option><option value="DoDung">🛠️ Đồ Dùng</option></select><span asp-validation-for="SanPham.LoaiSanPham" class="text-danger small"></span></div>
+                    <div class="col-lg-6 mb-3"><label asp-for="SanPham.ThuongHieuId" class="form-label"><i class="fas fa-crown me-2"></i>Thương hiệu <span class="text-danger">*</span></label><select asp-for="SanPham.ThuongHieuId" class="form-select" asp-items="ViewBag.ThuongHieuList"><option value="">-- Chọn thương hiệu --</option></select><span asp-validation-for="SanPham.ThuongHieuId" class="text-danger small"></span></div>
+                    <div class="col-lg-3 mb-3 d-flex align-items-center"><div class="form-check form-switch mt-3"><input asp-for="SanPham.TrangThai" class="form-check-input" type="checkbox" /><label class="form-check-label fw-semibold" asp-for="SanPham.TrangThai"><i class="fas fa-toggle-on me-2"></i>Đang hoạt động</label></div></div>
+                    <div class="col-lg-3 mb-3">
+                        <label asp-for="SanPham.HanSuDung" class="form-label"><i class="fas fa-calendar-alt me-2"></i>Hạn sử dụng</label>
+                        <input type="datetime-local" asp-for="SanPham.HanSuDung" class="form-control" value="@(Model.SanPham.HanSuDung?.ToString("yyyy-MM-ddTHH:mm") ?? "")" />
+                        <span asp-validation-for="SanPham.HanSuDung" class="text-danger small"></span>
+                    </div>
+                </div>
+
+                <div id="thanhPhanSection" class="mt-4">
+                    <div class="card border-0 bg-light p-3">
+                        <h6 class="mb-3 fw-semibold"><i class="fas fa-leaf text-success me-2"></i>Thành phần</h6><div class="row g-3" style="max-height: 200px; overflow-y: auto;">
+                            @foreach (var thanhPhan in ViewBag.ThanhPhanList as List<SelectListItem> ?? new List<SelectListItem>())
+                            {
+                                var isSelected = Model.SanPham.ThanhPhanIds?.Contains(Guid.Parse(thanhPhan.Value)) ?? false;
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input check-thanhphan" type="checkbox" name="SanPham.ThanhPhanIds" value="@thanhPhan.Value" id="thanhPhan_@thanhPhan.Value" @(isSelected ? "checked" : "") />
+                                        <label class="form-check-label" for="thanhPhan_@thanhPhan.Value">@thanhPhan.Text</label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <div id="chatLieuSection" class="mt-4">
+                    <div class="card border-0 bg-light p-3">
+                        <h6 class="mb-3 fw-semibold"><i class="fas fa-cube text-warning me-2"></i>Chất liệu</h6><div class="row g-3" style="max-height: 200px; overflow-y: auto;">
+                            @foreach (var chatLieu in ViewBag.ChatLieuList as List<SelectListItem> ?? new List<SelectListItem>())
+                            {
+                                var isSelected = Model.SanPham.ChatLieuIds?.Contains(Guid.Parse(chatLieu.Value)) ?? false;
+                                <div class="col-md-6 col-lg-4">
+                                    <div class="form-check">
+                                        <input class="form-check-input check-chatlieu" type="checkbox" name="SanPham.ChatLieuIds" value="@chatLieu.Value" id="chatLieu_@chatLieu.Value" @(isSelected ? "checked" : "") />
+                                        <label class="form-check-label" for="chatLieu_@chatLieu.Value">@chatLieu.Text</label>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Biến thể sản phẩm -->
+        <div class="card shadow mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title mb-0"><i class="fas fa-layer-group me-2"></i>Biến thể sản phẩm</h5>
+                <button type="button" class="btn btn-success btn-sm" id="addVariantBtn"><i class="fas fa-plus me-2"></i>Thêm biến thể</button>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light"><tr><th>Kích cỡ <span class="text-danger">*</span></th><th>hương vị <span class="text-danger">*</span></th><th>Giá bán <span class="text-danger">*</span></th><th>Giá nhập</th><th>Số lượng <span class="text-danger">*</span></th><th>Mô tả</th><th>Ảnh</th><th></th></tr></thead>
+                        <tbody id="chiTietBody"></tbody>
+                    </table>
+                </div>
+                <div id="variantError" class="text-danger small mt-2"></div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex justify-content-end gap-2">
+            <a asp-area="Admin" asp-action="Index" asp-controller="SanPham" class="btn btn-secondary"><i class="fas fa-times me-2"></i>Hủy</a>
+            <button type="submit" class="btn btn-primary"><i class="fas fa-save me-2"></i>Lưu thay đổi</button>
+        </div>
+    </form>
+</div>
+
+<!-- Modal chọn ảnh -->
+<div class="modal fade" id="anhModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Chọn ảnh</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row" id="anhList">
+                    @foreach (var anh in (IEnumerable<FurryFriends.API.Models.DTO.AnhDTO>)ViewBag.AnhList)
+                    {
+                        <div class="col-3">
+                            <div class="card border-0 shadow-sm h-100">
+                                <img src="https://localhost:7289@(anh.DuongDan)" class="card-img-top" style="cursor:pointer;height:120px;object-fit:cover;"
+                                     data-anh-id="@anh.AnhId" data-duongdan="@anh.DuongDan" onclick="selectAnh(this)" />
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const chiTietBody = document.getElementById('chiTietBody');
+            const form = document.querySelector('form');
+            let currentAnhBtn = null;
+
+            const kichCoOptionsData = @Html.Raw(kichCoJson);
+            const mauSacOptionsData = @Html.Raw(mauSacJson);
+            const existingChiTietData = @Html.Raw(chiTietListJson);
+
+            function generateOptions(data, placeholder, selectedValue = '') {
+                let optionsHtml = `<option value="">-- ${placeholder} --</option>`;
+                data.forEach(item => {
+                    const isSelected = item.Value === selectedValue.toString() ? 'selected' : '';
+                    optionsHtml += `<option value="${item.Value}" ${isSelected}>${item.Text}</option>`;
+                });
+                return optionsHtml;
+            }
+
+            function addChiTietRow(chiTietData = null) {
+                const currentIndex = chiTietBody.rows.length;
+                const newRow = chiTietBody.insertRow();
+
+                // Dùng dữ liệu có sẵn (khi edit) hoặc giá trị mặc định (khi thêm mới)
+                const sanPhamChiTietId = chiTietData?.SanPhamChiTietId || '';
+                const kichCoId = chiTietData?.KichCoId || '';
+                const mauSacId = chiTietData?.MauSacId || '';
+                const giaBan = chiTietData?.GiaBan || 0;
+                const giaNhap = chiTietData?.GiaNhap || 0;
+                const soLuong = chiTietData?.SoLuongTon || 0;
+                const moTa = chiTietData?.MoTa || '';
+                const anhId = chiTietData?.AnhId || '';
+                const duongDan = chiTietData?.DuongDan || '';
+
+                const kichCoOptions = generateOptions(kichCoOptionsData, 'Chọn kích cỡ', kichCoId);
+                const mauSacOptions = generateOptions(mauSacOptionsData, 'Chọn hương vị', mauSacId);
+                const anhPreview = duongDan ? `<img src="https://localhost:7289${duongDan}" style="max-width:60px;max-height:60px;object-fit:cover;" class="rounded shadow-sm" />` : '';
+
+                newRow.innerHTML = `
+                    <input type="hidden" name="ChiTietList[${currentIndex}].SanPhamChiTietId" value="${sanPhamChiTietId}" />
+                    <td><select name="ChiTietList[${currentIndex}].KichCoId" class="form-select form-select-sm" data-val="true" data-val-required="Vui lòng chọn kích cỡ.">${kichCoOptions}</select><span class="text-danger small" data-valmsg-for="ChiTietList[${currentIndex}].KichCoId"></span></td>
+                    <td><select name="ChiTietList[${currentIndex}].MauSacId" class="form-select form-select-sm" data-val="true" data-val-required="Vui lòng chọn màu sắc.">${mauSacOptions}</select><span class="text-danger small" data-valmsg-for="ChiTietList[${currentIndex}].MauSacId"></span></td>
+                    <td><div class="input-group input-group-sm"><input name="ChiTietList[${currentIndex}].GiaBan" type="number" class="form-control price-input" value="${giaBan}" min="0" data-val="true" data-val-required="Giá bán là bắt buộc." data-val-range="Giá bán phải lớn hơn hoặc bằng 0." data-val-range-min="0" oninput="calculateProfitForRow(this)" /><span class="input-group-text">VNĐ</span></div><span class="text-danger small" data-valmsg-for="ChiTietList[${currentIndex}].GiaBan"></span></td>
+                    <td><div class="input-group input-group-sm"><input name="ChiTietList[${currentIndex}].GiaNhap" type="number" class="form-control price-input" value="${giaNhap}" min="0" data-val="true" data-val-range="Giá nhập phải lớn hơn hoặc bằng 0." data-val-range-min="0" oninput="calculateProfitForRow(this)" /><span class="input-group-text">VNĐ</span></div><span class="text-danger small" data-valmsg-for="ChiTietList[${currentIndex}].GiaNhap"></span></td>
+                    <td><input name="ChiTietList[${currentIndex}].SoLuongTon" type="number" class="form-control form-control-sm" value="${soLuong}" min="0" data-val="true" data-val-required="Số lượng là bắt buộc." data-val-range="Số lượng phải lớn hơn hoặc bằng 0." data-val-range-min="0" /><span class="text-danger small" data-valmsg-for="ChiTietList[${currentIndex}].SoLuongTon"></span></td>
+                    <td><input name="ChiTietList[${currentIndex}].MoTa" class="form-control form-control-sm" value="${moTa}" /></td>
+                    <td>
+                        <button type="button" class="btn btn-outline-primary btn-sm" onclick="openAnhModal(this)"><i class="fas fa-image"></i></button>
+                        <input type="hidden" name="ChiTietList[${currentIndex}].AnhId" value="${anhId}" />
+                        <div class="anh-preview mt-1">${anhPreview}</div>
+                    </td>
+                    <td><button type="button" class="btn btn-danger btn-sm" onclick="removeRow(this)" title="Xóa biến thể"><i class="fas fa-trash"></i></button></td>
+                `;
+
+                // KÍCH HOẠT LẠI VALIDATION CHO FORM
+                $(form).removeData("validator").removeData("unobtrusiveValidation");
+                $.validator.unobtrusive.parse(form);
+            }
+
+            function updateRowIndexes() {
+                const rows = chiTietBody.querySelectorAll('tr');
+                rows.forEach((row, newIndex) => {
+                    row.querySelectorAll('input, select, span').forEach(element => {
+                        const oldName = element.getAttribute('name');
+                        if (oldName) {
+                            element.setAttribute('name', oldName.replace(/\[\d+\]/, `[${newIndex}]`));
+                        }
+                        const oldFor = element.getAttribute('data-valmsg-for');
+                        if (oldFor) {
+                            element.setAttribute('data-valmsg-for', oldFor.replace(/\[\d+\]/, `[${newIndex}]`));
+                        }
+                    });
+                });
+            }
+
+            window.removeRow = function(btn) {
+                Swal.fire({
+                    title: 'Xác nhận xóa',
+                    text: 'Bạn có chắc chắn muốn xóa biến thể này?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Xóa',
+                    cancelButtonText: 'Hủy'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        btn.closest('tr').remove();
+                        updateRowIndexes();
+                    }
+                });
+            }
+            
+            window.openAnhModal = function(btn) {
+                currentAnhBtn = btn;
+                new bootstrap.Modal(document.getElementById('anhModal')).show();
+            }
+
+            window.selectAnh = function(img) {
+                const anhId = img.dataset.anhId;
+                const duongDan = img.dataset.duongdan;
+                const row = currentAnhBtn.closest('tr');
+                row.querySelector('input[name*="AnhId"]').value = anhId;
+                const preview = row.querySelector('.anh-preview');
+                preview.innerHTML = `<img src="https://localhost:7289${duongDan}" style="max-width:60px;max-height:60px;object-fit:cover;" class="rounded shadow-sm" />`;
+                bootstrap.Modal.getInstance(document.getElementById('anhModal')).hide();
+            }
+
+            window.toggleProperties = function () {
+                const loaiSanPham = document.querySelector('select[name="SanPham.LoaiSanPham"]').value;
+                document.getElementById('thanhPhanSection').style.display = (loaiSanPham === 'DoAn') ? 'block' : 'none';
+                document.getElementById('chatLieuSection').style.display = (loaiSanPham === 'DoDung') ? 'block' : 'none';
+            }
+
+                         // HÀM TÍNH TOÁN LỢI NHUẬN CHO TỪNG HÀNG
+             window.calculateProfitForRow = function(input) {
+                 const row = input.closest('tr');
+                 const giaBanInput = row.querySelector('input[name*="GiaBan"]');
+                 const giaNhapInput = row.querySelector('input[name*="GiaNhap"]');
+
+                 const giaBan = parseFloat(giaBanInput.value) || 0;
+                 const giaNhap = parseFloat(giaNhapInput.value) || 0;
+
+                 // Xóa tooltip cũ nếu có
+                 const existingTooltip = document.querySelector('.profit-tooltip');
+                 if (existingTooltip) {
+                     existingTooltip.remove();
+                 }
+
+                 // Chỉ hiển thị tooltip khi có giá trị
+                 if (giaBan > 0 && giaNhap > 0) {
+                     const loiNhuan = giaBan - giaNhap;
+                     const loiNhuanPhanTram = (loiNhuan / giaNhap) * 100;
+                     
+                     const profitClass = loiNhuan >= 0 ? 'text-success' : 'text-danger';
+                     const sign = loiNhuan >= 0 ? '+' : '';
+                     
+                     const tooltip = document.createElement('div');
+                     tooltip.className = 'profit-tooltip';
+                     tooltip.innerHTML = `
+                         <div class="text-dark fw-bold" style="font-size: 0.875rem;">
+                             Lợi nhuận: ${sign}${loiNhuan.toLocaleString('vi-VN')} đ
+                         </div>
+                         <small class="${profitClass}">
+                             ${sign}${loiNhuanPhanTram.toFixed(1)}% / 1 sản phẩm
+                         </small>
+                     `;
+                     
+                     // Tính toán vị trí chính xác
+                     const rect = giaBanInput.getBoundingClientRect();
+                     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                     const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+                     
+                     tooltip.style.cssText = `
+                         position: absolute;
+                         top: ${rect.bottom + scrollTop + 5}px;
+                         left: ${rect.left + scrollLeft}px;
+                         background: white;
+                         border: 2px solid #007bff;
+                         border-radius: 0.5rem;
+                         padding: 0.75rem;
+                         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                         z-index: 99999;
+                         min-width: 150px;
+                         pointer-events: none;
+                         font-size: 0.875rem;
+                         max-width: 200px;
+                     `;
+                     
+                     document.body.appendChild(tooltip);
+                 } else if (giaBan > 0) {
+                     const tooltip = document.createElement('div');
+                     tooltip.className = 'profit-tooltip';
+                     tooltip.innerHTML = `
+                         <div class="text-warning fw-bold" style="font-size: 0.875rem;">
+                             Chưa có giá nhập
+                         </div>
+                         <small class="text-muted">
+                             Nhập giá nhập để tính lợi nhuận / 1 sản phẩm
+                         </small>
+                     `;
+                     
+                     // Tính toán vị trí chính xác
+                     const rect = giaBanInput.getBoundingClientRect();
+                     const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                     const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
+                     
+                     tooltip.style.cssText = `
+                         position: absolute;
+                         top: ${rect.bottom + scrollTop + 5}px;
+                         left: ${rect.left + scrollLeft}px;
+                         background: white;
+                         border: 2px solid #ffc107;
+                         border-radius: 0.5rem;
+                         padding: 0.75rem;
+                         box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                         z-index: 99999;
+                         min-width: 150px;
+                         pointer-events: none;
+                         font-size: 0.875rem;
+                         max-width: 200px;
+                     `;
+                     
+                     document.body.appendChild(tooltip);
+                 }
+             };
+
+            // HÀM ĐỂ LOAD CÁC BIẾN THỂ ĐÃ CÓ
+            function loadExistingVariants() {
+                if (existingChiTietData && existingChiTietData.length > 0) {
+                    existingChiTietData.forEach(variant => {
+                        addChiTietRow(variant);
+                    });
+                }
+            }
+
+                         // CÁC THIẾT LẬP BAN ĐẦU
+             document.getElementById('addVariantBtn').addEventListener('click', () => addChiTietRow(null));
+
+             form.addEventListener('submit', (e) => {
+                 const variantErrorDiv = document.getElementById('variantError');
+                 if (chiTietBody.rows.length === 0) {
+                     variantErrorDiv.textContent = "Phải có ít nhất một biến thể.";
+                     e.preventDefault();
+                     Swal.fire({
+                         icon: 'error',
+                         title: 'Lỗi',
+                         text: 'Vui lòng thêm ít nhất một biến thể sản phẩm.'
+                     });
+                 } else {
+                     variantErrorDiv.textContent = "";
+                 }
+             });
+
+             // Ẩn tooltip khi scroll hoặc click ra ngoài
+             document.addEventListener('scroll', function() {
+                 const tooltip = document.querySelector('.profit-tooltip');
+                 if (tooltip) {
+                     tooltip.remove();
+                 }
+             });
+
+             document.addEventListener('click', function(e) {
+                 if (!e.target.closest('.price-input')) {
+                     const tooltip = document.querySelector('.profit-tooltip');
+                     if (tooltip) {
+                         tooltip.remove();
+                     }
+                 }
+             });
+
+             // Khởi tạo trạng thái và dữ liệu ban đầu
+             toggleProperties();
+             loadExistingVariants();
+
+             // Tính toán lợi nhuận ban đầu cho các biến thể đã có
+             setTimeout(() => {
+                 const priceInputs = document.querySelectorAll('.price-input');
+                 priceInputs.forEach(input => {
+                     calculateProfitForRow(input);
+                 });
+             }, 100);
+        });
+    </script>
+}
