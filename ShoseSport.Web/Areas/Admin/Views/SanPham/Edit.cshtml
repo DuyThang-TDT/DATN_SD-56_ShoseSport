@@ -68,7 +68,9 @@
             <div class="card-body">
                 <div class="row g-3">
                     <div class="col-lg-6 mb-3"><label asp-for="SanPham.TenSanPham" class="form-label"><i class="fas fa-tag me-2"></i>Tên sản phẩm <span class="text-danger">*</span></label><input asp-for="SanPham.TenSanPham" class="form-control" /><span asp-validation-for="SanPham.TenSanPham" class="text-danger small"></span></div>
-                    <div class="col-lg-6 mb-3"><label asp-for="SanPham.LoaiSanPham" class="form-label"><i class="fas fa-list me-2"></i>Loại sản phẩm <span class="text-danger">*</span></label><select asp-for="SanPham.LoaiSanPham" class="form-select" onchange="toggleProperties()"><option value="">-- Chọn loại --</option><option value="DoAn">🍽️ Đồ Ăn</option><option value="DoDung">🛠️ Đồ Dùng</option></select><span asp-validation-for="SanPham.LoaiSanPham" class="text-danger small"></span></div>
+                    <div class="col-lg-6 mb-3"><label asp-for="SanPham.LoaiSanPham" class="form-label"><i class="fas fa-list me-2"></i>Loại sản phẩm <span class="text-danger">*</span></label><select asp-for="SanPham.LoaiSanPham" class="form-select" onchange="toggleProperties()">                            <option value="">-- Chọn loại --</option>
+                            <option value="GiayTheThao">👟 Giày Thể Thao</option>
+                            <option value="GiayTay">👞 Giày Tây</option></select><span asp-validation-for="SanPham.LoaiSanPham" class="text-danger small"></span></div>
                     <div class="col-lg-6 mb-3"><label asp-for="SanPham.ThuongHieuId" class="form-label"><i class="fas fa-crown me-2"></i>Thương hiệu <span class="text-danger">*</span></label><select asp-for="SanPham.ThuongHieuId" class="form-select" asp-items="ViewBag.ThuongHieuList"><option value="">-- Chọn thương hiệu --</option></select><span asp-validation-for="SanPham.ThuongHieuId" class="text-danger small"></span></div>
                     <div class="col-lg-3 mb-3 d-flex align-items-center"><div class="form-check form-switch mt-3"><input asp-for="SanPham.TrangThai" class="form-check-input" type="checkbox" /><label class="form-check-label fw-semibold" asp-for="SanPham.TrangThai"><i class="fas fa-toggle-on me-2"></i>Đang hoạt động</label></div></div>
                     <div class="col-lg-3 mb-3">
@@ -123,7 +125,7 @@
             <div class="card-body">
                 <div class="table-responsive">
                     <table class="table table-hover">
-                        <thead class="table-light"><tr><th>Kích cỡ <span class="text-danger">*</span></th><th>hương vị <span class="text-danger">*</span></th><th>Giá bán <span class="text-danger">*</span></th><th>Giá nhập</th><th>Số lượng <span class="text-danger">*</span></th><th>Mô tả</th><th>Ảnh</th><th></th></tr></thead>
+                        <thead class="table-light"><tr><th>Kích cỡ <span class="text-danger">*</span></th><th>Màu sắc <span class="text-danger">*</span></th><th>Giá bán <span class="text-danger">*</span></th><th>Giá nhập</th><th>Số lượng <span class="text-danger">*</span></th><th>Mô tả</th><th>Ảnh</th><th></th></tr></thead>
                         <tbody id="chiTietBody"></tbody>
                     </table>
                 </div>
@@ -202,7 +204,7 @@
                 const duongDan = chiTietData?.DuongDan || '';
 
                 const kichCoOptions = generateOptions(kichCoOptionsData, 'Chọn kích cỡ', kichCoId);
-                const mauSacOptions = generateOptions(mauSacOptionsData, 'Chọn hương vị', mauSacId);
+                const mauSacOptions = generateOptions(mauSacOptionsData, 'Chọn màu sắc', mauSacId);
                 const anhPreview = duongDan ? `<img src="https://localhost:7289${duongDan}" style="max-width:60px;max-height:60px;object-fit:cover;" class="rounded shadow-sm" />` : '';
 
                 newRow.innerHTML = `
@@ -277,8 +279,8 @@
 
             window.toggleProperties = function () {
                 const loaiSanPham = document.querySelector('select[name="SanPham.LoaiSanPham"]').value;
-                document.getElementById('thanhPhanSection').style.display = (loaiSanPham === 'DoAn') ? 'block' : 'none';
-                document.getElementById('chatLieuSection').style.display = (loaiSanPham === 'DoDung') ? 'block' : 'none';
+                document.getElementById('thanhPhanSection').style.display = 'none';
+                document.getElementById('chatLieuSection').style.display = (loaiSanPham === 'GiayTheThao' || loaiSanPham === 'GiayTay') ? 'block' : 'none';
             }
 
                          // HÀM TÍNH TOÁN LỢI NHUẬN CHO TỪNG HÀNG

@@ -2,7 +2,7 @@
 
 
 @{
-    ViewData["Title"] = "Quản lý hương vị";
+    ViewData["Title"] = "Quản lý màu sắc";
 }
 
 @if (TempData["success"] != null)
@@ -17,7 +17,7 @@
 <div class="row mb-4 g-3">
     <div class="col-md-4">
         <div class="bg-white shadow rounded p-4 border-start border-primary border-4">
-            <h6 class="text-muted">Tổng số hương vị</h6>
+            <h6 class="text-muted">Tổng số màu sắc</h6>
             <h3 class="fw-bold text-primary">@ViewBag.TotalCount</h3>
         </div>
     </div>
@@ -48,14 +48,14 @@
 <nav aria-label="breadcrumb" class="mb-3" style="padding-left: 50px;">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Trang chủ</a></li>
-        <li class="breadcrumb-item active">Quản lý hương vị</li>
+        <li class="breadcrumb-item active">Quản lý màu sắc</li>
     </ol>
 </nav>
 
 <div class="container-fluid" style="padding-left: 50px; padding-right: 50px;">
     <div class="card shadow">
         <div class="card-header">
-            <h5 class="card-title mb-0">Danh sách hương vị</h5>
+            <h5 class="card-title mb-0">Danh sách màu sắc</h5>
         </div>
         <div class="card-body">
             <div class="table-container table-responsive" id="mauSacTableContainer" style="margin-left: 10px; margin-right: 40px;">
@@ -63,8 +63,8 @@
                     <thead>
                         <tr>
                             <th>STT</th>
-                            <th>Tên hương vị</th>
-                            <th>Mã hương vị</th>
+                            <th>Màu sắc</th>
+                            <th>Mã màu</th>
                             <th>Mô tả</th>
                             <th>Trạng thái</th>
                             <th>Thao tác</th>
@@ -89,7 +89,7 @@
                                     }
                                     else
                                     {
-                                        <span class="text-muted">Chưa có mã hương vị</span>
+                                        <span class="text-muted">Chưa có mã màu</span>
                                     }
                                 </td>
                                 <td>@(string.IsNullOrEmpty(item.MoTa) ? "Không có mô tả" : item.MoTa)</td>

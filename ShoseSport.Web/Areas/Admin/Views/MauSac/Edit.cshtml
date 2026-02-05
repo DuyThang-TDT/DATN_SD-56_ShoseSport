@@ -1,7 +1,7 @@
 @model FurryFriends.API.Models.DTO.MauSacDTO
 
 @{
-    ViewData["Title"] = "Chỉnh sửa hương vị";
+    ViewData["Title"] = "Chỉnh sửa màu sắc";
 }
 
 <div class="top-bar" style="padding-left: 50px;">
@@ -17,7 +17,7 @@
 <nav aria-label="breadcrumb" class="mb-3" style="padding-left: 50px;">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Trang chủ</a></li>
-        <li class="breadcrumb-item"><a asp-area="Admin" asp-action="Index" asp-controller="MauSac">Quản lý hương vị</a></li>
+        <li class="breadcrumb-item"><a asp-area="Admin" asp-action="Index" asp-controller="MauSac">Quản lý màu sắc</a></li>
         <li class="breadcrumb-item active">Chỉnh sửa</li>
     </ol>
 </nav>
@@ -27,7 +27,7 @@
         <div class="col-md-8">
             <div class="card shadow">
                 <div class="card-header">
-                    <h5 class="card-title mb-0">Thông tin hương vị</h5>
+                    <h5 class="card-title mb-0">Thông tin màu sắc</h5>
                 </div>
                 <div class="card-body">
                     <form asp-area="Admin" asp-action="Edit" asp-controller="MauSac" method="post">
@@ -35,13 +35,13 @@
                         <input type="hidden" asp-for="MauSacId" />
 
                         <div class="mb-3">
-                            <label asp-for="TenMau" class="form-label">Tên hương vị <span class="text-danger">*</span></label>
-                            <input asp-for="TenMau" class="form-control" placeholder="Nhập tên hương vị..." />
+                            <label asp-for="TenMau" class="form-label">Tên màu sắc <span class="text-danger">*</span></label>
+                            <input asp-for="TenMau" class="form-control" placeholder="Nhập tên màu sắc..." />
                             <span asp-validation-for="TenMau" class="text-danger"></span>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="MaMau" class="form-label">Mã hương vị</label>
+                            <label asp-for="MaMau" class="form-label">Mã màu sắc</label>
                             <div class="input-group">
                                 <input asp-for="MaMau" class="form-control" type="color" id="colorPicker" placeholder="Chọn mã..." />
                                 <input type="text" class="form-control" id="colorText" placeholder="#000000" readonly />
@@ -52,7 +52,7 @@
 
                         <div class="mb-3">
                             <label asp-for="MoTa" class="form-label">Mô tả</label>
-                            <textarea asp-for="MoTa" class="form-control" rows="3" placeholder="Nhập mô tả hương vị..."></textarea>
+                            <textarea asp-for="MoTa" class="form-control" rows="3" placeholder="Nhập mô tả màu sắc..."></textarea>
                             <span asp-validation-for="MoTa" class="text-danger"></span>
                         </div>
 

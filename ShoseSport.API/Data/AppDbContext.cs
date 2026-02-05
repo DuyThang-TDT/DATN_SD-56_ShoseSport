@@ -174,6 +174,7 @@ namespace FurryFriends.API.Data
 		   .WithMany(hdct => hdct.PhieuHoanTras)
 		   .HasForeignKey(p => p.HoaDonChiTietId);
 		}
+
 		private void ConfigureTaiKhoan(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<NhanVien>()

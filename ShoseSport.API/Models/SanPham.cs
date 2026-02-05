@@ -25,6 +25,7 @@ namespace FurryFriends.API.Models
         public bool TrangThai { get; set; }
 
         public DateTime? HanSuDung { get; set; }
+        public string? Loai { get; set; }
 
         [ForeignKey("ThuongHieuId")]
         public virtual ThuongHieu? ThuongHieu { get; set; }

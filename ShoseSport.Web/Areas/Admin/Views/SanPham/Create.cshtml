@@ -80,8 +80,8 @@
                         <label asp-for="SanPham.LoaiSanPham" class="form-label"><i class="fas fa-list me-2"></i>Loại sản phẩm <span class="text-danger">*</span></label>
                         <select asp-for="SanPham.LoaiSanPham" class="form-select" onchange="toggleProperties()">
                             <option value="">-- Chọn loại --</option>
-                            <option value="DoAn">🍽️ Đồ Ăn</option>
-                            <option value="DoDung">🛠️ Đồ Dùng</option>
+                            <option value="GiayTheThao">👟 Giày Thể Thao</option>
+                            <option value="GiayTay">👞 Giày Tây</option>
                         </select>
                         <span asp-validation-for="SanPham.LoaiSanPham" class="text-danger small"></span>
                     </div>
@@ -161,7 +161,7 @@
                         <thead class="table-light">
                             <tr>
                                 <th>Kích cỡ <span class="text-danger">*</span></th>
-                                <th>hương vị <span class="text-danger">*</span></th>
+                                <th>Màu sắc <span class="text-danger">*</span></th>
                                 <th>Giá bán <span class="text-danger">*</span></th>
                                 <th>Giá nhập</th>
                                 <th>Số lượng <span class="text-danger">*</span></th>
@@ -266,7 +266,7 @@
             }
 
             const kichCoOptionsHtml = generateOptions(kichCoOptionsData, 'Chọn kích cỡ');
-            const mauSacOptionsHtml = generateOptions(mauSacOptionsData, 'Chọn Hương vị');
+            const mauSacOptionsHtml = generateOptions(mauSacOptionsData, 'Chọn Màu sắc');
 
             // 2. HÀM THÊM HÀNG MỚI
             function addChiTietRow() {
@@ -279,7 +279,7 @@
                         <span class="text-danger small" data-valmsg-for="ChiTietList[${currentIndex}].KichCoId"></span>
                     </td>
                     <td>
-                        <select name="ChiTietList[${currentIndex}].MauSacId" class="form-select form-select-sm" data-val="true" data-val-required="Vui lòng chọn hương vị.">${mauSacOptionsHtml}</select>
+                        <select name="ChiTietList[${currentIndex}].MauSacId" class="form-select form-select-sm" data-val="true" data-val-required="Vui lòng chọn màu sắc.">${mauSacOptionsHtml}</select>
                         <span class="text-danger small" data-valmsg-for="ChiTietList[${currentIndex}].MauSacId"></span>
                     </td>
                     <td>
@@ -371,8 +371,8 @@
 
             window.toggleProperties = function () {
                 const loaiSanPham = document.querySelector('select[name="SanPham.LoaiSanPham"]').value;
-                document.getElementById('thanhPhanSection').style.display = (loaiSanPham === 'DoAn') ? 'block' : 'none';
-                document.getElementById('chatLieuSection').style.display = (loaiSanPham === 'DoDung') ? 'block' : 'none';
+                document.getElementById('thanhPhanSection').style.display = 'none'; // Shoes don't use ingredients
+                document.getElementById('chatLieuSection').style.display = (loaiSanPham === 'GiayTheThao' || loaiSanPham === 'GiayTay') ? 'block' : 'none';
             }
 
                          // 5. HÀM TÍNH TOÁN LỢI NHUẬN CHO TỪNG HÀNG

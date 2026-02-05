@@ -57,8 +57,89 @@
                                 <div class="col-md-6 text-end">
                                      <p><strong>Tổng tiền:</strong> <span class="text-danger fw-bold fs-5">@Model.TongTienSauKhiGiam.ToString("N0") VNĐ</span></p>
                                      <p><strong>Thanh toán:</strong> @Model.LoaiHoaDon</p>
+                                     @if (Model.TrangThai == 0 || Model.TrangThai == 1)
+                                     {
+                                         <button type="button" class="btn btn-outline-danger btn-sm mt-2" onclick="confirmCancelOrder()">
+                                             <i class="fas fa-times me-1"></i> Hủy đơn hàng
+                                         </button>
+                                     }
                                 </div>
                             </div>
+
+                            @section Scripts {
+                                <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+                                <script>
+                                    function confirmCancelOrder() {
+                                        Swal.fire({
+                                            title: 'Hủy đơn hàng?',
+                                            text: "Bạn có chắc chắn muốn hủy đơn hàng này không?",
+                                            icon: 'warning',
+                                            showCancelButton: true,
+                                            confirmButtonColor: '#d33',
+                                            cancelButtonColor: '#3085d6',
+                                            confirmButtonText: 'Đồng ý hủy',
+                                            cancelButtonText: 'Không'
+                                        }).then((result) => {
+                                            if (result.isConfirmed) {
+                                                cancelOrder();
+                                            }
+                                        })
+                                    }
+
+                                    async function cancelOrder() {
+                                        const hoaDonId = '@Model.HoaDonId';
+                                        const sdt = '@ViewBag.Sdt';
+
+                                        // Hiển thị loading
+                                        const btn = document.querySelector('button[onclick="confirmCancelOrder()"]');
+                                        const originalText = btn.innerHTML;
+                                        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Đang xử lý...';
+                                        btn.disabled = true;
+
+                                        try {
+                                            const formData = new FormData();
+                                            formData.append('hoaDonId', hoaDonId);
+                                            formData.append('sdt', sdt);
+
+                                            const response = await fetch('/TraCuuDonHang/HuyDonHang', {
+                                                method: 'POST',
+                                                body: formData
+                                            });
+
+                                            const res = await response.json();
+
+                                            if (res.success) {
+                                                Swal.fire(
+                                                    'Đã hủy!',
+                                                    res.message,
+                                                    'success'
+                                                ).then(() => {
+                                                    location.reload();
+                                                });
+                                            } else {
+                                                Swal.fire(
+                                                    'Lỗi!',
+                                                    res.message,
+                                                    'error'
+                                                );
+                                                // Reset button
+                                                btn.innerHTML = originalText;
+                                                btn.disabled = false;
+                                            }
+                                        } catch (error) {
+                                            console.error('Error:', error);
+                                            Swal.fire(
+                                                'Lỗi!',
+                                                'Đã xảy ra lỗi khi kết nối đến máy chủ.',
+                                                'error'
+                                            );
+                                            // Reset button
+                                            btn.innerHTML = originalText;
+                                            btn.disabled = false;
+                                        }
+                                    }
+                                </script>
+                            }
 
                             @if (Model.HoaDonChiTiets != null && Model.HoaDonChiTiets.Any())
                             {
