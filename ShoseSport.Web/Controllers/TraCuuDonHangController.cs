@@ -49,5 +49,46 @@ namespace FurryFriends.Web.Controllers
             ViewBag.Sdt = sdt;
             return View(hoaDon);
         }
+
+        [HttpPost]
+        public async Task<IActionResult> HuyDonHang(Guid hoaDonId, string sdt)
+        {
+            try
+            {
+                if (hoaDonId == Guid.Empty || string.IsNullOrWhiteSpace(sdt))
+                {
+                    return Json(new { success = false, message = "Thông tin không hợp lệ!" });
+                }
+
+                // 1. Kiểm tra đơn hàng có tồn tại và đúng SĐT không
+                var hoaDon = await _hoaDonService.TraCuuDonHangAsync(hoaDonId, sdt);
+                if (hoaDon == null)
+                {
+                    return Json(new { success = false, message = "Không tìm thấy đơn hàng hoặc số điện thoại không khớp!" });
+                }
+
+                // 2. Kiểm tra trạng thái (chỉ được hủy khi Chờ duyệt (0) hoặc Đã duyệt (1))
+                if (hoaDon.TrangThai != 0 && hoaDon.TrangThai != 1)
+                {
+                     return Json(new { success = false, message = "Đơn hàng không thể hủy ở trạng thái hiện tại!" });
+                }
+
+                // 3. Thực hiện hủy
+                var result = await _hoaDonService.HuyDonHangAsync(hoaDonId);
+
+                if (result.Success)
+                {
+                    return Json(new { success = true, message = result.Message });
+                }
+                else
+                {
+                    return Json(new { success = false, message = result.Message });
+                }
+            }
+            catch (Exception ex)
+            {
+                return Json(new { success = false, message = $"Lỗi: {ex.Message}" });
+            }
+        }
     }
 }

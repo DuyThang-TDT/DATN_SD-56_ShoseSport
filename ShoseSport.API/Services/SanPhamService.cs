@@ -45,10 +45,12 @@ namespace FurryFriends.API.Services
                 ThuongHieuId = dto.ThuongHieuId,
                 TrangThai = dto.TrangThai,
                 HanSuDung = dto.HanSuDung,
+                Loai = dto.LoaiSanPham, // Save the specific type
                 SanPhamThanhPhans = new List<SanPhamThanhPhan>(),
                 SanPhamChatLieus = new List<SanPhamChatLieu>()
             };
 
+            // Logic for relations based on type
             if (dto.LoaiSanPham == "DoAn" && dto.ThanhPhanIds != null)
             {
                 foreach (var tpId in dto.ThanhPhanIds)
@@ -56,7 +58,8 @@ namespace FurryFriends.API.Services
                     sanPham.SanPhamThanhPhans.Add(new SanPhamThanhPhan { SanPhamId = sanPham.SanPhamId, ThanhPhanId = tpId });
                 }
             }
-            else if (dto.LoaiSanPham == "DoDung" && dto.ChatLieuIds != null)
+            // Support old "DoDung" AND new shoe types that use materials
+            else if ((dto.LoaiSanPham == "DoDung" || dto.LoaiSanPham == "GiayTheThao" || dto.LoaiSanPham == "GiayTay") && dto.ChatLieuIds != null)
             {
                 foreach (var clId in dto.ChatLieuIds)
                 {
@@ -84,6 +87,7 @@ namespace FurryFriends.API.Services
             existing.ThuongHieuId = dto.ThuongHieuId;
             existing.TrangThai = dto.TrangThai;
             existing.HanSuDung = dto.HanSuDung;
+            existing.Loai = dto.LoaiSanPham; // Update the specific type
 
             // 3. Xóa các quan hệ cũ một cách an toàn
             existing.SanPhamThanhPhans.Clear();
@@ -97,7 +101,7 @@ namespace FurryFriends.API.Services
                     existing.SanPhamThanhPhans.Add(new SanPhamThanhPhan { ThanhPhanId = tpId });
                 }
             }
-            else if (dto.LoaiSanPham == "DoDung" && dto.ChatLieuIds != null)
+            else if ((dto.LoaiSanPham == "DoDung" || dto.LoaiSanPham == "GiayTheThao" || dto.LoaiSanPham == "GiayTay") && dto.ChatLieuIds != null)
             {
                 foreach (var clId in dto.ChatLieuIds)
                 {
@@ -162,7 +166,8 @@ namespace FurryFriends.API.Services
 
             var filtered = all.Where(sp =>
                 string.IsNullOrEmpty(loaiSanPham) ||
-                (loaiSanPham == "DoAn" && sp.SanPhamThanhPhans.Any()) ||
+                (sp.Loai == loaiSanPham) || // Priority check
+                (loaiSanPham == "DoAn" && sp.SanPhamThanhPhans.Any()) || // Fallback for legacy
                 (loaiSanPham == "DoDung" && sp.SanPhamChatLieus.Any())
             );
 
@@ -208,13 +213,20 @@ namespace FurryFriends.API.Services
 
         private static SanPhamDTO MapToDTO(SanPham x)
         {
+            // Use stored type if available, otherwise infer fallback
+            string loaiSanPham = x.Loai;
+            if (string.IsNullOrEmpty(loaiSanPham))
+            {
+                loaiSanPham = (x.SanPhamThanhPhans?.Any() == true) ? "DoAn" : "DoDung";
+            }
+
             return new SanPhamDTO
             {
                 SanPhamId = x.SanPhamId,
                 TenSanPham = x.TenSanPham,
                 ThuongHieuId = x.ThuongHieuId ?? Guid.Empty,
                 TenThuongHieu = x.ThuongHieu?.TenThuongHieu,
-                LoaiSanPham = (x.SanPhamThanhPhans?.Any() == true) ? "DoAn" : "DoDung",
+                LoaiSanPham = loaiSanPham,
                 ThanhPhanIds = x.SanPhamThanhPhans?.Select(tp => tp.ThanhPhanId).ToList() ?? new List<Guid>(),
                 ChatLieuIds = x.SanPhamChatLieus?.Select(cl => cl.ChatLieuId).ToList() ?? new List<Guid>(),
                 TenThanhPhans = x.SanPhamThanhPhans?.Select(tp => tp.ThanhPhan?.TenThanhPhan).ToList() ?? new List<string>(),

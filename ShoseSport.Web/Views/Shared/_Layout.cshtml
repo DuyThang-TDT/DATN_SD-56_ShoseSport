@@ -95,15 +95,65 @@
                 <div class="hidden md:flex items-center gap-4">
                     @if (!string.IsNullOrEmpty(taiKhoanId))
                     {
-                        <span class="font-semibold text-gray-700">
-                            <i class="fa-solid fa-user"></i> @hoTen
-                        </span>
-
-                        <form asp-controller="KhachHangLogin" asp-action="Logout" method="get">
-                            <button class="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-black">
-                                Đăng xuất
+                        <div class="relative" id="userMenuContainer">
+                            <button onclick="toggleUserMenu()" class="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-full hover:shadow-lg transition-all duration-300">
+                                <i class="fa-regular fa-circle-user text-lg"></i>
+                                <span class="font-medium max-w-[150px] truncate">@hoTen</span>
+                                <i class="fa-solid fa-chevron-down text-xs transition-transform duration-300" id="userMenuArrow"></i>
                             </button>
-                        </form>
+
+                            <!-- Dropdown Menu -->
+                            <div id="userDropdown" class="hidden absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden transform origin-top-right transition-all duration-200 z-50">
+                                <div class="p-4 border-b border-gray-100 bg-gray-50">
+                                    <p class="text-sm text-gray-500">Xin chào,</p>
+                                    <p class="font-bold text-gray-800 truncate">@hoTen</p>
+                                </div>
+                                <div class="py-2">
+                                    <a asp-controller="ThongTinCaNhan" asp-action="Index" class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors">
+                                        <i class="fa-regular fa-id-card w-5 text-center"></i>
+                                        <span>Thông tin tài khoản</span>
+                                    </a>
+                                    <a asp-controller="DonHang" asp-action="Index" class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors">
+                                        <i class="fa-solid fa-bag-shopping w-5 text-center"></i>
+                                        <span>Quản lý đơn hàng</span>
+                                    </a>
+                                    
+                                    @if (isAdmin || isEmployee)
+                                    {
+                                        <a asp-area="Admin" asp-controller="Dashboard" asp-action="Index" class="flex items-center gap-3 px-4 py-3 text-gray-700 hover:bg-purple-50 hover:text-purple-600 transition-colors">
+                                            <i class="fa-solid fa-gauge-high w-5 text-center"></i>
+                                            <span>Trang quản trị</span>
+                                        </a>
+                                    }
+                                </div>
+                                <div class="border-t border-gray-100">
+                                    <form asp-controller="KhachHangLogin" asp-action="Logout" method="get">
+                                        <button type="submit" class="w-full flex items-center gap-3 px-4 py-3 text-red-600 hover:bg-red-50 transition-colors text-left">
+                                            <i class="fa-solid fa-right-from-bracket w-5 text-center"></i>
+                                            <span>Đăng xuất</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <script>
+                            function toggleUserMenu() {
+                                const menu = document.getElementById('userDropdown');
+                                const arrow = document.getElementById('userMenuArrow');
+                                menu.classList.toggle('hidden');
+                                arrow.classList.toggle('rotate-180');
+                            }
+
+                            // Close on click outside
+                            window.addEventListener('click', function(e) {
+                                const container = document.getElementById('userMenuContainer');
+                                if (container && !container.contains(e.target)) {
+                                    document.getElementById('userDropdown').classList.add('hidden');
+                                    document.getElementById('userMenuArrow').classList.remove('rotate-180');
+                                }
+                            });
+                        </script>
                     }
                     else
                     {
@@ -112,7 +162,7 @@
                             Đăng nhập
                         </a>
                     }
-
+                    
                     <a asp-controller="GioHangs" asp-action="Index"
                        class="relative px-4 py-2 bg-black text-white rounded-lg">
                         <i class="fa-solid fa-cart-shopping"></i>

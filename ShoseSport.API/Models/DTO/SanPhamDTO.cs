@@ -14,8 +14,8 @@ namespace FurryFriends.API.Models.DTO
         public string TenSanPham { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "Loại sản phẩm là bắt buộc.")]
-        [RegularExpression("DoAn|DoDung", ErrorMessage = "Loại sản phẩm phải là 'DoAn' hoặc 'DoDung'.")]
-        public string LoaiSanPham { get; set; } = string.Empty; // "DoAn" hoặc "DoDung"
+        [RegularExpression("GiayTheThao|GiayTay", ErrorMessage = "Loại sản phẩm phải là 'GiayTheThao' hoặc 'GiayTay'.")]
+        public string LoaiSanPham { get; set; } = string.Empty; // "GiayTheThao" hoặc "GiayTay"
 
         // Nếu là Đồ Ăn
         public List<Guid>? ThanhPhanIds { get; set; }
