@@ -407,7 +407,7 @@ namespace FurryFriends.API.Controllers
 
             try
             {
-                var subject = "Yêu cầu đặt lại mật khẩu cho tài khoản Furry Friends";
+                var subject = "Yêu cầu đặt lại mật khẩu cho tài khoản ShoseSport";
                 var body = $"<p>Xin chào,</p><p>Mã xác nhận để đặt lại mật khẩu của bạn là: <strong>{code}</strong></p><p>Mã này sẽ hết hạn sau 10 phút.</p>";
                 
                 _logger.LogInformation($"Bắt đầu gửi email đến: {request.Email}");
