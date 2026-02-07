@@ -1,5 +1,7 @@
 ﻿@model FurryFriends.Web.ViewModels.SanPhamViewModel
 @using FurryFriends.Web.Services
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
 
 @{
     ViewData["Title"] = $"{Model.TenSanPham} - FuryFriend";
@@ -545,6 +547,9 @@
         .btn-add-cart:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            background: #9ca3af; /* Gray out disabled button */
+            transform: none;
+            box-shadow: none;
         }
 
         /* Loading animation */
@@ -971,9 +976,22 @@
             <button class="btn-cancel" onclick="closeVariantModal()">
                 <i class="fas fa-times mr-2"></i>Hủy
                                                 </button>
-            <button class="btn-add-cart" id="addToCartBtn" onclick="addToCart()">
-                <i class="fas fa-cart-plus mr-2"></i>Thêm vào giỏ
-                                                </button>
+                                                @{
+                                                    var role = HttpContextAccessor.HttpContext.Session.GetString("Role");
+                                                    var isAdminOrEmployee = !string.IsNullOrEmpty(role) && (role.ToLower().Contains("admin") || role.ToLower().Contains("nhanvien"));
+                                                }
+                                                @if (isAdminOrEmployee)
+                                                {
+                                                     <button class="btn-add-cart" disabled style="background:#6c757d; cursor:not-allowed;">
+                                                        <i class="fas fa-ban mr-2"></i>Admin không thể mua
+                                                    </button>
+                                                }
+                                                else
+                                                {
+                                                    <button class="btn-add-cart" id="addToCartBtn" onclick="addToCart()">
+                                                        <i class="fas fa-cart-plus mr-2"></i>Thêm vào giỏ
+                                                    </button>
+                                                }
                                             </div>
                                     </div>
                                 </div>
