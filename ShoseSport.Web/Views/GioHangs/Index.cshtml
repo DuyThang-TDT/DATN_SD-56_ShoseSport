@@ -1,4 +1,6 @@
 ﻿@model FurryFriends.API.Models.DTO.GioHangDTO
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
 @{
     Layout = "_Layout";
     var selectedVoucherIdObj = ViewBag.VoucherId;
@@ -967,7 +969,21 @@
                                     </div>
                                 }
 
-                                <button type="submit" class="checkout-btn"><i class="fas fa-credit-card"></i> Tiến hành thanh toán</button>
+                                @{
+                                    var role = HttpContextAccessor.HttpContext.Session.GetString("Role");
+                                    var isAdminOrEmployee = !string.IsNullOrEmpty(role) && (role.ToLower().Contains("admin") || role.ToLower().Contains("nhanvien"));
+                                }
+                                
+                                @if (isAdminOrEmployee)
+                                {
+                                     <button type="button" class="checkout-btn" disabled style="background:#6c757d; cursor:not-allowed;">
+                                        <i class="fas fa-ban"></i> Admin/Nhân viên không thể thanh toán
+                                    </button>
+                                }
+                                else
+                                {
+                                    <button type="submit" class="checkout-btn"><i class="fas fa-credit-card"></i> Tiến hành thanh toán</button>
+                                }
                             </form>
                         </div>
                     </div>

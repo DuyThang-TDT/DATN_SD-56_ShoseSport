@@ -164,6 +164,17 @@ namespace FurryFriends.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AddToCart(AddToCartViewModel model)
         {
+            var role = HttpContext.Session.GetString("Role");
+            if (!string.IsNullOrEmpty(role) && (role.ToLower().Contains("admin") || role.ToLower().Contains("nhanvien")))
+            {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return BadRequest(new { success = false, message = "Tài khoản quản trị/nhân viên không được phép mua hàng!" });
+                }
+                TempData["Error"] = "Tài khoản quản trị/nhân viên không được phép mua hàng!";
+                return RedirectToAction("Index", "SanPhamKhachHang");
+            }
+
             try
             {
                 if (!ModelState.IsValid)
@@ -324,6 +335,13 @@ namespace FurryFriends.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> ThanhToan(Guid khachHangId, Guid? voucherId)
         {
+             var role = HttpContext.Session.GetString("Role");
+             if (!string.IsNullOrEmpty(role) && (role.ToLower().Contains("admin") || role.ToLower().Contains("nhanvien")))
+             {
+                 TempData["Error"] = "Tài khoản quản trị/nhân viên không được phép thanh toán!";
+                 return RedirectToAction("Index", "SanPhamKhachHang");
+             }
+
              if (khachHangId == Guid.Empty)
              {
                  try { khachHangId = GetKhachHangId(); }
@@ -372,6 +390,13 @@ namespace FurryFriends.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> ThanhToan(ThanhToanDTO dto)
         {
+            var role = HttpContext.Session.GetString("Role");
+            if (!string.IsNullOrEmpty(role) && (role.ToLower().Contains("admin") || role.ToLower().Contains("nhanvien")))
+            {
+                TempData["Error"] = "Tài khoản quản trị/nhân viên không được phép thanh toán!";
+                return RedirectToAction("Index", "SanPhamKhachHang");
+            }
+
             // ✅ Kiểm tra dto có null không
             if (dto == null)
             {
