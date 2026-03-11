@@ -1,9 +1,9 @@
-using FurryFriends.API.Library;
-using FurryFriends.API.Models.VNPay;
-using FurryFriends.Web.Services.IServices;
+using ShoseSport.API.Library;
+using ShoseSport.API.Models.VNPay;
+using ShoseSport.Web.Services.IServices;
 using Microsoft.Extensions.Logging;
 
-namespace FurryFriends.Web.Services
+namespace ShoseSport.Web.Services
 {
     public class VnPayService : IVnPayService
     {

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace FurryFriends.API.Migrations
+namespace ShoseSport.API.Migrations
 {
     /// <inheritdoc />
     public partial class UpdateAdminSeed : Migration

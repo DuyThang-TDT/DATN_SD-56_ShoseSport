@@ -1,12 +1,12 @@
-﻿using FurryFriends.API.Models.DTO;
-using FurryFriends.API.Services.IServices;
+﻿using ShoseSport.API.Models.DTO;
+using ShoseSport.API.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic;
 
-namespace FurryFriends.API.Controllers
+namespace ShoseSport.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

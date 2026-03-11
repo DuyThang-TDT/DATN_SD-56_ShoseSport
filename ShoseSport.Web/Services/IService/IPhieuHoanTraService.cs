@@ -1,7 +1,7 @@
 ﻿
-using FurryFriends.Web.ViewModels;
+using ShoseSport.Web.ViewModels;
 
-namespace FurryFriends.Web.Services.IService
+namespace ShoseSport.Web.Services.IService
 {
     public interface IPhieuHoanTraService
     {

@@ -1,10 +1,10 @@
-﻿using FurryFriends.API.Models.DTO;
-using FurryFriends.Web.Models;
-using FurryFriends.Web.Services.IService;
-using FurryFriends.Web.Service.IService;
-using FurryFriends.API.Models;
+﻿using ShoseSport.API.Models.DTO;
+using ShoseSport.Web.Models;
+using ShoseSport.Web.Services.IService;
+using ShoseSport.Web.Service.IService;
+using ShoseSport.API.Models;
 
-namespace FurryFriends.Web.Services
+namespace ShoseSport.Web.Services
 {
 	public class ThongTinCaNhanService : IThongTinCaNhanService
 	{

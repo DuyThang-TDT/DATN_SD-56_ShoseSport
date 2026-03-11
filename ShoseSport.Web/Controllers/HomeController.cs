@@ -1,18 +1,18 @@
-using FurryFriends.Web.Models;
+using ShoseSport.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 using System.Net.Http.Headers;
 using System.Text;
 using Newtonsoft.Json;
 using System.Text.RegularExpressions;
-using FurryFriends.API.Models;
-using FurryFriends.Web.Services.IService;
-using FurryFriends.API.Models.DTO;
-using FurryFriends.Web.ViewModels;
-using FurryFriends.Web.Services;
-using FurryFriends.Web.Filter;
+using ShoseSport.API.Models;
+using ShoseSport.Web.Services.IService;
+using ShoseSport.API.Models.DTO;
+using ShoseSport.Web.ViewModels;
+using ShoseSport.Web.Services;
+using ShoseSport.Web.Filter;
 
-namespace FurryFriends.Web.Controllers
+namespace ShoseSport.Web.Controllers
 {
     public class HomeController : Controller
     {
@@ -250,7 +250,7 @@ namespace FurryFriends.Web.Controllers
                 }
 
                 // 5. Fallback: gọi Gemini (nguyên bản)
-                string prompt = $"Bạn là một trợ lý bán hàng cho website bán đồ dùng cho thú cưng tên là FurryFriends chuyên nghiệp, thân thiện, trả lời ngắn gọn, dễ hiểu, ưu tiên trả lời đúng nghiệp vụ bán hàng. Nếu câu hỏi của khách hàng liên quan đến hóa đơn, đơn hàng hoặc sản phẩm thì hãy trả lời theo dữ liệu thực tế (nếu có). Nếu không có dữ liệu, hãy trả lời tự nhiên, không bịa thông tin. Câu hỏi của khách hàng: '{userMsg}'. Luôn trả lời bằng tiếng Việt. Nếu khách hàng hỏi bạn gì liên quan tới tìm hoá đơn, đơn hàng, sản phẩm thì hãy trả lời là hãy viết theo format: mã hoá đơn là + mã, mã đơn hàng là + mã, tên sản phẩm là + tên. Ví dụ: mã hoá đơn là 3FA85F64, đơn hàng 3FA85F64, tên sản phẩm là thức ăn mèo. Không được giới thiệu website bán thú cưng khác ngoài FurryFriends.";
+                string prompt = $"Bạn là một trợ lý bán hàng cho website bán giày thể thao tên là ShoseSport chuyên nghiệp, thân thiện, trả lời ngắn gọn, dễ hiểu, ưu tiên trả lời đúng nghiệp vụ bán hàng. Nếu câu hỏi của khách hàng liên quan đến hóa đơn, đơn hàng hoặc sản phẩm thì hãy trả lời theo dữ liệu thực tế (nếu có). Nếu không có dữ liệu, hãy trả lời tự nhiên, không bịa thông tin. Câu hỏi của khách hàng: '{userMsg}'. Luôn trả lời bằng tiếng Việt. Nếu khách hàng hỏi bạn gì liên quan tới tìm hoá đơn, đơn hàng, sản phẩm thì hãy trả lời là hãy viết theo format: mã hoá đơn là + mã, mã đơn hàng là + mã, tên sản phẩm là + tên. Ví dụ: mã hoá đơn là 3FA85F64, đơn hàng 3FA85F64, tên sản phẩm là giày thể thao nika. Không được giới thiệu website bán giày thể thao khác ngoài ShoseSport.";
 
                 using var http = new HttpClient();
                 var requestBody = new

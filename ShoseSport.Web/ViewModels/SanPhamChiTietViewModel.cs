@@ -1,4 +1,4 @@
-namespace FurryFriends.Web.ViewModels
+namespace ShoseSport.Web.ViewModels
 {
     public class SanPhamChiTietViewModel
     {

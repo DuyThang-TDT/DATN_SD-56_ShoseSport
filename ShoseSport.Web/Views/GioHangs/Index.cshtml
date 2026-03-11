@@ -1,4 +1,4 @@
-﻿@model FurryFriends.API.Models.DTO.GioHangDTO
+﻿@model ShoseSport.API.Models.DTO.GioHangDTO
 @using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
 @{
@@ -12,8 +12,8 @@
     var tongDonHang = ViewBag.TongDonHang as decimal?;
     var tenVoucher = ViewBag.TenVoucher as string;
     var maVoucher = ViewBag.MaVoucher as string;
-    var danhSachVouchers = ViewBag.Vouchers as IEnumerable<FurryFriends.API.Models.Voucher>;
-    var items = Model?.ChiTietGioHang ?? new List<FurryFriends.API.Models.DTO.GioHangChiTietDTO>();
+    var danhSachVouchers = ViewBag.Vouchers as IEnumerable<ShoseSport.API.Models.Voucher>;
+    var items = Model?.ChiTietGioHang ?? new List<ShoseSport.API.Models.DTO.GioHangChiTietDTO>();
     decimal subTotal = items.Sum(x => x.ThanhTien);
 
     // Sử dụng thông tin từ ViewBag nếu có, nếu không thì tính mặc định
@@ -804,7 +804,7 @@
                                     @{
                                         if (ViewBag.KhachHangId != null && ViewBag.KhachHangId != Guid.Empty)
                                         {
-                                            var dcs = (IEnumerable<FurryFriends.API.Models.DiaChiKhachHang>)(ViewBag.DiaChis ?? new List<FurryFriends.API.Models.DiaChiKhachHang>());
+                                            var dcs = (IEnumerable<ShoseSport.API.Models.DiaChiKhachHang>)(ViewBag.DiaChis ?? new List<ShoseSport.API.Models.DiaChiKhachHang>());
                                             var macDinh = dcs.FirstOrDefault(x => x.TrangThai == 1);
                                             if (macDinh != null)
                                             {
@@ -842,7 +842,7 @@
                                             </div>
                                             <div class="modal-body">
                                                 <div class="address-list">
-                                                    @foreach (var dc in (IEnumerable<FurryFriends.API.Models.DiaChiKhachHang>)(ViewBag.DiaChis ?? new List<FurryFriends.API.Models.DiaChiKhachHang>()))
+                                                    @foreach (var dc in (IEnumerable<ShoseSport.API.Models.DiaChiKhachHang>)(ViewBag.DiaChis ?? new List<ShoseSport.API.Models.DiaChiKhachHang>()))
                                                     {
                                                         <label class="address-item">
                                                             <input class="address-radio" type="radio" name="diaChiRadio" value="@dc.DiaChiId" @(dc.TrangThai == 1 ? "checked" : "") data-default="@(dc.TrangThai == 1)" />
@@ -855,7 +855,7 @@
                                                         </div>
                                                     </label>
                                                 }
-                                                @if ((ViewBag.DiaChis == null) || ((IEnumerable<FurryFriends.API.Models.DiaChiKhachHang>)ViewBag.DiaChis).Count() == 0)
+                                                @if ((ViewBag.DiaChis == null) || ((IEnumerable<ShoseSport.API.Models.DiaChiKhachHang>)ViewBag.DiaChis).Count() == 0)
                                                 {
                                                     <div class="text-muted">Bạn chưa có địa chỉ. Vui lòng thêm trong hồ sơ.</div>
                                                 }
@@ -898,7 +898,7 @@
                         <div class="section">
                             <div class="section-title"><div><i class="fas fa-wallet"></i> Hình thức thanh toán</div></div>
                             <select id="paymentSelect" class="form-select">
-                                @foreach (var hinhThuc in (IEnumerable<FurryFriends.API.Models.HinhThucThanhToan>)ViewBag.HinhThucThanhToanList)
+                                @foreach (var hinhThuc in (IEnumerable<ShoseSport.API.Models.HinhThucThanhToan>)ViewBag.HinhThucThanhToanList)
                                 {
                                     <option value="@hinhThuc.HinhThucThanhToanId">@hinhThuc.TenHinhThuc</option>
                                 }

@@ -1,8 +1,8 @@
-using FurryFriends.API.Models.DTO;
+using ShoseSport.API.Models.DTO;
 using System;
 using System.Collections.Generic;
 
-namespace FurryFriends.Web.ViewModels
+namespace ShoseSport.Web.ViewModels
 {
     public class GiamGiaCreateViewModel
     {

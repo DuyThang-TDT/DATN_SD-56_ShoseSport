@@ -1,11 +1,11 @@
-using FurryFriends.API.Data;
-using FurryFriends.API.Models;
+using ShoseSport.API.Data;
+using ShoseSport.API.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace FurryFriends.API.Services
+namespace ShoseSport.API.Services
 {
     public class InvoiceCleanupService : BackgroundService
     {

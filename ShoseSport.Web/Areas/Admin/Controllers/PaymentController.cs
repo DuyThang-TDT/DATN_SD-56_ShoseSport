@@ -1,9 +1,9 @@
-using FurryFriends.API.Models.VNPay;
-using FurryFriends.Web.Services.IServices;
+using ShoseSport.API.Models.VNPay;
+using ShoseSport.Web.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
-using FurryFriends.Web.Filter;
+using ShoseSport.Web.Filter;
 
-namespace FurryFriends.Web.Controllers
+namespace ShoseSport.Web.Controllers
 {
     [AuthorizeAdminOnly]
     public class PaymentController : Controller

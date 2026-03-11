@@ -1,7 +1,7 @@
-﻿using FurryFriends.API.Models.DTO;
-using FurryFriends.Web.Models;
+﻿using ShoseSport.API.Models.DTO;
+using ShoseSport.Web.Models;
 
-namespace FurryFriends.Web.Services.IService
+namespace ShoseSport.Web.Services.IService
 {
 	public interface IThongTinCaNhanService
 	{

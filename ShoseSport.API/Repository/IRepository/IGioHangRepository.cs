@@ -1,7 +1,7 @@
-﻿using FurryFriends.API.Models;
-using FurryFriends.API.Models.DTO;
+﻿using ShoseSport.API.Models;
+using ShoseSport.API.Models.DTO;
 
-namespace FurryFriends.API.Repository.IRepository
+namespace ShoseSport.API.Repository.IRepository
 {
     public interface IGioHangRepository
     {

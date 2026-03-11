@@ -1,7 +1,7 @@
-﻿using FurryFriends.API.Models.DTO;
+﻿using ShoseSport.API.Models.DTO;
 using System.ComponentModel;
 
-namespace FurryFriends.Web.ViewModels
+namespace ShoseSport.Web.ViewModels
 {
     public class SanPhamFullCreateViewModel
     {

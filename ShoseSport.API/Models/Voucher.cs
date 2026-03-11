@@ -1,9 +1,9 @@
-﻿using FurryFriends.API.Data;
+﻿using ShoseSport.API.Data;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
 
-namespace FurryFriends.API.Models
+namespace ShoseSport.API.Models
 {
     public class Voucher : IValidatableObject
     {

@@ -1,12 +1,12 @@
-﻿using FurryFriends.API.Models;
-using FurryFriends.Web.Services;
+﻿using ShoseSport.API.Models;
+using ShoseSport.Web.Services;
 using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using FurryFriends.Web.Services.IService;
+using ShoseSport.Web.Services.IService;
 
-namespace FurryFriends.Web.Services
+namespace ShoseSport.Web.Services
 {
     public class KhachHangService : IKhachHangService
     {
