@@ -1,8 +1,8 @@
-﻿using FurryFriends.Web.Services.IService;
+﻿using ShoseSport.Web.Services.IService;
 using Microsoft.AspNetCore.Mvc;
-using FurryFriends.Web.Filter;
+using ShoseSport.Web.Filter;
 
-namespace FurryFriends.Web.Areas.Admin.Controllers
+namespace ShoseSport.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [AuthorizeAdminOnly]

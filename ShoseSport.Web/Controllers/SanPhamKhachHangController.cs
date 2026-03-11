@@ -1,11 +1,11 @@
-﻿using FurryFriends.API.Models.DTO;
-using FurryFriends.Web.Services.IService;
-using FurryFriends.Web.Services;
-using FurryFriends.Web.ViewModels;
+﻿using ShoseSport.API.Models.DTO;
+using ShoseSport.Web.Services.IService;
+using ShoseSport.Web.Services;
+using ShoseSport.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-using FurryFriends.Web.Filter;
+using ShoseSport.Web.Filter;
 
-namespace FurryFriends.Web.Controllers
+namespace ShoseSport.Web.Controllers
 {
     public class SanPhamKhachHangController : Controller
     {

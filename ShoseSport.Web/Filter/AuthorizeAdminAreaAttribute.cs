@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace FurryFriends.Web.Filter
+namespace ShoseSport.Web.Filter
 {
     public class AuthorizeAdminAreaAttribute : ActionFilterAttribute
     {

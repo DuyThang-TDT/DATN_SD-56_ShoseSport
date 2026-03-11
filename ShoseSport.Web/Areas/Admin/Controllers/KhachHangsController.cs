@@ -1,14 +1,14 @@
 using System.Net.Http;
 using System.Text;
-using FurryFriends.API.Models;
-using FurryFriends.API.Models.DTO;
-using FurryFriends.Web.Services.IService;
+using ShoseSport.API.Models;
+using ShoseSport.API.Models.DTO;
+using ShoseSport.Web.Services.IService;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
-using FurryFriends.Web.Filter;
+using ShoseSport.Web.Filter;
 
-namespace FurryFriends.Web.Areas.Admin.Controllers
+namespace ShoseSport.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [AuthorizeEmployee]// ✅ Cho cả Admin và Employee

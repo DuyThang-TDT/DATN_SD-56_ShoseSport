@@ -1,7 +1,7 @@
-using FurryFriends.API.Models;
+using ShoseSport.API.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace FurryFriends.API.Data
+namespace ShoseSport.API.Data
 {
     public class AppDbContext : DbContext
     {
@@ -125,7 +125,7 @@ namespace FurryFriends.API.Data
                 NgaySinh = new DateTime(1990, 1, 1),
                 DiaChi = "Hà Nội",
                 SDT = "0123456789",
-                Email = "admin@furryfriends.local",
+                Email = "admin@ShoseSport.local",
                 GioiTinh = "Nam",
                 ChucVuId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
                 TrangThai = true,
@@ -142,7 +142,7 @@ namespace FurryFriends.API.Data
                 NgaySinh = new DateTime(1995, 5, 15),
                 DiaChi = "Hà Nội",
                 SDT = "0987654321",
-                Email = "nhanvien@furryfriends.local",
+                Email = "nhanvien@ShoseSport.local",
                 GioiTinh = "Nữ",
                 ChucVuId = Guid.Parse("44444444-4444-4444-4444-444444444444"),
                 TrangThai = true,

@@ -1,4 +1,4 @@
-namespace FurryFriends.API.Models.VNPay
+namespace ShoseSport.API.Models.VNPay
 {
     public class PaymentInformationModel
     {

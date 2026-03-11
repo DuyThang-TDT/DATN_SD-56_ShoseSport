@@ -1,6 +1,6 @@
-﻿using FurryFriends.API.Models;
+﻿using ShoseSport.API.Models;
 
-namespace FurryFriends.Web.Service.IService
+namespace ShoseSport.Web.Service.IService
 {
     public interface IDiaChiKhachHangService
     {

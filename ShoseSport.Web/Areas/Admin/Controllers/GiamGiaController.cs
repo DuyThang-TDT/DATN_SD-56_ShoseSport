@@ -1,14 +1,14 @@
-using FurryFriends.API.Models.DTO;
-using FurryFriends.Web.Services; // Nơi định nghĩa lớp ApiException
-using FurryFriends.Web.Services.IService;
+using ShoseSport.API.Models.DTO;
+using ShoseSport.Web.Services; // Nơi định nghĩa lớp ApiException
+using ShoseSport.Web.Services.IService;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
-using FurryFriends.Web.Filter;
+using ShoseSport.Web.Filter;
 
-namespace FurryFriends.Web.Areas.Admin.Controllers
+namespace ShoseSport.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [AuthorizeAdminOnly]

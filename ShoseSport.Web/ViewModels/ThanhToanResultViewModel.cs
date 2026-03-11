@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace FurryFriends.Web.ViewModels
+namespace ShoseSport.Web.ViewModels
 {
     public class ThanhToanResultViewModel
     {

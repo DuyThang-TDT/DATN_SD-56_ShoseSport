@@ -1,8 +1,8 @@
-﻿using FurryFriends.Web.Services.IService;
-using FurryFriends.Web.ViewModels;
+﻿using ShoseSport.Web.Services.IService;
+using ShoseSport.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FurryFriends.Web.Areas.Admin.Controllers
+namespace ShoseSport.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
     public class PhieuHoanTraController : Controller

@@ -1,9 +1,9 @@
-﻿using FurryFriends.API.Models.DTO;
+﻿using ShoseSport.API.Models.DTO;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace FurryFriends.API.Services.IServices
+namespace ShoseSport.API.Services.IServices
 {
     public interface IThanhPhanService
     {

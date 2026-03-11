@@ -1,15 +1,15 @@
 using AutoMapper;
-using FurryFriends.API.Models;
-using FurryFriends.API.Models.DTO;
-using FurryFriends.API.Repository.IRepository;
-using FurryFriends.API.Services.IServices;
+using ShoseSport.API.Models;
+using ShoseSport.API.Models.DTO;
+using ShoseSport.API.Repository.IRepository;
+using ShoseSport.API.Services.IServices;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FurryFriends.API.Services
+namespace ShoseSport.API.Services
 {
     public class GiamGiaService : IGiamGiaService
     {

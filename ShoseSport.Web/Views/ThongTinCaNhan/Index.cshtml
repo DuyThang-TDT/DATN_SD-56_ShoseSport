@@ -1,4 +1,4 @@
-﻿@model FurryFriends.Web.Models.ThongTinCaNhanViewModel
+﻿@model ShoseSport.Web.Models.ThongTinCaNhanViewModel
 @{
     ViewData["Title"] = "Thông Tin Cá Nhân";
     Layout = "~/Views/Shared/_Layout.cshtml";
@@ -131,7 +131,7 @@
         }
         else if (activeTab == "password")
         {
-            @await Html.PartialAsync("DoiMatKhau", new FurryFriends.Web.Models.DoiMatKhauViewModel { TaiKhoanId = Model.TaiKhoanId })
+            @await Html.PartialAsync("DoiMatKhau", new ShoseSport.Web.Models.DoiMatKhauViewModel { TaiKhoanId = Model.TaiKhoanId })
         }
     </div>
 </div>

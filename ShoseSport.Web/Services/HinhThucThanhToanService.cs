@@ -1,7 +1,7 @@
-using FurryFriends.API.Models;
-using FurryFriends.Web.Services.IService;
+using ShoseSport.API.Models;
+using ShoseSport.Web.Services.IService;
 
-namespace FurryFriends.Web.Services
+namespace ShoseSport.Web.Services
 {
     public class HinhThucThanhToanService : IHinhThucThanhToanService
     {

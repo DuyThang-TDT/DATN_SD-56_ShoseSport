@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace FurryFriends.API.Migrations
+namespace ShoseSport.API.Migrations
 {
     /// <inheritdoc />
     public partial class RemoveSeedProducts : Migration

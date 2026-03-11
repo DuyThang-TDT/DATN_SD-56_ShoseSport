@@ -1,4 +1,4 @@
-@model IEnumerable<FurryFriends.API.Models.DTO.SanPhamChiTietDTO>
+@model IEnumerable<ShoseSport.API.Models.DTO.SanPhamChiTietDTO>
 @{
     ViewData["Title"] = "Biến thể sản phẩm";
     var tenSanPham = ViewBag.TenSanPham ?? "Không xác định";
@@ -70,7 +70,7 @@
                             </td>
                             <td>
                                 @{
-                                    var danhSachMauSac = ViewBag.DanhSachMauSac as IEnumerable<FurryFriends.API.Models.DTO.MauSacDTO>;
+                                    var danhSachMauSac = ViewBag.DanhSachMauSac as IEnumerable<ShoseSport.API.Models.DTO.MauSacDTO>;
                                     var ms = danhSachMauSac?.FirstOrDefault(x => x.MauSacId == item.MauSacId);
                                     if (ms != null && !ms.TrangThai)
                                     {
@@ -84,7 +84,7 @@
                             </td>
                             <td>
                                 @{
-                                    var danhSachKichCo = ViewBag.DanhSachKichCo as IEnumerable<FurryFriends.API.Models.DTO.KichCoDTO>;
+                                    var danhSachKichCo = ViewBag.DanhSachKichCo as IEnumerable<ShoseSport.API.Models.DTO.KichCoDTO>;
                                     var kc = danhSachKichCo?.FirstOrDefault(x => x.KichCoId == item.KichCoId);
                                     if (kc != null && !kc.TrangThai)
                                     {

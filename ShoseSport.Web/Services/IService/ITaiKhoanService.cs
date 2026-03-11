@@ -1,9 +1,9 @@
-﻿﻿using FurryFriends.API.Models;
-using FurryFriends.API.Models.DTO;
-using LoginRequest = FurryFriends.API.Models.LoginRequest;
-using LoginResponse = FurryFriends.API.Models.LoginResponse;
+﻿﻿using ShoseSport.API.Models;
+using ShoseSport.API.Models.DTO;
+using LoginRequest = ShoseSport.API.Models.LoginRequest;
+using LoginResponse = ShoseSport.API.Models.LoginResponse;
 
-namespace FurryFriends.Web.Services.IService
+namespace ShoseSport.Web.Services.IService
 {
     public interface ITaiKhoanService
     {

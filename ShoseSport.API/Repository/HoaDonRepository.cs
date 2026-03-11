@@ -1,12 +1,12 @@
-﻿using FurryFriends.API.Data;
-using FurryFriends.API.Models;
-using FurryFriends.API.Repository.IRepository;
+﻿using ShoseSport.API.Data;
+using ShoseSport.API.Models;
+using ShoseSport.API.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System.Text;
 
-namespace FurryFriends.API.Repository
+namespace ShoseSport.API.Repository
 {
     public class HoaDonRepository : IHoaDonRepository
     {
@@ -175,7 +175,7 @@ namespace FurryFriends.API.Repository
 
                 try
                 {
-                    string webProjectPath = Path.GetFullPath(Path.Combine(_environment.ContentRootPath, "..", "FurryFriends.Web"));
+                    string webProjectPath = Path.GetFullPath(Path.Combine(_environment.ContentRootPath, "..", "ShoseSport.Web"));
                     string logoPath = Path.Combine(webProjectPath, "wwwroot", "images", "hihihi.png");
 
                     if (File.Exists(logoPath))
@@ -211,7 +211,7 @@ namespace FurryFriends.API.Repository
                 companyInfo.Add(new Chunk("142 Nguyễn Đổng Chi , Nam Từ Liêm\n", normalFont));
                 companyInfo.Add(new Chunk("TP. Hà Nội, Việt Nam\n", normalFont));
                 companyInfo.Add(new Chunk("Tel: 0968596808\n", normalFont));
-                companyInfo.Add(new Chunk("Email: info@furryfriends.vn", normalFont));
+                companyInfo.Add(new Chunk("Email: info@ShoseSport.vn", normalFont));
                 companyInfo.Alignment = Element.ALIGN_RIGHT;
                 companyInfoCell.AddElement(companyInfo);
 
@@ -522,7 +522,7 @@ namespace FurryFriends.API.Repository
                 watermarkTable.WidthPercentage = 100;
                 watermarkTable.SpacingBefore = 20f;
 
-                var watermarkCell = new PdfPCell(new Phrase("www.furryfriends.vn | Powered by FurryFriends System",
+                var watermarkCell = new PdfPCell(new Phrase("www.ShoseSport.vn | Powered by ShoseSport System",
                     new Font(baseFont, 8, Font.ITALIC, BaseColor.LIGHT_GRAY)));
                 watermarkCell.Border = Rectangle.TOP_BORDER;
                 watermarkCell.BorderColor = BaseColor.LIGHT_GRAY;
