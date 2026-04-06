@@ -1,9 +1,9 @@
-using FurryFriends.API.Data;
-using FurryFriends.API.Services;
+using ShoseSport.API.Data;
+using ShoseSport.API.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace FurryFriends.API.Controllers
+namespace ShoseSport.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

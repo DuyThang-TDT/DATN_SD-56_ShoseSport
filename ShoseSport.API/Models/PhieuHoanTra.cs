@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
 
-namespace FurryFriends.API.Models
+namespace ShoseSport.API.Models
 {
 	public class PhieuHoanTra
 	{

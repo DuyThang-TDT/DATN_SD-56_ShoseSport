@@ -1,4 +1,4 @@
-using FurryFriends.Web.Services.IService;
+using ShoseSport.Web.Services.IService;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Mail;
 using System.Net;
@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using System;
 using System.Threading;
 
-namespace FurryFriends.Web.Controllers
+namespace ShoseSport.Web.Controllers
 {
     public class HoaDonController : Controller
     {
@@ -90,8 +90,8 @@ namespace FurryFriends.Web.Controllers
 
                     using (var mailMessage = new MailMessage(senderEmail, senderEmail)) // Gửi cho chính mình
                     {
-                        mailMessage.Subject = "Test Email - FurryFriends";
-                        mailMessage.Body = "Đây là email test từ FurryFriends. Nếu bạn nhận được email này, cấu hình email đã hoạt động!";
+                        mailMessage.Subject = "Test Email - ShoseSpost";
+                        mailMessage.Body = "Đây là email test từ ShoseSpost. Nếu bạn nhận được email này, cấu hình email đã hoạt động!";
                         mailMessage.IsBodyHtml = false;
 
                         await smtpClient.SendMailAsync(mailMessage);
@@ -117,7 +117,7 @@ namespace FurryFriends.Web.Controllers
                 var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"] ?? "587");
                 var senderEmail = _configuration["EmailSettings:SenderEmail"] ?? "your-email@gmail.com";
                 var senderPassword = _configuration["EmailSettings:SenderPassword"] ?? "your-app-password";
-                var senderName = _configuration["EmailSettings:SenderName"] ?? "FurryFriends Store";
+                var senderName = _configuration["EmailSettings:SenderName"] ?? "ShoseSpost Store";
 
                 // ✅ Lấy thông tin email từ object
                 var emailProperty = hoaDon.GetType().GetProperty("EmailCuaKhachHang");
@@ -144,7 +144,7 @@ namespace FurryFriends.Web.Controllers
 
                     using (var mailMessage = new MailMessage(senderEmail, toEmail))
                     {
-                        mailMessage.Subject = $"Hóa đơn #{invoiceNumber} - FurryFriends Store";
+                        mailMessage.Subject = $"Hóa đơn #{invoiceNumber} - ShoseSport Store";
                         mailMessage.Body = CreateDetailedEmailBody(hoaDon, invoiceNumber);
                         mailMessage.IsBodyHtml = true;
                         mailMessage.Priority = MailPriority.Normal;
@@ -191,13 +191,13 @@ namespace FurryFriends.Web.Controllers
                 <body>
                     <div class='container'>
                         <div class='header'>
-                            <div class='logo'>🐾 FurryFriends</div>
+                            <div class='logo'> ShoseSport</div>
                             <h2>Cảm ơn bạn đã đặt hàng!</h2>
                         </div>
                         <div class='content'>
                             <p>Xin chào <strong>{customerName}</strong>,</p>
                             
-                            <p>Cảm ơn bạn đã tin tưởng và mua sắm tại <span class='highlight'>FurryFriends Store</span>!</p>
+                            <p>Cảm ơn bạn đã tin tưởng và mua sắm tại <span class='highlight'>ShoseSport Store</span>!</p>
                             
                             <p>Hóa đơn điện tử cho đơn hàng <strong>#{invoiceNumber}</strong> của bạn đã được đính kèm trong email này.</p>
                             
@@ -213,18 +213,18 @@ namespace FurryFriends.Web.Controllers
                             <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi:</p>
                             <ul>
                                 <li>📞 Hotline: <strong>0968596808</strong></li>
-                                <li>📧 Email: <strong>info@furryfriends.vn</strong></li>
-                                <li>🏪 Địa chỉ: <strong>142 Nguyễn Đổng Chi, Nam Từ Liêm, TP. Hà Nội</strong></li>
+                                <li>📧 Email: <strong>info@ShoseSport.vn</strong></li>
+                                <li>🏪 Địa chỉ: <strong>Trinh Văn Bô, Nam Từ Liêm, TP. Hà Nội</strong></li>
                             </ul>
                             
-                            <p>Một lần nữa, cảm ơn bạn đã lựa chọn FurryFriends!</p>
+                            <p>Một lần nữa, cảm ơn bạn đã lựa chọn ShoseSport!</p>
                             
                             <p>Trân trọng,<br>
-                            <strong>Đội ngũ FurryFriends Store</strong> 🐾</p>
+                            <strong>Đội ngũ ShoseSport Store</strong>👟</p>
                         </div>
                         <div class='footer'>
-                            <p>© 2024 FurryFriends Store. All rights reserved.</p>
-                            <p>www.furryfriends.vn | Powered by FurryFriends System</p>
+                            <p>© 2024 ShoseSport Store. All rights reserved.</p>
+                            <p>www.ShoseSport.vn | Powered by ShoseSport System</p>
                         </div>
                     </div>
                 </body>
@@ -313,14 +313,14 @@ namespace FurryFriends.Web.Controllers
                 <body>
                     <div class='container'>
                         <div class='header'>
-                            <div class='logo'>🐾 FurryFriends</div>
+                            <div class='logo'>👟 ShoseSport</div>
                             <h2>Hóa Đơn Điện Tử</h2>
                             <p>Mã hóa đơn: #{invoiceNumber}</p>
                         </div>
                         <div class='content'>
                             <p>Xin chào <strong>{tenKhachHang}</strong>,</p>
                             
-                            <p>Cảm ơn bạn đã tin tưởng và mua sắm tại <span class='highlight'>FurryFriends Store</span>!</p>
+                            <p>Cảm ơn bạn đã tin tưởng và mua sắm tại <span class='highlight'>ShoseSport Store</span>!</p>
                             
                             <div class='invoice-details'>
                                 <h3 style='margin-top: 0; color: #667eea;'>📋 Thông tin đơn hàng</h3>
@@ -411,18 +411,18 @@ namespace FurryFriends.Web.Controllers
                             <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi:</p>
                             <ul>
                                 <li>📞 Hotline: <strong>0968596808</strong></li>
-                                <li>📧 Email: <strong>info@furryfriends.vn</strong></li>
-                                <li>🏪 Địa chỉ: <strong>142 Nguyễn Đổng Chi, Nam Từ Liêm, TP. Hà Nội</strong></li>
+                                <li>📧 Email: <strong>info@ShoseSport.vn</strong></li>
+                                <li>🏪 Địa chỉ: <strong>Trịnh Văn Bô, Nam Từ Liêm, TP. Hà Nội</strong></li>
                             </ul>
                             
-                            <p>Một lần nữa, cảm ơn bạn đã lựa chọn FurryFriends!</p>
+                            <p>Một lần nữa, cảm ơn bạn đã lựa chọn ShoseSport!</p>
                             
                             <p>Trân trọng,<br>
-                            <strong>Đội ngũ FurryFriends Store</strong> 🐾</p>
+                            <strong>Đội ngũ ShoseSport Store</strong> 👟</p>
                         </div>
                         <div class='footer'>
-                            <p>© 2024 FurryFriends Store. All rights reserved.</p>
-                            <p>www.furryfriends.vn | Powered by FurryFriends System</p>
+                            <p>© 2026 ShoseSport Store. All rights reserved.</p>
+                            <p>www.ShoseSport.vn | Powered by ShoseSport System</p>
                         </div>
                     </div>
                 </body>

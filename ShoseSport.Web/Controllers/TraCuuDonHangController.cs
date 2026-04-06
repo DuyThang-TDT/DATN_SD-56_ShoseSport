@@ -1,7 +1,7 @@
-using FurryFriends.Web.Services.IService;
+using ShoseSport.Web.Services.IService;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FurryFriends.Web.Controllers
+namespace ShoseSport.Web.Controllers
 {
     public class TraCuuDonHangController : Controller
     {

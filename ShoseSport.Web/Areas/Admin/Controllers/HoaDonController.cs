@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using FurryFriends.Web.Services.IService;
-using FurryFriends.Web.Services;
-using FurryFriends.API.Models;
-using FurryFriends.Web.ViewModels;
-using FurryFriends.Web.Filter;
+using ShoseSport.Web.Services.IService;
+using ShoseSport.Web.Services;
+using ShoseSport.API.Models;
+using ShoseSport.Web.ViewModels;
+using ShoseSport.Web.Filter;
 using System.Security.Claims;
 
-namespace FurryFriends.Web.Areas.Admin.Controllers
+namespace ShoseSport.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [AuthorizeEmployee]

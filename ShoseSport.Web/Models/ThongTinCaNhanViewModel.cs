@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FurryFriends.Web.Models
+namespace ShoseSport.Web.Models
 {
 	public class ThongTinCaNhanViewModel
 	{

@@ -1,6 +1,6 @@
 ﻿// File: API/Models/DTO/BanHang/SanPhamBanHangDto.cs
 
-namespace FurryFriends.API.Models.DTO.BanHang
+namespace ShoseSport.API.Models.DTO.BanHang
 {
     public class SanPhamBanHangDto
     {

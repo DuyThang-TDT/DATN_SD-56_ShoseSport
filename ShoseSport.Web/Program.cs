@@ -1,9 +1,9 @@
-using FurryFriends.Web.Service;
-using FurryFriends.Web.Service.IService;
-using FurryFriends.Web.Services;
-using FurryFriends.Web.Services.Handlers;
-using FurryFriends.Web.Services.IService;
-using FurryFriends.Web.Services.IServices;
+using ShoseSport.Web.Service;
+using ShoseSport.Web.Service.IService;
+using ShoseSport.Web.Services;
+using ShoseSport.Web.Services.Handlers;
+using ShoseSport.Web.Services.IService;
+using ShoseSport.Web.Services.IServices;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Facebook;
 using Microsoft.AspNetCore.Authentication.Google;
@@ -150,7 +150,7 @@ builder.Services.AddAuthentication(options =>
 })
         .AddCookie(options =>
         {
-            options.Cookie.Name = "FurryFriends.Auth";
+            options.Cookie.Name = "ShoseSport.Auth";
             options.Cookie.HttpOnly = true;
             options.Cookie.SecurePolicy = CookieSecurePolicy.SameAsRequest;
             options.Cookie.SameSite = SameSiteMode.Lax;

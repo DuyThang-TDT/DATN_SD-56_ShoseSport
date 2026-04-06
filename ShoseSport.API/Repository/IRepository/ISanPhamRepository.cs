@@ -1,7 +1,7 @@
-﻿using FurryFriends.API.Models;
+﻿using ShoseSport.API.Models;
 using System.Linq.Expressions;
 
-namespace FurryFriends.API.Repository.IRepository
+namespace ShoseSport.API.Repository.IRepository
 {
     public interface ISanPhamRepository
     {

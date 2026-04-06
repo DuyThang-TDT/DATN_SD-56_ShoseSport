@@ -1,8 +1,8 @@
-using FurryFriends.API.Models.DTO;
-using FurryFriends.Web.Services.IService;
-using FurryFriends.Web.ViewModels;
+using ShoseSport.API.Models.DTO;
+using ShoseSport.Web.Services.IService;
+using ShoseSport.Web.ViewModels;
 
-namespace FurryFriends.Web.Services
+namespace ShoseSport.Web.Services
 {
     public class DiscountCalculationService
     {

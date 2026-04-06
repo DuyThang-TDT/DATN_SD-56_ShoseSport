@@ -1,11 +1,11 @@
-using FurryFriends.API.Models.VNPay;
+using ShoseSport.API.Models.VNPay;
 using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace FurryFriends.API.Library
+namespace ShoseSport.API.Library
 {
     public class VnPayCompare : IComparer<string>
     {

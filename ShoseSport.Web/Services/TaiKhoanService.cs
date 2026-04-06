@@ -1,15 +1,15 @@
-using FurryFriends.API.Models;
-using FurryFriends.API.Repository.IRepository;
-using FurryFriends.Web.Services.IService;
+using ShoseSport.API.Models;
+using ShoseSport.API.Repository.IRepository;
+using ShoseSport.Web.Services.IService;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http;
 using System.Net.Http.Json;
-using LoginRequest = FurryFriends.API.Models.LoginRequest;
-using LoginResponse = FurryFriends.API.Models.LoginResponse;
+using LoginRequest = ShoseSport.API.Models.LoginRequest;
+using LoginResponse = ShoseSport.API.Models.LoginResponse;
 using System.Text.Json;
-using FurryFriends.API.Models.DTO;
+using ShoseSport.API.Models.DTO;
 
-namespace FurryFriends.Web.Services
+namespace ShoseSport.Web.Services
 {
     public class TaiKhoanService : ITaiKhoanService
     {

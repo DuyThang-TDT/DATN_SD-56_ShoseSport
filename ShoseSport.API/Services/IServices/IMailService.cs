@@ -1,4 +1,4 @@
-﻿namespace FurryFriends.API.Services.IServices
+﻿namespace ShoseSport.API.Services.IServices
 {
     public interface IMailService
     {

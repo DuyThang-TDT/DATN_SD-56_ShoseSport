@@ -1,10 +1,10 @@
-﻿using FurryFriends.API.Models.DTO;
-using FurryFriends.Web.Services.IService;
-using FurryFriends.Web.ViewModels;
+﻿using ShoseSport.API.Models.DTO;
+using ShoseSport.Web.Services.IService;
+using ShoseSport.Web.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FurryFriends.Web.Controllers
+namespace ShoseSport.Web.Controllers
 {
     [AllowAnonymous] // Quan trọng: Cho phép truy cập công khai
     public class AccountController : Controller

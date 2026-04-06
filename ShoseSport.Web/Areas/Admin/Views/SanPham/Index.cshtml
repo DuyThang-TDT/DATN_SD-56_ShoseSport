@@ -1,6 +1,6 @@
-@model IEnumerable<FurryFriends.API.Models.DTO.SanPhamDTO>
+@model IEnumerable<ShoseSport.API.Models.DTO.SanPhamDTO>
 @using Microsoft.AspNetCore.Mvc.Rendering
-@using FurryFriends.Web.Helpers
+@using ShoseSport.Web.Helpers
 
 @{
     ViewData["Title"] = "Quản lý sản phẩm";
@@ -73,7 +73,7 @@
                 <label class="form-label">Thương hiệu</label>
                 <select id="filterThuongHieu" class="form-select">
                     <option value="">Tất cả</option>
-                    @foreach (var th in (ViewBag.DanhSachThuongHieu as List<FurryFriends.API.Models.DTO.ThuongHieuDTO> ?? new List<FurryFriends.API.Models.DTO.ThuongHieuDTO>()))
+                    @foreach (var th in (ViewBag.DanhSachThuongHieu as List<ShoseSport.API.Models.DTO.ThuongHieuDTO> ?? new List<ShoseSport.API.Models.DTO.ThuongHieuDTO>()))
                     {
                         var text = th.TrangThai ? th.TenThuongHieu : th.TenThuongHieu + " (Ngưng hoạt động)";
                         <option value="@text">@text</option>
@@ -84,7 +84,7 @@
                 <label class="form-label">Chất liệu</label>
                 <select id="filterChatLieu" class="form-select">
                     <option value="">Tất cả</option>
-                    @foreach (var cl in (ViewBag.DanhSachChatLieu as List<FurryFriends.API.Models.DTO.ChatLieuDTO> ?? new List<FurryFriends.API.Models.DTO.ChatLieuDTO>()))
+                    @foreach (var cl in (ViewBag.DanhSachChatLieu as List<ShoseSport.API.Models.DTO.ChatLieuDTO> ?? new List<ShoseSport.API.Models.DTO.ChatLieuDTO>()))
                     {
                         var text = cl.TrangThai ? cl.TenChatLieu : cl.TenChatLieu + " (Ngưng hoạt động)";
                         <option value="@text">@text</option>
@@ -95,7 +95,7 @@
                 <label class="form-label">Thành phần</label>
                 <select id="filterThanhPhan" class="form-select">
                     <option value="">Tất cả</option>
-                    @foreach (var tp in (ViewBag.DanhSachThanhPhan as List<FurryFriends.API.Models.DTO.ThanhPhanDTO> ?? new List<FurryFriends.API.Models.DTO.ThanhPhanDTO>()))
+                    @foreach (var tp in (ViewBag.DanhSachThanhPhan as List<ShoseSport.API.Models.DTO.ThanhPhanDTO> ?? new List<ShoseSport.API.Models.DTO.ThanhPhanDTO>()))
                     {
                         var text = tp.TrangThai ? tp.TenThanhPhan : tp.TenThanhPhan + " (Ngưng hoạt động)";
                         <option value="@text">@text</option>
@@ -140,7 +140,7 @@
                                 <td>
                                     @if (item.ChatLieuIds != null && item.TenChatLieus != null && item.ChatLieuIds.Count == item.TenChatLieus.Count && item.ChatLieuIds.Count > 0)
                                     {
-                                        var danhSachChatLieu = ViewBag.DanhSachChatLieu as List<FurryFriends.API.Models.DTO.ChatLieuDTO>;
+                                        var danhSachChatLieu = ViewBag.DanhSachChatLieu as List<ShoseSport.API.Models.DTO.ChatLieuDTO>;
                                         var chatLieuNames = new List<string>();
                                         for (int i = 0; i < item.ChatLieuIds.Count; i++)
                                         {
@@ -160,7 +160,7 @@
                                 <td>
                                     @if (item.ThanhPhanIds != null && item.TenThanhPhans != null && item.ThanhPhanIds.Count == item.TenThanhPhans.Count && item.ThanhPhanIds.Count > 0)
                                     {
-                                        var danhSachThanhPhan = ViewBag.DanhSachThanhPhan as List<FurryFriends.API.Models.DTO.ThanhPhanDTO>;
+                                        var danhSachThanhPhan = ViewBag.DanhSachThanhPhan as List<ShoseSport.API.Models.DTO.ThanhPhanDTO>;
                                         var thanhPhanNames = new List<string>();
                                         for (int i = 0; i < item.ThanhPhanIds.Count; i++)
                                         {
@@ -180,7 +180,7 @@
                                 <td>
                                     @{
                                         var thuongHieuId = item.ThuongHieuId;
-                                        var danhSachThuongHieu = ViewBag.DanhSachThuongHieu as List<FurryFriends.API.Models.DTO.ThuongHieuDTO>;
+                                        var danhSachThuongHieu = ViewBag.DanhSachThuongHieu as List<ShoseSport.API.Models.DTO.ThuongHieuDTO>;
                                         var th = danhSachThuongHieu?.FirstOrDefault(x => x.ThuongHieuId == thuongHieuId);
                                         if (th != null)
                                         {

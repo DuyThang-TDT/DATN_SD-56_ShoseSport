@@ -1,10 +1,10 @@
-﻿using FurryFriends.API.Models.DTO.BanHang;
-using FurryFriends.API.Models.DTO.BanHang.Requests;
+﻿using ShoseSport.API.Models.DTO.BanHang;
+using ShoseSport.API.Models.DTO.BanHang.Requests;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace FurryFriends.API.Repository.IRepository
+namespace ShoseSport.API.Repository.IRepository
 {
     public interface IBanHangRepository
     {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 
-namespace FurryFriends.API.Repository.IRepository
+namespace ShoseSport.API.Repository.IRepository
 {
 	public interface IRepository<T> where T : class
 	{

@@ -1,18 +1,18 @@
 ﻿using AutoMapper;
 using AutoMapper.QueryableExtensions;
-using FurryFriends.API.Data;
-using FurryFriends.API.Models;
-using FurryFriends.API.Models.DTO.BanHang;
-using FurryFriends.API.Models.DTO.BanHang.Requests;
-using FurryFriends.API.Repository.IRepository;
+using ShoseSport.API.Data;
+using ShoseSport.API.Models;
+using ShoseSport.API.Models.DTO.BanHang;
+using ShoseSport.API.Models.DTO.BanHang.Requests;
+using ShoseSport.API.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using FurryFriends.API.Models;
+using ShoseSport.API.Models;
 
-namespace FurryFriends.API.Repository
+namespace ShoseSport.API.Repository
 {
     public class BanHangRepository : IBanHangRepository
     {
@@ -203,7 +203,7 @@ namespace FurryFriends.API.Repository
                             TenKhachHang = "Khách lẻ",
                             NgayTaoTaiKhoan = DateTime.Now, // ✅ Sử dụng giờ Việt Nam
                             TrangThai = 1,
-                            EmailCuaKhachHang = "khachle@furryfriends.local",
+                            EmailCuaKhachHang = "khachle@ShoseSpost.local",
                             SDT = "0000000000"
                         };
                         await _context.KhachHangs.AddAsync(khachLe);
@@ -900,7 +900,7 @@ namespace FurryFriends.API.Repository
                         TenKhachHang = "Khách lẻ",
                         NgayTaoTaiKhoan = DateTime.Now, // ✅ Sử dụng giờ Việt Nam
                         TrangThai = 1,
-                        EmailCuaKhachHang = "khachle@furryfriends.local",
+                        EmailCuaKhachHang = "khachle@ShoseSpost.local",
                         SDT = "0000000000"
                     };
                     await _context.KhachHangs.AddAsync(khachLe);

@@ -1,10 +1,10 @@
-﻿using FurryFriends.API.Data;
-using FurryFriends.API.Models;
-using FurryFriends.API.Repository.IRepository;
+﻿using ShoseSport.API.Data;
+using ShoseSport.API.Models;
+using ShoseSport.API.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace FurryFriends.API.Repository
+namespace ShoseSport.API.Repository
 {
     public class SanPhamRepository : ISanPhamRepository
     {

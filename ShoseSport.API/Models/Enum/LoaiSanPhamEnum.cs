@@ -1,4 +1,4 @@
-﻿namespace FurryFriends.API.Models.Enums
+﻿namespace ShoseSport.API.Models.Enums
 {
     public enum LoaiSanPhamEnum
     {

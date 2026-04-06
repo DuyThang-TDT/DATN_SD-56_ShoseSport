@@ -1,11 +1,11 @@
-﻿using FurryFriends.API.Models.DTO;
-using FurryFriends.Web.Services.IService;
-using FurryFriends.Web.ViewModels;
+﻿using ShoseSport.API.Models.DTO;
+using ShoseSport.Web.Services.IService;
+using ShoseSport.Web.ViewModels;
 using Newtonsoft.Json;
 using System.Net;
 using System.Text;
 
-namespace FurryFriends.Web.Services
+namespace ShoseSport.Web.Services
 {
     public class GioHangService : IGioHangService
     {
