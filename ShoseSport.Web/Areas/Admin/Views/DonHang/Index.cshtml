@@ -688,12 +688,14 @@
                                     
                                     @if (!string.IsNullOrEmpty(hoaDon.ThongTinVoucherLucMua))
                                     {
+                                        var shippingFee = (hoaDon.LoaiHoaDon == "BanTaiQuay" || hoaDon.TongTienSauKhiGiam >= 500000) ? 0 : 30000;
+                                        var discountAmount = hoaDon.TongTien + shippingFee - hoaDon.TongTienSauKhiGiam;
                                         <div class="price-item text-success">
                                             <span class="price-label">
                                                 <i class="fas fa-ticket-alt me-1"></i>
                                                 Voucher áp dụng:
                                             </span>
-                                            <span class="price-value">-@((hoaDon.TongTien + 30000 - hoaDon.TongTienSauKhiGiam).ToString("N0")) VNĐ</span>
+                                            <span class="price-value">-@discountAmount.ToString("N0") VNĐ</span>
                                         </div>
                                         <div class="price-item text-muted small">
                                             <span class="price-label">Chi tiết:</span>
@@ -702,7 +704,7 @@
                                     }
                                     else if (hoaDon.Voucher != null)
                                     {
-                                        var shippingFee = hoaDon.TongTienSauKhiGiam >= 500000 ? 0 : 30000;
+                                        var shippingFee = (hoaDon.LoaiHoaDon == "BanTaiQuay" || hoaDon.TongTienSauKhiGiam >= 500000) ? 0 : 30000;
                                         var discountAmount = hoaDon.TongTien + shippingFee - hoaDon.TongTienSauKhiGiam;
                                         <div class="price-item text-success">
                                             <span class="price-label">
@@ -713,24 +715,27 @@
                                         </div>
                                     }
                                     
-                                    @* ✅ Hiển thị phí vận chuyển chỉ khi đơn hàng dưới 500k *@
-                                    @if (hoaDon.TongTienSauKhiGiam < 500000)
+                                    @if (hoaDon.LoaiHoaDon != "BanTaiQuay")
                                     {
-                                        <div class="price-item">
-                                            <span class="price-label">Phí vận chuyển:</span>
-                                            <span class="price-value">30,000 VNĐ</span>
-                                        </div>
-                                    }
-                                    @* ✅ Hiển thị FREESHIP khi đơn hàng trên 500k *@
-                                    @if (hoaDon.TongTienSauKhiGiam >= 500000)
-                                    {
-                                        <div class="price-item text-success">
-                                            <span class="price-label">
-                                                <i class="fas fa-shipping-fast me-1"></i>
-                                                Phí vận chuyển:
-                                            </span>
-                                            <span class="price-value">FREESHIP</span>
-                                        </div>
+                                        @* ✅ Hiển thị phí vận chuyển chỉ khi đơn hàng dưới 500k *@
+                                        @if (hoaDon.TongTienSauKhiGiam < 500000)
+                                        {
+                                            <div class="price-item">
+                                                <span class="price-label">Phí vận chuyển:</span>
+                                                <span class="price-value">30,000 VNĐ</span>
+                                            </div>
+                                        }
+                                        @* ✅ Hiển thị FREESHIP khi đơn hàng trên 500k *@
+                                        @if (hoaDon.TongTienSauKhiGiam >= 500000)
+                                        {
+                                            <div class="price-item text-success">
+                                                <span class="price-label">
+                                                    <i class="fas fa-shipping-fast me-1"></i>
+                                                    Phí vận chuyển:
+                                                </span>
+                                                <span class="price-value">FREESHIP</span>
+                                            </div>
+                                        }
                                     }
                                     <div class="price-item total">
                                         <span class="price-label">Tổng thanh toán:</span>
@@ -957,6 +962,12 @@
             2 => "Đang giao",
             3 => "Đã giao",
             4 => "Đã hủy",
+            5 => "Đã TT (Online)",
+            6 => "Treo",
+            7 => "Đang xử lý (Tại quầy)",
+            8 => "Đã TT (Tại quầy)",
+            9 => "Hoàn thành (Tại quầy)",
+            10 => "Hủy (Tại quầy)",
             _ => "Không xác định"
         };
     }
@@ -970,6 +981,12 @@
             2 => "status-shipping",
             3 => "status-delivered",
             4 => "status-cancelled",
+            5 => "status-delivered",
+            6 => "status-pending",
+            7 => "status-approved",
+            8 => "status-delivered",
+            9 => "status-delivered",
+            10 => "status-cancelled",
             _ => "status-pending"
         };
     }

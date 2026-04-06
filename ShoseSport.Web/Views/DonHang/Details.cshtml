@@ -1579,14 +1579,21 @@
                                 @{ 
                                     var _discount = Model.VoucherDiscount ?? 0m; 
                                     // ✅ Tính toán phí ship đúng: Tổng thanh toán - (Tổng tiền hàng - Giảm giá)
-                                    var _phiShip = Model.TongTienSauKhiGiam - (Model.TongTien - _discount);
-                                    // ✅ Đảm bảo phí ship không âm và không vượt quá 30k
-                                    _phiShip = Math.Max(0, Math.Min(30000, _phiShip));
+                                    var _phiShip = 0m;
+                                    if (Model.LoaiHoaDon != "BanTaiQuay")
+                                    {
+                                        _phiShip = Model.TongTienSauKhiGiam - (Model.TongTien - _discount);
+                                        // ✅ Đảm bảo phí ship không âm và không vượt quá 30k
+                                        _phiShip = Math.Max(0, Math.Min(30000, _phiShip));
+                                    }
                                 }
-                                <div class="total-item">
-                                    <span>Phí vận chuyển:</span>
-                                    <span>@_phiShip.ToString("N0") VNĐ</span>
-                                </div>
+                                @if (Model.LoaiHoaDon != "BanTaiQuay")
+                                {
+                                    <div class="total-item">
+                                        <span>Phí vận chuyển:</span>
+                                        <span>@_phiShip.ToString("N0") VNĐ</span>
+                                    </div>
+                                }
                                 <div class="total-item final">
                                     <span>Tổng thanh toán:</span>
                                     <span>@Model.TongTienSauKhiGiam.ToString("N0") VNĐ</span>

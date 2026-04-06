@@ -1,4 +1,4 @@
-﻿using ShoseSport.API.Data;
+using ShoseSport.API.Data;
 using ShoseSport.API.Models;
 using ShoseSport.API.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
@@ -56,7 +56,7 @@ namespace ShoseSport.API.Repository
                     .Include(h => h.Voucher)
                     .Include(h => h.HinhThucThanhToan)
                     .Include(h => h.DiaChiGiaoHang)
-                    .Where(h => h.TrangThai >= 0 && h.TrangThai <= 5) // ✅ Chỉ lấy hóa đơn trạng thái 0-5
+                    .Where(h => h.TrangThai >= 0 && h.TrangThai <= 10) // ✅ Lấy cả hóa đơn online (0-5) và offline (6-10)
                     .OrderByDescending(h => h.NgayTao) // ✅ Sắp xếp theo thời gian gần nhất
                     .AsNoTracking()
                     .ToListAsync();
