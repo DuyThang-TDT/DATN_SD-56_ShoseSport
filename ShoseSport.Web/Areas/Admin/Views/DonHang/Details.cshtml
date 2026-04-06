@@ -861,7 +861,7 @@
                     @* ✅ Hiển thị voucher/giảm giá nếu có *@
                     @if (!string.IsNullOrEmpty(Model.ThongTinVoucherLucMua))
                     {
-                        var shippingFee = Model.TongTienSauKhiGiam >= 500000 ? 0 : 30000;
+                        var shippingFee = (Model.LoaiHoaDon == "BanTaiQuay" || Model.TongTienSauKhiGiam >= 500000) ? 0 : 30000;
                         var discountAmount = Model.TongTien + shippingFee - Model.TongTienSauKhiGiam;
                         <div class="price-item text-success">
                             <span class="price-label">
@@ -877,7 +877,7 @@
                     }
                     else if (Model.Voucher != null)
                     {
-                        var shippingFee = Model.TongTienSauKhiGiam >= 500000 ? 0 : 30000;
+                        var shippingFee = (Model.LoaiHoaDon == "BanTaiQuay" || Model.TongTienSauKhiGiam >= 500000) ? 0 : 30000;
                         var discountAmount = Model.TongTien + shippingFee - Model.TongTienSauKhiGiam;
                         <div class="price-item text-success">
                             <span class="price-label">

@@ -34,8 +34,8 @@ namespace FurryFriends.Web.Areas.Admin.Controllers
             {
                 var hoaDons = await _hoaDonService.GetDonHangListAsync(); // ✅ Sử dụng method mới
                 
-                // ✅ Lọc bổ sung để đảm bảo chỉ hiển thị trạng thái 0-5
-                var hoaDonsFiltered = hoaDons?.Where(h => h.TrangThai >= 0 && h.TrangThai <= 5).ToList() ?? new List<HoaDon>();
+                // ✅ Lọc bổ sung để đảm bảo chỉ hiển thị trạng thái 0-10
+                var hoaDonsFiltered = hoaDons?.Where(h => h.TrangThai >= 0 && h.TrangThai <= 10).ToList() ?? new List<HoaDon>();
                 
                 return View(hoaDonsFiltered);
             }
@@ -58,8 +58,8 @@ namespace FurryFriends.Web.Areas.Admin.Controllers
                     return NotFound();
                 }
 
-                // ✅ Kiểm tra trạng thái để đảm bảo chỉ xem chi tiết hóa đơn trạng thái 0-5
-                if (hoaDon.TrangThai < 0 || hoaDon.TrangThai > 5)
+                // ✅ Kiểm tra trạng thái để đảm bảo chỉ xem chi tiết hóa đơn trạng thái 0-10
+                if (hoaDon.TrangThai < 0 || hoaDon.TrangThai > 10)
                 {
                     return NotFound("Không tìm thấy đơn hàng hoặc đơn hàng không thuộc quản lý đơn hàng");
                 }
@@ -92,8 +92,8 @@ namespace FurryFriends.Web.Areas.Admin.Controllers
                     return Json(new { success = false, message = "Không tìm thấy đơn hàng" });
                 }
 
-                // ✅ Kiểm tra trạng thái để đảm bảo chỉ xử lý hóa đơn trạng thái 0-5
-                if (hoaDon.TrangThai < 0 || hoaDon.TrangThai > 5)
+                // ✅ Kiểm tra trạng thái để đảm bảo chỉ xử lý hóa đơn trạng thái 0-10
+                if (hoaDon.TrangThai < 0 || hoaDon.TrangThai > 10)
                 {
                     return Json(new { success = false, message = "Đơn hàng không thuộc quản lý đơn hàng" });
                 }
@@ -151,8 +151,8 @@ namespace FurryFriends.Web.Areas.Admin.Controllers
                     return Json(new { success = false, message = "Không tìm thấy đơn hàng" });
                 }
 
-                // ✅ Kiểm tra trạng thái để đảm bảo chỉ xử lý hóa đơn trạng thái 0-5
-                if (hoaDon.TrangThai < 0 || hoaDon.TrangThai > 5)
+                // ✅ Kiểm tra trạng thái để đảm bảo chỉ xử lý hóa đơn trạng thái 0-10
+                if (hoaDon.TrangThai < 0 || hoaDon.TrangThai > 10)
                 {
                     return Json(new { success = false, message = "Đơn hàng không thuộc quản lý đơn hàng" });
                 }
@@ -230,8 +230,8 @@ namespace FurryFriends.Web.Areas.Admin.Controllers
                     return Json(new { success = false, message = "Không tìm thấy đơn hàng" });
                 }
 
-                // ✅ Kiểm tra trạng thái để đảm bảo chỉ xử lý hóa đơn trạng thái 0-5
-                if (hoaDon.TrangThai < 0 || hoaDon.TrangThai > 5)
+                // ✅ Kiểm tra trạng thái để đảm bảo chỉ xử lý hóa đơn trạng thái 0-10
+                if (hoaDon.TrangThai < 0 || hoaDon.TrangThai > 10)
                 {
                     return Json(new { success = false, message = "Đơn hàng không thuộc quản lý đơn hàng" });
                 }
@@ -308,8 +308,8 @@ namespace FurryFriends.Web.Areas.Admin.Controllers
                     return Json(new { success = false, message = "Không tìm thấy đơn hàng" });
                 }
 
-                // ✅ Kiểm tra trạng thái để đảm bảo chỉ xử lý hóa đơn trạng thái 0-5
-                if (hoaDon.TrangThai < 0 || hoaDon.TrangThai > 5)
+                // ✅ Kiểm tra trạng thái để đảm bảo chỉ xử lý hóa đơn trạng thái 0-10
+                if (hoaDon.TrangThai < 0 || hoaDon.TrangThai > 10)
                 {
                     return Json(new { success = false, message = "Đơn hàng không thuộc quản lý đơn hàng" });
                 }
@@ -415,6 +415,12 @@ namespace FurryFriends.Web.Areas.Admin.Controllers
                 2 => "Đang giao",
                 3 => "Đã giao",
                 4 => "Đã hủy",
+                5 => "Đã thanh toán (Online)",
+                6 => "Chưa thanh toán (Tại quầy)",
+                7 => "Đã thanh toán (Tại quầy)",
+                8 => "Đang giao (Tại quầy)",
+                9 => "Đã giao (Tại quầy)",
+                10 => "Đã hủy (Tại quầy)",
                 _ => "Không xác định"
             };
         }
