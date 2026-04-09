@@ -2,6 +2,8 @@
 using ShoseSport.API.Models.DTO;
 using ShoseSport.API.Repository.IRepository;
 using ShoseSport.API.Services.IServices;
+using ShoseSport.API.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,10 +14,12 @@ namespace ShoseSport.API.Services
     public class SanPhamChiTietService : ISanPhamChiTietService
     {
         private readonly ISanPhamChiTietRepository _repository;
+        private readonly AppDbContext _context;
 
-        public SanPhamChiTietService(ISanPhamChiTietRepository repository)
+        public SanPhamChiTietService(ISanPhamChiTietRepository repository, AppDbContext context)
         {
             _repository = repository;
+            _context = context;
         }
 
         public async Task<IEnumerable<SanPhamChiTietDTO>> GetAllAsync()
@@ -25,15 +29,13 @@ namespace ShoseSport.API.Services
             {
                 SanPhamChiTietId = x.SanPhamChiTietId,
                 SanPhamId = x.SanPhamId,
-                // Luôn hiển thị tên sản phẩm cha
                 TenSanPham = x.SanPham?.TenSanPham,
-                
                 KichCoId = x.KichCoId,
                 TenKichCo = x.KichCo?.TenKichCo,
                 MauSacId = x.MauSacId,
                 TenMau = x.MauSac?.TenMau,
                 Gia = x.Gia,
-                GiaNhap = x.GiaNhap, // ✅ Thêm mapping cho GiaNhap
+                GiaNhap = x.GiaNhap,
                 SoLuong = x.SoLuong,
                 MoTa = x.MoTa,
                 AnhId = x.AnhId,
@@ -55,15 +57,13 @@ namespace ShoseSport.API.Services
             {
                 SanPhamChiTietId = item.SanPhamChiTietId,
                 SanPhamId = item.SanPhamId,
-                // Luôn hiển thị tên sản phẩm cha
                 TenSanPham = item.SanPham?.TenSanPham,
-               
                 KichCoId = item.KichCoId,
                 TenKichCo = item.KichCo?.TenKichCo,
                 MauSacId = item.MauSacId,
                 TenMau = item.MauSac?.TenMau,
                 Gia = item.Gia,
-                GiaNhap = item.GiaNhap, // ✅ Thêm mapping cho GiaNhap
+                GiaNhap = item.GiaNhap,
                 SoLuong = item.SoLuong,
                 MoTa = item.MoTa,
                 AnhId = item.AnhId,
@@ -75,38 +75,50 @@ namespace ShoseSport.API.Services
             };
         }
 
-        public async Task<bool> CreateAsync(SanPhamChiTietDTO dto)
-        {
-            var entity = new SanPhamChiTiet
-            {
-                SanPhamChiTietId = Guid.NewGuid(),
-                SanPhamId = dto.SanPhamId,
-                KichCoId = dto.KichCoId,
-                MauSacId = dto.MauSacId,
-                Gia = dto.Gia,
-                GiaNhap = dto.GiaNhap, // ✅ Thêm mapping cho GiaNhap
-                SoLuong = dto.SoLuong,
-                MoTa = dto.MoTa,
-                AnhId = dto.AnhId, // chỉ lưu Id, không upload ảnh
-                NgayTao = DateTime.Now,
-                TrangThai = dto.TrangThai ?? 1
-            };
-
-            await _repository.AddAsync(entity);
-            await _repository.SaveAsync();
-            return true;
-        }
-
+        // ============================
+        // 🔥 FIX CHÍNH Ở ĐÂY
+        // ============================
         public async Task<SanPhamChiTietDTO?> CreateAndReturnAsync(SanPhamChiTietDTO dto)
         {
+            // 1. Lấy hoặc tạo sản phẩm
+            var sanPham = await _context.SanPhams
+                .FirstOrDefaultAsync(x => x.SanPhamId == dto.SanPhamId);
+
+            if (sanPham == null)
+            {
+                sanPham = new SanPham
+                {
+                    SanPhamId = Guid.NewGuid(),
+                    TenSanPham = "Sản phẩm auto",
+                    TrangThai = true
+                };
+
+                _context.SanPhams.Add(sanPham);
+                await _context.SaveChangesAsync();
+            }
+
+            // 2. 🔥 CHECK TRÙNG (QUAN TRỌNG NHẤT)
+            var exists = await _context.SanPhamChiTiets.AnyAsync(x =>
+                x.SanPhamId == sanPham.SanPhamId &&
+                x.KichCoId == dto.KichCoId &&
+                x.MauSacId == dto.MauSacId
+            );
+
+            if (exists)
+            {
+                // 👉 Không tạo nữa, tránh trùng
+                return null;
+            }
+
+            // 3. Tạo mới SPCT
             var entity = new SanPhamChiTiet
             {
                 SanPhamChiTietId = Guid.NewGuid(),
-                SanPhamId = dto.SanPhamId,
+                SanPhamId = sanPham.SanPhamId,
                 KichCoId = dto.KichCoId,
                 MauSacId = dto.MauSacId,
                 Gia = dto.Gia,
-                GiaNhap = dto.GiaNhap, // ✅ Thêm mapping cho GiaNhap
+                GiaNhap = dto.GiaNhap,
                 SoLuong = dto.SoLuong,
                 MoTa = dto.MoTa,
                 AnhId = dto.AnhId,
@@ -117,7 +129,6 @@ namespace ShoseSport.API.Services
             await _repository.AddAsync(entity);
             await _repository.SaveAsync();
 
-            // Map lại sang DTO
             return new SanPhamChiTietDTO
             {
                 SanPhamChiTietId = entity.SanPhamChiTietId,
@@ -125,13 +136,19 @@ namespace ShoseSport.API.Services
                 KichCoId = entity.KichCoId,
                 MauSacId = entity.MauSacId,
                 Gia = entity.Gia,
-                GiaNhap = entity.GiaNhap, // ✅ Thêm mapping cho GiaNhap
+                GiaNhap = entity.GiaNhap,
                 SoLuong = entity.SoLuong,
                 MoTa = entity.MoTa,
                 AnhId = entity.AnhId,
                 NgayTao = entity.NgayTao,
                 TrangThai = entity.TrangThai
             };
+        }
+
+        public async Task<bool> CreateAsync(SanPhamChiTietDTO dto)
+        {
+            var result = await CreateAndReturnAsync(dto);
+            return result != null;
         }
 
         public async Task<bool> UpdateAsync(Guid id, SanPhamChiTietDTO dto)
@@ -142,10 +159,10 @@ namespace ShoseSport.API.Services
             entity.KichCoId = dto.KichCoId;
             entity.MauSacId = dto.MauSacId;
             entity.Gia = dto.Gia;
-            entity.GiaNhap = dto.GiaNhap; // ✅ Thêm mapping cho GiaNhap
+            entity.GiaNhap = dto.GiaNhap;
             entity.SoLuong = dto.SoLuong;
             entity.MoTa = dto.MoTa;
-            entity.AnhId = dto.AnhId; // cập nhật ảnh nếu có
+            entity.AnhId = dto.AnhId;
             entity.NgaySua = DateTime.Now;
             entity.TrangThai = dto.TrangThai ?? entity.TrangThai;
 

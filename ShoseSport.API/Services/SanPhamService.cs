@@ -36,6 +36,9 @@ namespace ShoseSport.API.Services
             return MapToDTO(sp);
         }
 
+        // ============================
+        // 🚀 CREATE + AUTO GEN VARIANT
+        // ============================
         public async Task<SanPhamDTO> CreateAsync(SanPhamDTO dto)
         {
             var sanPham = new SanPham
@@ -43,121 +46,72 @@ namespace ShoseSport.API.Services
                 SanPhamId = Guid.NewGuid(),
                 TenSanPham = dto.TenSanPham,
                 ThuongHieuId = dto.ThuongHieuId,
-                TrangThai = dto.TrangThai,
+                TrangThai = true,
                 HanSuDung = dto.HanSuDung,
-                Loai = dto.LoaiSanPham, // Save the specific type
-                SanPhamThanhPhans = new List<SanPhamThanhPhan>(),
-                SanPhamChatLieus = new List<SanPhamChatLieu>()
+                Loai = dto.LoaiSanPham
             };
-
-            // Logic for relations based on type
-            if (dto.LoaiSanPham == "DoAn" && dto.ThanhPhanIds != null)
-            {
-                foreach (var tpId in dto.ThanhPhanIds)
-                {
-                    sanPham.SanPhamThanhPhans.Add(new SanPhamThanhPhan { SanPhamId = sanPham.SanPhamId, ThanhPhanId = tpId });
-                }
-            }
-            // Support old "DoDung" AND new shoe types that use materials
-            else if ((dto.LoaiSanPham == "DoDung" || dto.LoaiSanPham == "GiayTheThao" || dto.LoaiSanPham == "GiayTay") && dto.ChatLieuIds != null)
-            {
-                foreach (var clId in dto.ChatLieuIds)
-                {
-                    sanPham.SanPhamChatLieus.Add(new SanPhamChatLieu { SanPhamId = sanPham.SanPhamId, ChatLieuId = clId });
-                }
-            }
 
             await _repository.AddAsync(sanPham);
             await _repository.SaveAsync();
+
+            // 🔥 LẤY SIZE + MÀU TỪ DB
+            var sizes = await _context.KichCos.ToListAsync();
+            var colors = await _context.MauSacs.ToListAsync();
+
+            if (!sizes.Any() || !colors.Any())
+                throw new Exception("Chưa có dữ liệu Size hoặc Màu trong DB");
+
+            var listChiTiet = new List<SanPhamChiTiet>();
+
+            foreach (var size in sizes)
+            {
+                foreach (var color in colors)
+                {
+                    listChiTiet.Add(new SanPhamChiTiet
+                    {
+                        SanPhamChiTietId = Guid.NewGuid(),
+                        SanPhamId = sanPham.SanPhamId,
+                        KichCoId = size.KichCoId,
+                        MauSacId = color.MauSacId,
+                        SoLuong = 10,            // 👉 mặc định
+                        Gia = 1000000,           // 👉 mặc định
+                        GiaNhap = 800000,
+                        NgayTao = DateTime.Now,
+                        TrangThai = 1
+                    });
+                }
+            }
+
+            await _context.SanPhamChiTiets.AddRangeAsync(listChiTiet);
+            await _context.SaveChangesAsync();
+
             dto.SanPhamId = sanPham.SanPhamId;
             return dto;
         }
 
         public async Task UpdateAsync(Guid id, SanPhamDTO dto)
         {
-            // 1. Tải đối tượng cần cập nhật cùng với các collection liên quan
             var existing = await _context.SanPhams
-                .Include(sp => sp.SanPhamThanhPhans)
-                .Include(sp => sp.SanPhamChatLieus)
                 .FirstOrDefaultAsync(sp => sp.SanPhamId == id)
-                ?? throw new KeyNotFoundException($"Không tìm thấy sản phẩm với ID {id}");
+                ?? throw new KeyNotFoundException("Không tìm thấy sản phẩm");
 
-            // 2. Cập nhật các thuộc tính chính của SanPham
             existing.TenSanPham = dto.TenSanPham;
             existing.ThuongHieuId = dto.ThuongHieuId;
             existing.TrangThai = dto.TrangThai;
             existing.HanSuDung = dto.HanSuDung;
-            existing.Loai = dto.LoaiSanPham; // Update the specific type
+            existing.Loai = dto.LoaiSanPham;
 
-            // 3. Xóa các quan hệ cũ một cách an toàn
-            existing.SanPhamThanhPhans.Clear();
-            existing.SanPhamChatLieus.Clear();
-
-            // 4. Thêm lại các quan hệ mới dựa trên DTO
-            if (dto.LoaiSanPham == "DoAn" && dto.ThanhPhanIds != null)
-            {
-                foreach (var tpId in dto.ThanhPhanIds)
-                {
-                    existing.SanPhamThanhPhans.Add(new SanPhamThanhPhan { ThanhPhanId = tpId });
-                }
-            }
-            else if ((dto.LoaiSanPham == "DoDung" || dto.LoaiSanPham == "GiayTheThao" || dto.LoaiSanPham == "GiayTay") && dto.ChatLieuIds != null)
-            {
-                foreach (var clId in dto.ChatLieuIds)
-                {
-                    existing.SanPhamChatLieus.Add(new SanPhamChatLieu { ChatLieuId = clId });
-                }
-            }
-
-            // 5. Lưu tất cả các thay đổi vào DB
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            try
-            {
-                if (!await _repository.ExistsAsync(id))
-                    throw new KeyNotFoundException($"Không tìm thấy sản phẩm với ID {id}");
+            var sanPham = await _repository.GetByIdAsync(id)
+                ?? throw new KeyNotFoundException("Không tìm thấy");
 
-                // Kiểm tra sản phẩm có đang áp dụng giảm giá không
-                var sanPhamChiTiets = await _context.SanPhamChiTiets
-                    .Where(spct => spct.SanPhamId == id)
-                    .ToListAsync();
-
-                Console.WriteLine($"Found {sanPhamChiTiets.Count} SanPhamChiTiets for product {id}");
-
-                var sanPhamChiTietIds = sanPhamChiTiets.Select(spct => spct.SanPhamChiTietId).ToList();
-
-                if (sanPhamChiTietIds.Any())
-                {
-                    var dotGiamGiaSanPham = await _context.DotGiamGiaSanPhams
-                        .Where(dggsp => sanPhamChiTietIds.Contains(dggsp.SanPhamChiTietId))
-                        .FirstOrDefaultAsync();
-
-                    Console.WriteLine($"Found discount product: {dotGiamGiaSanPham != null}");
-
-                    if (dotGiamGiaSanPham != null)
-                    {
-                        throw new InvalidOperationException($"Không thể xóa sản phẩm vì đang được áp dụng trong chương trình giảm giá. Vui lòng xóa sản phẩm khỏi chương trình giảm giá trước.");
-                    }
-                }
-
-                // Thực hiện xóa mềm bằng cách đặt TrangThai = false
-                var sanPham = await _repository.GetByIdAsync(id);
-                if (sanPham != null)
-                {
-                    sanPham.TrangThai = false;
-                    _repository.Update(sanPham);
-                    await _repository.SaveAsync();
-                }
-                Console.WriteLine($"Successfully deleted product {id}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error deleting product {id}: {ex.Message}");
-                throw;
-            }
+            sanPham.TrangThai = false;
+            _repository.Update(sanPham);
+            await _repository.SaveAsync();
         }
 
         public async Task<(IEnumerable<SanPhamDTO> Data, int TotalCount)> GetFilteredAsync(string? loaiSanPham, int page, int pageSize)
@@ -166,14 +120,12 @@ namespace ShoseSport.API.Services
 
             var filtered = all.Where(sp =>
                 string.IsNullOrEmpty(loaiSanPham) ||
-                (sp.Loai == loaiSanPham) || // Priority check
-                (loaiSanPham == "DoAn" && sp.SanPhamThanhPhans.Any()) || // Fallback for legacy
-                (loaiSanPham == "DoDung" && sp.SanPhamChatLieus.Any())
+                sp.Loai == loaiSanPham
             );
 
             var totalCount = filtered.Count();
+
             var paged = filtered
-                .OrderByDescending(sp => sp.SanPhamId)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Select(MapToDTO);
@@ -189,48 +141,34 @@ namespace ShoseSport.API.Services
 
         public async Task<IEnumerable<SanPhamDTO>> GetTopSellingProductsAsync(int top)
         {
-            var topProductsInfo = await _context.HoaDonChiTiets
-                .Include(ct => ct.SanPhamChiTiet)
-                    .ThenInclude(spct => spct.SanPham)
-                .GroupBy(ct => ct.SanPhamChiTiet.SanPhamId)
+            var data = await _context.HoaDonChiTiets
+                .GroupBy(x => x.SanPhamChiTiet.SanPhamId)
                 .Select(g => new
                 {
                     SanPhamId = g.Key,
-                    TotalSold = g.Sum(x => x.SoLuongSanPham)
+                    Total = g.Sum(x => x.SoLuongSanPham)
                 })
-                .OrderByDescending(x => x.TotalSold)
+                .OrderByDescending(x => x.Total)
                 .Take(top)
                 .ToListAsync();
 
-            var ids = topProductsInfo.Select(x => x.SanPhamId).ToList();
+            var ids = data.Select(x => x.SanPhamId).ToList();
 
-            var allSanPhams = await _repository.GetAllAsync();
+            var all = await _repository.GetAllAsync();
 
-            var topSellingSanPhams = allSanPhams.Where(sp => ids.Contains(sp.SanPhamId));
-
-            return topSellingSanPhams.Select(MapToDTO);
+            return all.Where(x => ids.Contains(x.SanPhamId))
+                      .Select(MapToDTO);
         }
 
         private static SanPhamDTO MapToDTO(SanPham x)
         {
-            // Use stored type if available, otherwise infer fallback
-            string loaiSanPham = x.Loai;
-            if (string.IsNullOrEmpty(loaiSanPham))
-            {
-                loaiSanPham = (x.SanPhamThanhPhans?.Any() == true) ? "DoAn" : "DoDung";
-            }
-
             return new SanPhamDTO
             {
                 SanPhamId = x.SanPhamId,
                 TenSanPham = x.TenSanPham,
                 ThuongHieuId = x.ThuongHieuId ?? Guid.Empty,
                 TenThuongHieu = x.ThuongHieu?.TenThuongHieu,
-                LoaiSanPham = loaiSanPham,
-                ThanhPhanIds = x.SanPhamThanhPhans?.Select(tp => tp.ThanhPhanId).ToList() ?? new List<Guid>(),
-                ChatLieuIds = x.SanPhamChatLieus?.Select(cl => cl.ChatLieuId).ToList() ?? new List<Guid>(),
-                TenThanhPhans = x.SanPhamThanhPhans?.Select(tp => tp.ThanhPhan?.TenThanhPhan).ToList() ?? new List<string>(),
-                TenChatLieus = x.SanPhamChatLieus?.Select(cl => cl.ChatLieu?.TenChatLieu).ToList() ?? new List<string>(),
+                LoaiSanPham = x.Loai,
                 TrangThai = x.TrangThai,
                 HanSuDung = x.HanSuDung
             };

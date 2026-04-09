@@ -9,12 +9,12 @@ using System.Linq;
 using System.Threading.Tasks;
 using ShoseSport.Web.Filter;
 using ShoseSport.API.Models;
+using Microsoft.AspNetCore.Http;
 
 namespace ShoseSport.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [AuthorizeEmployee]
-
     public class SanPhamController : Controller
     {
         private readonly ISanPhamService _sanPhamService;
@@ -28,9 +28,15 @@ namespace ShoseSport.Web.Areas.Admin.Controllers
         private readonly IThongBaoService _thongBaoService;
 
         public SanPhamController(
-            ISanPhamService sanPhamService, ISanPhamChiTietService chiTietService, IAnhService anhService,
-            IThuongHieuService thuongHieuService, IKichCoService kichCoService, IMauSacService mauSacService,
-            IThanhPhanService thanhPhanService, IChatLieuService chatLieuService, IThongBaoService thongBaoService)
+            ISanPhamService sanPhamService,
+            ISanPhamChiTietService chiTietService,
+            IAnhService anhService,
+            IThuongHieuService thuongHieuService,
+            IKichCoService kichCoService,
+            IMauSacService mauSacService,
+            IThanhPhanService thanhPhanService,
+            IChatLieuService chatLieuService,
+            IThongBaoService thongBaoService)
         {
             _sanPhamService = sanPhamService;
             _chiTietService = chiTietService;
@@ -43,7 +49,7 @@ namespace ShoseSport.Web.Areas.Admin.Controllers
             _thongBaoService = thongBaoService;
         }
 
-        // ---------------- GET: Hiển thị danh sách sản phẩm ----------------
+        // ================== INDEX ==================
         public async Task<IActionResult> Index()
         {
             try
@@ -59,27 +65,26 @@ namespace ShoseSport.Web.Areas.Admin.Controllers
             }
         }
 
-        // ---------------- GET: Hiển thị form tạo mới ----------------
+        // ================== CREATE GET ==================
         [HttpGet]
         public async Task<IActionResult> Create()
         {
             await LoadDropdownData(isCreateMode: true);
 
-            var viewModel = new SanPhamFullCreateViewModel
+            return View(new SanPhamFullCreateViewModel
             {
                 SanPham = new SanPhamDTO { TrangThai = true },
-                ChiTietList = new List<SanPhamChiTietCreateViewModel>()
-            };
-            return View(viewModel);
+                ChiTietList = new List<SanPhamChiTietCreateViewModel>() // vẫn giữ để tránh lỗi View
+            });
         }
 
-        // ---------------- POST: Tạo sản phẩm đầy đủ ----------------
+        // ================== CREATE POST ==================
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ReadOnly]
         public async Task<IActionResult> Create(SanPhamFullCreateViewModel model)
         {
-            ValidateChiTietList(model.ChiTietList);
+            // ❌ BỎ ValidateChiTietList
 
             if (!ModelState.IsValid)
             {
@@ -87,6 +92,7 @@ namespace ShoseSport.Web.Areas.Admin.Controllers
                 return View(model);
             }
 
+            // ✅ Chỉ tạo sản phẩm (API đã auto gen variant)
             var createResult = await _sanPhamService.CreateAsync(model.SanPham);
 
             if (!createResult.Success)
@@ -97,37 +103,10 @@ namespace ShoseSport.Web.Areas.Admin.Controllers
             }
 
             var createdSanPham = createResult.Data;
-            bool hasVariantError = false;
 
-            foreach (var chiTietVM in model.ChiTietList)
-            {
-                var chiTietToCreate = new SanPhamChiTietDTO
-                {
-                    SanPhamId = createdSanPham.SanPhamId,
-                    MauSacId = chiTietVM.MauSacId,
-                    KichCoId = chiTietVM.KichCoId,
-                    SoLuong = chiTietVM.SoLuongTon,
-                    Gia = chiTietVM.GiaBan,
-                    GiaNhap = chiTietVM.GiaNhap,
-                    MoTa = chiTietVM.MoTa,
-                    AnhId = chiTietVM.AnhId
-                };
-                var variantResult = await _chiTietService.CreateAsync(chiTietToCreate);
-                if (!variantResult.Success)
-                {
-                    hasVariantError = true;
-                    AddApiErrorsToModelState(variantResult);
-                }
-            }
+            TempData["Success"] = "Tạo sản phẩm thành công!";
 
-            if (hasVariantError)
-            {
-                ModelState.AddModelError("", "Đã có lỗi xảy ra khi tạo một số biến thể. Vui lòng kiểm tra lại.");
-                await LoadDropdownData(isCreateMode: true);
-                return View(model);
-            }
-
-            TempData["Success"] = "Tạo sản phẩm và các biến thể thành công!";
+            // 🔔 Thông báo
             await _thongBaoService.CreateAsync(new ThongBaoDTO
             {
                 TieuDe = $"Thêm sản phẩm: {createdSanPham.TenSanPham}",
@@ -137,10 +116,11 @@ namespace ShoseSport.Web.Areas.Admin.Controllers
                 NgayTao = DateTime.Now,
                 DaDoc = false
             });
+
             return RedirectToAction("Index");
         }
 
-        // ---------------- GET: Hiển thị form chỉnh sửa ----------------
+        // ================== EDIT GET ==================
         [HttpGet]
         public async Task<IActionResult> Edit(Guid id)
         {
@@ -148,7 +128,8 @@ namespace ShoseSport.Web.Areas.Admin.Controllers
             if (sanPham == null) return NotFound();
 
             var allChiTiet = await _chiTietService.GetAllAsync();
-                            var chiTietList = allChiTiet?
+
+            var chiTietList = allChiTiet?
                 .Where(x => x.SanPhamId == id)
                 .Select(x => new SanPhamChiTietCreateViewModel
                 {
@@ -165,16 +146,14 @@ namespace ShoseSport.Web.Areas.Admin.Controllers
 
             await LoadDropdownData(sanPham);
 
-            var viewModel = new SanPhamFullCreateViewModel
+            return View(new SanPhamFullCreateViewModel
             {
                 SanPham = sanPham,
                 ChiTietList = chiTietList
-            };
-
-            return View(viewModel);
+            });
         }
 
-        // ---------------- POST: Chỉnh sửa sản phẩm đầy đủ ----------------
+        // ================== EDIT POST ==================
         [HttpPost]
         [ValidateAntiForgeryToken]
         [ReadOnly]
@@ -182,7 +161,6 @@ namespace ShoseSport.Web.Areas.Admin.Controllers
         {
             var oldSanPham = await _sanPhamService.GetByIdAsync(model.SanPham.SanPhamId);
             if (oldSanPham == null) return NotFound();
-            ValidateChiTietList(model.ChiTietList);
 
             if (!ModelState.IsValid)
             {
@@ -199,36 +177,15 @@ namespace ShoseSport.Web.Areas.Admin.Controllers
                 return View(model);
             }
 
+            // ✔ Vẫn giữ xử lý variant ở EDIT
             await ProcessVariants(model.SanPham.SanPhamId, model.ChiTietList);
 
             TempData["Success"] = "Cập nhật sản phẩm thành công!";
 
-            var changes = new List<string>();
-            if (oldSanPham.TenSanPham != model.SanPham.TenSanPham)
-                changes.Add($"Tên: '{oldSanPham.TenSanPham}' → '{model.SanPham.TenSanPham}'");
-            if (oldSanPham.TrangThai != model.SanPham.TrangThai)
-                changes.Add($"Trạng thái: {(oldSanPham.TrangThai ? "Hoạt động" : "Ngưng")} → {(model.SanPham.TrangThai ? "Hoạt động" : "Ngưng")}");
-
-            // (Bạn có thể bổ sung so sánh biến thể tương tự)
-
-            var userName = HttpContext.Session.GetString("HoTen") ?? "Hệ thống";
-
-            await _thongBaoService.CreateAsync(new ThongBaoDTO
-            {
-                TieuDe = "Cập nhật sản phẩm",
-                NoiDung = changes.Any()
-                    ? $"Sản phẩm '{model.SanPham.TenSanPham}' đã được chỉnh sửa: {string.Join(", ", changes)}"
-                    : $"Sản phẩm '{model.SanPham.TenSanPham}' đã được chỉnh sửa.",
-                Loai = "SanPham",
-                UserName = userName,
-                NgayTao = DateTime.Now,
-                DaDoc = false
-            });
-
             return RedirectToAction("Index");
         }
 
-        // ---------------- GET & POST: Xóa sản phẩm ----------------
+        // ================== DELETE ==================
         [HttpGet]
         public async Task<IActionResult> Delete(Guid id)
         {
@@ -251,97 +208,70 @@ namespace ShoseSport.Web.Areas.Admin.Controllers
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Xóa mềm - đổi trạng thái thành không hoạt động
                 sanPham.TrangThai = false;
                 var updateResult = await _sanPhamService.UpdateAsync(id, sanPham);
-                
+
                 if (updateResult.Success)
                 {
-                    TempData["Success"] = "Sản phẩm đã được vô hiệu hóa thành công.";
-
-                    // 🔔 Thêm thông báo
-                    var userName = HttpContext.Session.GetString("HoTen") ?? "Hệ thống";
-                    await _thongBaoService.CreateAsync(new ThongBaoDTO
-                    {
-                        TieuDe = "Vô hiệu hóa sản phẩm",
-                        NoiDung = $"Sản phẩm '{sanPham.TenSanPham}' đã được vô hiệu hóa",
-                        Loai = "SanPham",
-                        UserName = userName,
-                        NgayTao = DateTime.Now,
-                        DaDoc = false
-                    });
-
+                    TempData["Success"] = "Sản phẩm đã được vô hiệu hóa.";
                     return RedirectToAction(nameof(Index));
                 }
-                
-                var errorMessage = updateResult.Errors?.FirstOrDefault().Value.FirstOrDefault() ?? "Vô hiệu hóa sản phẩm thất bại!";
-                TempData["Error"] = errorMessage;
+
+                TempData["Error"] = "Xóa thất bại!";
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"Lỗi khi vô hiệu hóa sản phẩm: {ex.Message}";
+                TempData["Error"] = ex.Message;
                 return RedirectToAction(nameof(Index));
             }
         }
 
-        // ---------------- CÁC HÀM HỖ TRỢ (HELPER METHODS) ----------------
-
+        // ================== PROCESS VARIANT ==================
         private async Task ProcessVariants(Guid sanPhamId, List<SanPhamChiTietCreateViewModel> submittedVariants)
         {
-            var existingVariants = (await _chiTietService.GetAllAsync() ?? new List<SanPhamChiTietDTO>())
-                                     .Where(v => v.SanPhamId == sanPhamId).ToList();
+            var existing = (await _chiTietService.GetAllAsync())
+                .Where(x => x.SanPhamId == sanPhamId).ToList();
 
-            var submittedVariantIds = submittedVariants.Select(s => s.SanPhamChiTietId).Where(id => id.HasValue).ToList();
+            var submittedIds = submittedVariants
+                .Where(x => x.SanPhamChiTietId.HasValue)
+                .Select(x => x.SanPhamChiTietId.Value)
+                .ToList();
 
-            var variantsToDelete = existingVariants.Where(e => !submittedVariantIds.Contains(e.SanPhamChiTietId));
-            foreach (var variant in variantsToDelete)
+            foreach (var item in existing.Where(x => !submittedIds.Contains(x.SanPhamChiTietId)))
             {
-                await _chiTietService.DeleteAsync(variant.SanPhamChiTietId);
+                await _chiTietService.DeleteAsync(item.SanPhamChiTietId);
             }
 
-            foreach (var submittedVariant in submittedVariants)
+            foreach (var item in submittedVariants)
             {
                 var dto = new SanPhamChiTietDTO
                 {
                     SanPhamId = sanPhamId,
-                    MauSacId = submittedVariant.MauSacId,
-                    KichCoId = submittedVariant.KichCoId,
-                    SoLuong = submittedVariant.SoLuongTon,
-                    Gia = submittedVariant.GiaBan,
-                    GiaNhap = submittedVariant.GiaNhap,
-                    MoTa = submittedVariant.MoTa,
-                    AnhId = submittedVariant.AnhId,
+                    MauSacId = item.MauSacId,
+                    KichCoId = item.KichCoId,
+                    SoLuong = item.SoLuongTon,
+                    Gia = item.GiaBan,
+                    GiaNhap = item.GiaNhap,
+                    MoTa = item.MoTa,
+                    AnhId = item.AnhId,
                     TrangThai = 1
                 };
 
-                if (submittedVariant.SanPhamChiTietId.HasValue && submittedVariant.SanPhamChiTietId != Guid.Empty)
-                {
-                    await _chiTietService.UpdateAsync(submittedVariant.SanPhamChiTietId.Value, dto);
-                }
+                if (item.SanPhamChiTietId.HasValue && item.SanPhamChiTietId != Guid.Empty)
+                    await _chiTietService.UpdateAsync(item.SanPhamChiTietId.Value, dto);
                 else
-                {
                     await _chiTietService.CreateAsync(dto);
-                }
             }
         }
 
-        private void ValidateChiTietList(List<SanPhamChiTietCreateViewModel> chiTietList)
+        // ================== LOAD DROPDOWN ==================
+        private async Task LoadDropdownData(SanPhamDTO? sanPham = null, bool isCreateMode = false)
         {
-            if (chiTietList == null || !chiTietList.Any())
-            {
-                ModelState.AddModelError("", "Vui lòng thêm ít nhất một biến thể sản phẩm!");
-                return;
-            }
-
-            for (int i = 0; i < chiTietList.Count; i++)
-            {
-                var chiTiet = chiTietList[i];
-                if (chiTiet.MauSacId == Guid.Empty) ModelState.AddModelError($"ChiTietList[{i}].MauSacId", "Vui lòng chọn màu sắc.");
-                if (chiTiet.KichCoId == Guid.Empty) ModelState.AddModelError($"ChiTietList[{i}].KichCoId", "Vui lòng chọn kích cỡ.");
-                if (chiTiet.GiaBan <= 0) ModelState.AddModelError($"ChiTietList[{i}].GiaBan", "Giá bán phải lớn hơn 0.");
-                if (chiTiet.SoLuongTon < 0) ModelState.AddModelError($"ChiTietList[{i}].SoLuongTon", "Số lượng không được âm.");
-            }
+            ViewBag.KichCoList = new SelectList(await _kichCoService.GetAllAsync(), "KichCoId", "TenKichCo");
+            ViewBag.MauSacList = new SelectList(await _mauSacService.GetAllAsync(), "MauSacId", "TenMau");
+            ViewBag.AnhList = await _anhService.GetAllAsync();
+            ViewBag.ThuongHieuList = new SelectList(await _thuongHieuService.GetAllAsync(), "ThuongHieuId", "TenThuongHieu");
         }
 
         private void AddApiErrorsToModelState<T>(ApiResult<T> result)
@@ -353,40 +283,6 @@ namespace ShoseSport.Web.Areas.Admin.Controllers
                     ModelState.AddModelError(error.Key, string.Join(", ", error.Value));
                 }
             }
-            else
-            {
-                ModelState.AddModelError(string.Empty, "Đã xảy ra lỗi không xác định từ API.");
-            }
-        }
-
-        private async Task LoadDropdownData(SanPhamDTO? sanPham = null, bool isCreateMode = false)
-        {
-            var allThuongHieu = (await _thuongHieuService.GetAllAsync()).ToList();
-            var allChatLieu = (await _chatLieuService.GetAllAsync()).ToList();
-            var allThanhPhan = (await _thanhPhanService.GetAllAsync()).ToList();
-            var allKichCo = (await _kichCoService.GetAllAsync()).ToList();
-            var allMauSac = (await _mauSacService.GetAllAsync()).ToList();
-
-            ViewBag.ThuongHieuList = allThuongHieu
-                .Where(th => isCreateMode ? th.TrangThai : (th.TrangThai || th.ThuongHieuId == sanPham?.ThuongHieuId))
-                .Select(th => new SelectListItem { Value = th.ThuongHieuId.ToString(), Text = th.TrangThai ? th.TenThuongHieu : $"{th.TenThuongHieu} (Ngưng hoạt động)" });
-
-            ViewBag.ChatLieuList = allChatLieu
-                .Where(cl => cl.TrangThai == true)
-                .Select(cl => new SelectListItem { Value = cl.ChatLieuId.ToString(), Text = cl.TenChatLieu })
-                .ToList();
-
-            ViewBag.ThanhPhanList = allThanhPhan
-                  .Where(tp => isCreateMode ? tp.TrangThai : (tp.TrangThai || (sanPham?.ThanhPhanIds?.Contains(tp.ThanhPhanId) ?? false)))
-                  .Select(tp => new SelectListItem { Value = tp.ThanhPhanId.ToString(), Text = tp.TrangThai ? tp.TenThanhPhan : $"{tp.TenThanhPhan} (Ngưng hoạt động)" }).ToList();
-
-            ViewBag.DanhSachThuongHieu = allThuongHieu;
-            ViewBag.DanhSachChatLieu = allChatLieu;
-            ViewBag.DanhSachThanhPhan = allThanhPhan;
-
-            ViewBag.KichCoList = new SelectList(allKichCo.Where(k => isCreateMode ? k.TrangThai : true), "KichCoId", "TenKichCo");
-            ViewBag.MauSacList = new SelectList(allMauSac.Where(m => isCreateMode ? m.TrangThai : true), "MauSacId", "TenMau");
-            ViewBag.AnhList = await _anhService.GetAllAsync();
         }
     }
 }
