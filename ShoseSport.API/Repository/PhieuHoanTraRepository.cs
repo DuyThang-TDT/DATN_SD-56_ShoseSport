@@ -1,4 +1,4 @@
-﻿using ShoseSport.API.Data;
+using ShoseSport.API.Data;
 using ShoseSport.API.Models;
 using ShoseSport.API.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
@@ -31,6 +31,8 @@ namespace ShoseSport.API.Repository
             .ThenInclude(ct => ct.HoaDon)
             .Include(p => p.HoaDonChiTiet)
             .ThenInclude(ct => ct.PhieuHoanTras)
+            .Include(p => p.HoaDonChiTiet)
+            .ThenInclude(ct => ct.SanPhamChiTiet)
             .FirstOrDefaultAsync(p => p.PhieuHoanTraId == id);
         }
 
@@ -41,6 +43,8 @@ namespace ShoseSport.API.Repository
             .ThenInclude(ct => ct.HoaDon)
             .Include(p => p.HoaDonChiTiet)
             .ThenInclude(ct => ct.PhieuHoanTras)
+            .Include(p => p.HoaDonChiTiet)
+            .ThenInclude(ct => ct.SanPhamChiTiet)
             .Where(p => p.HoaDonChiTiet.HoaDon.KhachHangId == khachHangId)
             .ToListAsync();
         }

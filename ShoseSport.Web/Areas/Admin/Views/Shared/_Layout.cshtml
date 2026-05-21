@@ -113,6 +113,12 @@
                                 <span>Quản lý đơn hàng</span>
                             </a>
                         </li>
+                        <li>
+                            <a href="@Url.Action("Index", "PhieuHoanTraAdmin", new { area = "Admin" })" class="nav-link @(ViewContext.RouteData.Values["Controller"]?.ToString() == "PhieuHoanTraAdmin" ? "active" : "")">
+                                <i class="nav-icon fas fa-undo"></i>
+                                <span>Quản lý hoàn trả</span>
+                            </a>
+                        </li>
                         @if (isAdmin)
                         {
                             <li>

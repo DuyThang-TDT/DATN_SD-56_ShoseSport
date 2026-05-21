@@ -200,8 +200,8 @@ namespace ShoseSport.Web.Services
             try
             {
                 var allOrders = await GetHoaDonListAsync();
-                // ✅ Chỉ tính tổng đơn hàng có trạng thái từ 0-5
-                return allOrders.Where(h => h.TrangThai >= 0 && h.TrangThai <= 5).Count();
+                // ✅ Chỉ tính tổng đơn hàng hoạt động/thành công (loại trừ trạng thái 4 - Đã hủy và 5 - Đã hoàn trả)
+                return allOrders.Where(h => h.TrangThai >= 0 && h.TrangThai < 4).Count();
             }
             catch (Exception ex)
             {
@@ -405,7 +405,7 @@ namespace ShoseSport.Web.Services
                     { 2, 0 }, // Đang giao
                     { 3, 0 }, // Đã giao
                     { 4, 0 }, // Đã hủy
-                    { 5, 0 }  // Đã thanh toán
+                    { 5, 0 }  // Đã hoàn trả
                 };
                 
                 // ✅ Đếm số lượng đơn hàng theo từng trạng thái - chỉ đếm trạng thái từ 0-5
@@ -417,7 +417,7 @@ namespace ShoseSport.Web.Services
                     }
                 }
                 
-                var labels = new[] { "Chờ duyệt", "Đã duyệt", "Đang giao", "Đã giao", "Đã hủy", "Đã thanh toán" };
+                var labels = new[] { "Chờ duyệt", "Đã duyệt", "Đang giao", "Đã giao", "Đã hủy", "Đã hoàn trả" };
                 var values = new[] { 
                     statusCounts[0], 
                     statusCounts[1], 
@@ -485,7 +485,7 @@ namespace ShoseSport.Web.Services
                 2 => "Đang giao",
                 3 => "Đã giao",
                 4 => "Đã hủy",
-                5 => "Đã thanh toán",
+                5 => "Đã hoàn trả",
                 _ => "Không xác định"
             };
         }

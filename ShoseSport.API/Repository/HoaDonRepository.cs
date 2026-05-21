@@ -614,6 +614,7 @@ namespace ShoseSport.API.Repository
                 2 => "Đang giao",
                 3 => "Đã giao",
                 4 => "Đã hủy",
+                5 => "Đã hoàn trả",
                 _ => "Không xác định"
             };
         }
@@ -746,6 +747,8 @@ namespace ShoseSport.API.Repository
             // 0 (Chờ duyệt) → 1 (Đã duyệt) ✓
             // 1 (Đã duyệt) → 2 (Đang giao) ✓
             // 2 (Đang giao) → 3 (Đã giao) ✓
+            // 3 (Đã giao) → 5 (Đã hoàn trả) ✓ - Khi duyệt phiếu hoàn trả
+            // 5 (Đã hoàn trả) → 3 (Đã giao) ✓ - Khi hủy duyệt phiếu hoàn trả
             // 0, 1 → 4 (Đã hủy) ✓ - Cho phép hủy đơn từ trạng thái chờ duyệt và đã duyệt
             // 4 (Đã hủy) → Không thể chuyển sang trạng thái khác
 
@@ -772,7 +775,10 @@ namespace ShoseSport.API.Repository
                     return trangThaiMoi == 3; // Chỉ có thể chuyển thành "Đã giao"
                 
                 case 3: // Đã giao
-                    return false; // Không thể chuyển từ trạng thái đã giao
+                    return trangThaiMoi == 5; // Cho phép sang Đã hoàn trả khi hoàn hàng
+                
+                case 5: // Đã hoàn trả
+                    return trangThaiMoi == 3; // Cho phép quay lại Đã giao nếu hủy duyệt/từ chối hoàn trả
                 
                 default:
                     return false;
@@ -790,7 +796,7 @@ namespace ShoseSport.API.Repository
                 return "Không thể thay đổi trạng thái của đơn hàng đã hủy";
             }
 
-            if (trangThaiHienTai == 3)
+            if (trangThaiHienTai == 3 && trangThaiMoi != 5)
             {
                 return "Không thể thay đổi trạng thái của đơn hàng đã giao thành công";
             }

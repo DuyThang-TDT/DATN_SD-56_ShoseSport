@@ -17,7 +17,7 @@ namespace ShoseSport.Web.Controllers
             var khachHangId = HttpContext.Session.GetString("KhachHangId");
             if (string.IsNullOrEmpty(khachHangId))
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("DangNhap", "KhachHangLogin");
             }
 
             var customerGuid = Guid.Parse(khachHangId);
@@ -95,7 +95,7 @@ namespace ShoseSport.Web.Controllers
             var khachHangId = HttpContext.Session.GetString("KhachHangId");
             if (string.IsNullOrEmpty(khachHangId))
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("DangNhap", "KhachHangLogin");
             }
 
             var customerGuid = Guid.Parse(khachHangId);
