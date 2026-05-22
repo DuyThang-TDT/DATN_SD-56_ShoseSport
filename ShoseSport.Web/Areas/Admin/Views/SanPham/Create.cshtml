@@ -96,10 +96,10 @@
                         <label asp-for="SanPham.HanSuDung" class="form-label">
                             <i class="fas fa-calendar-alt me-2"></i>Hạn sử dụng
                         </label>
-                        <input type="datetime-local"
-                               asp-for="SanPham.HanSuDung"
-                               class="form-control"
-                               min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")"
+                        <input type="datetime-local" 
+                               asp-for="SanPham.HanSuDung" 
+                               class="form-control" 
+                               min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" 
                                onchange="validateExpirationDate(this)" />
                         <span asp-validation-for="SanPham.HanSuDung" class="text-danger small"></span>
                     </div>
@@ -217,25 +217,25 @@
         // Function to validate expiration date
         function validateExpirationDate(input) {
             if (!input.value) return; // Skip if empty
-
+            
             const selectedDate = new Date(input.value);
             const now = new Date();
-
+            
             if (selectedDate <= now) {
                 // Reset to current date + 1 day
                 const tomorrow = new Date();
                 tomorrow.setDate(tomorrow.getDate() + 1);
-
+                
                 // Format as YYYY-MM-DDThh:mm (local time)
                 const formattedDate = tomorrow.toISOString().slice(0, 16);
                 input.value = formattedDate;
-
+                
                 // Show error message
                 const errorSpan = input.nextElementSibling;
                 if (errorSpan && errorSpan.classList.contains('field-validation-error')) {
                     errorSpan.textContent = "Hạn sử dụng phải sau ngày hiện tại";
                 }
-
+                
                 // Focus back to the input
                 input.focus();
             }
@@ -245,7 +245,7 @@
             const chiTietBody = document.getElementById('chiTietBody');
             const form = document.querySelector('form');
             let currentAnhBtn = null;
-
+            
             // Set min date for expiration date input
             const expDateInput = document.querySelector('input[type="datetime-local"][name$="HanSuDung"]');
             if (expDateInput) {
@@ -394,10 +394,10 @@
                  if (giaBan > 0 && giaNhap > 0) {
                      const loiNhuan = giaBan - giaNhap;
                      const loiNhuanPhanTram = (loiNhuan / giaNhap) * 100;
-
+                     
                      const profitClass = loiNhuan >= 0 ? 'text-success' : 'text-danger';
                      const sign = loiNhuan >= 0 ? '+' : '';
-
+                     
                      const tooltip = document.createElement('div');
                      tooltip.className = 'profit-tooltip';
                      tooltip.innerHTML = `
@@ -408,12 +408,12 @@
                              ${sign}${loiNhuanPhanTram.toFixed(1)}% / 1 sản phẩm
                          </small>
                      `;
-
+                     
                      // Tính toán vị trí chính xác
                      const rect = giaBanInput.getBoundingClientRect();
                      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
                      const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-
+                     
                      tooltip.style.cssText = `
                          position: absolute;
                          top: ${rect.bottom + scrollTop + 5}px;
@@ -429,7 +429,7 @@
                          font-size: 0.875rem;
                          max-width: 200px;
                      `;
-
+                     
                      document.body.appendChild(tooltip);
                  } else if (giaBan > 0) {
                      const tooltip = document.createElement('div');
@@ -442,12 +442,12 @@
                              Nhập giá nhập để tính lợi nhuận / 1 sản phẩm
                          </small>
                      `;
-
+                     
                      // Tính toán vị trí chính xác
                      const rect = giaBanInput.getBoundingClientRect();
                      const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
                      const scrollLeft = window.pageXOffset || document.documentElement.scrollLeft;
-
+                     
                      tooltip.style.cssText = `
                          position: absolute;
                          top: ${rect.bottom + scrollTop + 5}px;
@@ -463,7 +463,7 @@
                          font-size: 0.875rem;
                          max-width: 200px;
                      `;
-
+                     
                      document.body.appendChild(tooltip);
                  }
              };
