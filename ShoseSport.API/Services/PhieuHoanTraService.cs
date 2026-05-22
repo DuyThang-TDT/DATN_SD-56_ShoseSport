@@ -1,4 +1,4 @@
-﻿using ShoseSport.API.Data;
+using ShoseSport.API.Data;
 using ShoseSport.API.Models;
 using ShoseSport.API.Models.DTO;
 using ShoseSport.API.Repository.IRepository;
@@ -73,10 +73,46 @@ namespace ShoseSport.API.Services
             var entity = await _repo.GetByIdAsync(id);
             if (entity == null) return false;
 
-            // Nếu rất cần cho sửa số lượng, phải validate lại y như Create (không khuyến khích).
-            // Ở đây chỉ cho đổi trạng thái:
-            entity.TrangThai = request.TrangThai;
+            int oldStatus = entity.TrangThai;
+            int newStatus = request.TrangThai;
 
+            if (oldStatus != newStatus)
+            {
+                bool wasApproved = (oldStatus == 1 || oldStatus == 3);
+                bool isApproved = (newStatus == 1 || newStatus == 3);
+
+                if (!wasApproved && isApproved)
+                {
+                    // Chuyển sang trạng thái được chấp nhận (Duyệt/Hoàn tất) -> Cộng lại vào kho
+                    if (entity.HoaDonChiTiet != null && entity.HoaDonChiTiet.SanPhamChiTiet != null)
+                    {
+                        entity.HoaDonChiTiet.SanPhamChiTiet.SoLuong += entity.SoLuongHoan;
+                    }
+                    
+                    // Cập nhật trạng thái hóa đơn sang Đã hoàn trả (5)
+                    if (entity.HoaDonChiTiet != null && entity.HoaDonChiTiet.HoaDon != null)
+                    {
+                        entity.HoaDonChiTiet.HoaDon.TrangThai = 5;
+                    }
+                }
+                else if (wasApproved && !isApproved)
+                {
+                    // Chuyển từ trạng thái đã duyệt về chưa duyệt/từ chối -> Trừ lại số lượng từ kho
+                    if (entity.HoaDonChiTiet != null && entity.HoaDonChiTiet.SanPhamChiTiet != null)
+                    {
+                        var spct = entity.HoaDonChiTiet.SanPhamChiTiet;
+                        spct.SoLuong = Math.Max(0, spct.SoLuong - entity.SoLuongHoan);
+                    }
+                    
+                    // Cập nhật trạng thái hóa đơn quay lại Đã giao (3)
+                    if (entity.HoaDonChiTiet != null && entity.HoaDonChiTiet.HoaDon != null)
+                    {
+                        entity.HoaDonChiTiet.HoaDon.TrangThai = 3;
+                    }
+                }
+            }
+
+            entity.TrangThai = request.TrangThai;
             await _repo.UpdateAsync(entity);
             return true;
         }
@@ -84,6 +120,19 @@ namespace ShoseSport.API.Services
         // Có thể tắt hẳn xóa nếu không muốn mất lịch sử; tạm để nguyên
         public async Task<bool> DeleteAsync(Guid id)
         {
+            var entity = await _repo.GetByIdAsync(id);
+            if (entity == null) return false;
+
+            bool wasApproved = (entity.TrangThai == 1 || entity.TrangThai == 3);
+            if (wasApproved)
+            {
+                if (entity.HoaDonChiTiet != null && entity.HoaDonChiTiet.SanPhamChiTiet != null)
+                {
+                    var spct = entity.HoaDonChiTiet.SanPhamChiTiet;
+                    spct.SoLuong = Math.Max(0, spct.SoLuong - entity.SoLuongHoan);
+                }
+            }
+
             await _repo.DeleteAsync(id);
             return true;
         }

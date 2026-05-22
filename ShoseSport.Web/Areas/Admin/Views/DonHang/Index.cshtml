@@ -196,6 +196,11 @@
             color: #991b1b; 
             border: 2px solid #ef4444;
         }
+        .status-returned { 
+            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%); 
+            color: #6b21a8; 
+            border: 2px solid #a855f7;
+        }
 
         .action-buttons {
             display: flex;
@@ -537,6 +542,7 @@
         <button class="filter-btn" data-status="1" data-type="all">Đã duyệt</button>
         <button class="filter-btn" data-status="2" data-type="all">Đang giao</button>
         <button class="filter-btn" data-status="3" data-type="all">Đã giao</button>
+        <button class="filter-btn" data-status="5" data-type="all">Đã hoàn trả</button>
         <button class="filter-btn" data-status="4" data-type="all">Đã hủy</button>
                         <button class="filter-btn" data-status="all" data-type="BanTaiQuay">Khách tại quầy</button>
     </div>
@@ -962,7 +968,7 @@
             2 => "Đang giao",
             3 => "Đã giao",
             4 => "Đã hủy",
-            5 => "Đã TT (Online)",
+            5 => "Đã hoàn trả",
             6 => "Treo",
             7 => "Đang xử lý (Tại quầy)",
             8 => "Đã TT (Tại quầy)",
@@ -981,7 +987,7 @@
             2 => "status-shipping",
             3 => "status-delivered",
             4 => "status-cancelled",
-            5 => "status-delivered",
+            5 => "status-returned",
             6 => "status-pending",
             7 => "status-approved",
             8 => "status-delivered",

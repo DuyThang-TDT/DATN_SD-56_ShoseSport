@@ -1511,7 +1511,18 @@
                                 </div>
 
                                 <!-- ACTION: Nút yêu cầu hoàn trả -->
-
+                                @if (Model.TrangThai == 3)
+                                {
+                                    <div class="product-action" style="grid-column: 1 / -1; display: flex; justify-content: flex-end; padding-top: 0.75rem; border-top: 1px dashed #e2e8f0; margin-top: 0.5rem;">
+                                        <a href="/KhachHangHoanTra/Create?hoaDonId=@Model.HoaDonId&hoaDonChiTietId=@product.HoaDonChiTietId" 
+                                           class="btn-modern" 
+                                           style="padding: 0.5rem 1.25rem; border-radius: 10px; border: 1.5px solid #ef4444; color: #ef4444; font-size: 0.85rem; font-weight: 600; text-transform: none; display: inline-flex; align-items: center; gap: 0.5rem; background: transparent; transition: all 0.3s ease;"
+                                           onmouseover="this.style.background='#ef4444'; this.style.color='#fff';"
+                                           onmouseout="this.style.background='transparent'; this.style.color='#ef4444';">
+                                            <i class="fas fa-undo"></i> Yêu cầu hoàn trả sản phẩm
+                                        </a>
+                                    </div>
+                                }
                             </div>
                         </div>
                     }

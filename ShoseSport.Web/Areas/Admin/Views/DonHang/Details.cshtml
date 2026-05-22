@@ -155,6 +155,12 @@
             border: 2px solid #ef4444;
         }
 
+        .status-returned {
+            background: linear-gradient(135deg, #f3e8ff 0%, #e9d5ff 100%);
+            color: #6b21a8;
+            border: 2px solid #a855f7;
+        }
+
         .order-summary {
             background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%);
             border-radius: 12px;
@@ -498,6 +504,10 @@
         .icon-cancelled {
             background: #ef4444;
         }
+
+        .icon-returned {
+            background: #a855f7;
+        }
     </style>
 }
 
@@ -760,8 +770,31 @@
                                         @Model.NgayTao.AddHours(1).ToString("dd/MM/yyyy HH:mm:ss")
                                     }
                                 </div>
+                            </div>
                         </div>
-                    </div>
+                    }
+
+                    <!-- Chỉ hiển thị khi thực sự đã hoàn trả -->
+                    @if (Model.TrangThai == 5)
+                    {
+                        <div class="timeline-item">
+                            <div class="timeline-icon icon-returned">
+                                <i class="fas fa-undo"></i>
+                            </div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Đơn hàng đã hoàn trả</div>
+                                <div class="timeline-time">
+                                    @if (Model.ThoiGianThayDoiTrangThai.HasValue)
+                                    {
+                                        @Model.ThoiGianThayDoiTrangThai.Value.ToString("dd/MM/yyyy HH:mm:ss")
+                                    }
+                                    else
+                                    {
+                                        @Model.NgayTao.AddHours(2).ToString("dd/MM/yyyy HH:mm:ss")
+                                    }
+                                </div>
+                            </div>
+                        </div>
                     }
                 }
             </div>
@@ -1069,6 +1102,7 @@
             2 => "Đang giao",
             3 => "Đã giao",
             4 => "Đã hủy",
+            5 => "Đã hoàn trả",
             _ => "Không xác định"
         };
     }
@@ -1082,6 +1116,7 @@
             2 => "status-shipping",
             3 => "status-delivered",
             4 => "status-cancelled",
+            5 => "status-returned",
             _ => "status-pending"
         };
     }
@@ -1095,6 +1130,7 @@
             2 => "icon-shipping",
             3 => "icon-delivered",
             4 => "icon-cancelled",
+            5 => "icon-returned",
             _ => "icon-pending"
         };
     }
@@ -1108,19 +1144,21 @@
             2 => "fa-shipping-fast",
             3 => "fa-home",
             4 => "fa-times",
+            5 => "fa-undo",
             _ => "fa-info-circle"
         };
     }
 
     public string GetStatusChangeText(int trangThaiCu, int trangThaiMoi)
     {
-        return trangThaiCu switch
+        return trangThaiMoi switch
         {
             0 => "Đơn hàng được tạo",
             1 => "Đơn hàng được duyệt",
             2 => "Đơn hàng đang giao",
             3 => "Đơn hàng đã giao",
             4 => "Đơn hàng đã hủy",
+            5 => "Đơn hàng đã hoàn trả",
             _ => "Trạng thái không xác định"
         };
     }
