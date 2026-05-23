@@ -92,17 +92,7 @@
                         </select>
                         <span asp-validation-for="SanPham.ThuongHieuId" class="text-danger small"></span>
                     </div>
-                    <div class="col-lg-3 mb-3">
-                        <label asp-for="SanPham.HanSuDung" class="form-label">
-                            <i class="fas fa-calendar-alt me-2"></i>Hạn sử dụng
-                        </label>
-                        <input type="datetime-local" 
-                               asp-for="SanPham.HanSuDung" 
-                               class="form-control" 
-                               min="@DateTime.Now.ToString("yyyy-MM-ddTHH:mm")" 
-                               onchange="validateExpirationDate(this)" />
-                        <span asp-validation-for="SanPham.HanSuDung" class="text-danger small"></span>
-                    </div>
+                   
                     <div class="col-lg-3 mb-3 d-flex align-items-center">
                         <div class="form-check form-switch mt-3">
                             <input asp-for="SanPham.TrangThai" class="form-check-input" type="checkbox" />
@@ -214,43 +204,15 @@
     <partial name="_ValidationScriptsPartial" />
 
     <script>
-        // Function to validate expiration date
-        function validateExpirationDate(input) {
-            if (!input.value) return; // Skip if empty
-            
-            const selectedDate = new Date(input.value);
-            const now = new Date();
-            
-            if (selectedDate <= now) {
-                // Reset to current date + 1 day
-                const tomorrow = new Date();
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                
-                // Format as YYYY-MM-DDThh:mm (local time)
-                const formattedDate = tomorrow.toISOString().slice(0, 16);
-                input.value = formattedDate;
-                
-                // Show error message
-                const errorSpan = input.nextElementSibling;
-                if (errorSpan && errorSpan.classList.contains('field-validation-error')) {
-                    errorSpan.textContent = "Hạn sử dụng phải sau ngày hiện tại";
-                }
-                
-                // Focus back to the input
-                input.focus();
-            }
-        }
+       
+        
 
         document.addEventListener('DOMContentLoaded', function () {
             const chiTietBody = document.getElementById('chiTietBody');
             const form = document.querySelector('form');
             let currentAnhBtn = null;
+
             
-            // Set min date for expiration date input
-            const expDateInput = document.querySelector('input[type="datetime-local"][name$="HanSuDung"]');
-            if (expDateInput) {
-                // Set min attribute to current date/time
-                expDateInput.min = new Date().toISOString().slice(0, 16);
             }
 
             // 1. LẤY DỮ LIỆU DROPDOWN TỪ RAZOR MỘT CÁCH AN TOÀN
