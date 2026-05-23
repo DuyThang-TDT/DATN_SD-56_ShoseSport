@@ -1,6 +1,6 @@
-using FurryFriends.API.Models.VNPay;
+using ShoseSport.API.Models.VNPay;
 
-namespace FurryFriends.Web.Services.IServices
+namespace ShoseSport.Web.Services.IServices
 {
     public interface IVnPayService
     {

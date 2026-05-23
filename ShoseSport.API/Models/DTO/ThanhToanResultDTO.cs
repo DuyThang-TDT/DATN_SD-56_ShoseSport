@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace FurryFriends.API.Models.DTO
+namespace ShoseSport.API.Models.DTO
 {
     public class ThanhToanResultDTO
     {

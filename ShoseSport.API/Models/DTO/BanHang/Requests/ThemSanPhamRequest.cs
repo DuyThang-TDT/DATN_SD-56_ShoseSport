@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FurryFriends.API.Models.DTO.BanHang.Requests
+namespace ShoseSport.API.Models.DTO.BanHang.Requests
 {
     public class ThemSanPhamRequest
     {

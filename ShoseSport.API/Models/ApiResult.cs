@@ -1,4 +1,4 @@
-﻿namespace FurryFriends.API.Models
+﻿namespace ShoseSport.API.Models
 {
     public class ApiResult<T>
     {

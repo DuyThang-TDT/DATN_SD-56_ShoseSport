@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FurryFriends.Web.Models
+namespace ShoseSport.Web.Models
 {
 	public class DoiMatKhauViewModel
 	{

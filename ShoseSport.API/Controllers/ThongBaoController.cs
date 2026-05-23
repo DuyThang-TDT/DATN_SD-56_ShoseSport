@@ -1,10 +1,10 @@
-using FurryFriends.API.Models;
-using FurryFriends.API.Repository.IRepository;
+using ShoseSport.API.Models;
+using ShoseSport.API.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 
-namespace FurryFriends.API.Controllers
+namespace ShoseSport.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

@@ -1,6 +1,6 @@
-using FurryFriends.Web.ViewModels;
+using ShoseSport.Web.ViewModels;
 
-namespace FurryFriends.Web.Services
+namespace ShoseSport.Web.Services
 {
     public class DiscountService
     {

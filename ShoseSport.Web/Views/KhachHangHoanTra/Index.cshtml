@@ -1,4 +1,4 @@
-﻿@model IEnumerable<FurryFriends.Web.ViewModels.PhieuHoanTraViewModel>
+﻿@model IEnumerable<ShoseSport.Web.ViewModels.PhieuHoanTraViewModel>
 @{
     ViewData["Title"] = "Yêu cầu hoàn trả của tôi";
     Layout = "_Layout";
@@ -38,7 +38,7 @@
         return $"https://localhost:7289/images/{System.IO.Path.GetFileName(p)}";
     }
 
-    var groups = (Model ?? Enumerable.Empty<FurryFriends.Web.ViewModels.PhieuHoanTraViewModel>())
+    var groups = (Model ?? Enumerable.Empty<ShoseSport.Web.ViewModels.PhieuHoanTraViewModel>())
                  .GroupBy(x => x.HoaDonChiTietId)
                  .ToList();
 }

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FurryFriends.API.Models.DTO.BanHang
+namespace ShoseSport.API.Models.DTO.BanHang
 {
     public class HoaDonBanHangDto
     {

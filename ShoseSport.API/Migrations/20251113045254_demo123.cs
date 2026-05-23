@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #pragma warning disable CA1814 // Prefer jagged arrays over multidimensional
 
-namespace FurryFriends.API.Migrations
+namespace ShoseSport.API.Migrations
 {
     /// <inheritdoc />
     public partial class demo123 : Migration
@@ -667,8 +667,8 @@ namespace FurryFriends.API.Migrations
                 columns: new[] { "NhanVienId", "ChucVuId", "DiaChi", "Email", "GioiTinh", "HoVaTen", "NgayCapNhat", "NgaySinh", "NgayTao", "SDT", "TaiKhoanId", "TrangThai" },
                 values: new object[,]
                 {
-                    { new Guid("33333333-3333-3333-3333-333333333333"), new Guid("22222222-2222-2222-2222-222222222222"), "Hà Nội", "admin@furryfriends.local", "Nam", "Admin hệ thống", new DateTime(2025, 11, 13, 4, 52, 53, 24, DateTimeKind.Utc).AddTicks(9143), new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 11, 13, 4, 52, 53, 24, DateTimeKind.Utc).AddTicks(9143), "0123456789", new Guid("11111111-1111-1111-1111-111111111111"), true },
-                    { new Guid("66666666-6666-6666-6666-666666666666"), new Guid("44444444-4444-4444-4444-444444444444"), "Hà Nội", "nhanvien@furryfriends.local", "Nữ", "Nhân viên bán hàng", new DateTime(2025, 11, 13, 4, 52, 53, 24, DateTimeKind.Utc).AddTicks(9160), new DateTime(1995, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 11, 13, 4, 52, 53, 24, DateTimeKind.Utc).AddTicks(9159), "0987654321", new Guid("55555555-5555-5555-5555-555555555555"), true }
+                    { new Guid("33333333-3333-3333-3333-333333333333"), new Guid("22222222-2222-2222-2222-222222222222"), "Hà Nội", "admin@ShoseSpost.local", "Nam", "Admin hệ thống", new DateTime(2025, 11, 13, 4, 52, 53, 24, DateTimeKind.Utc).AddTicks(9143), new DateTime(1990, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 11, 13, 4, 52, 53, 24, DateTimeKind.Utc).AddTicks(9143), "0123456789", new Guid("11111111-1111-1111-1111-111111111111"), true },
+                    { new Guid("66666666-6666-6666-6666-666666666666"), new Guid("44444444-4444-4444-4444-444444444444"), "Hà Nội", "nhanvien@ShoseSpost.local", "Nữ", "Nhân viên bán hàng", new DateTime(2025, 11, 13, 4, 52, 53, 24, DateTimeKind.Utc).AddTicks(9160), new DateTime(1995, 5, 15, 0, 0, 0, 0, DateTimeKind.Unspecified), new DateTime(2025, 11, 13, 4, 52, 53, 24, DateTimeKind.Utc).AddTicks(9159), "0987654321", new Guid("55555555-5555-5555-5555-555555555555"), true }
                 });
 
             migrationBuilder.CreateIndex(

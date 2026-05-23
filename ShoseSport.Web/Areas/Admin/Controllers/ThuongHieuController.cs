@@ -1,10 +1,10 @@
-﻿using FurryFriends.API.Models.DTO;
-using FurryFriends.Web.Filter;
-using FurryFriends.Web.Services.IService;
+﻿using ShoseSport.API.Models.DTO;
+using ShoseSport.Web.Filter;
+using ShoseSport.Web.Services.IService;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Channels;
 
-namespace FurryFriends.Web.Areas.Admin.Controllers
+namespace ShoseSport.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
    [AuthorizeAdminOnly]

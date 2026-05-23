@@ -1,4 +1,4 @@
-﻿using FurryFriends.API.Models;
+﻿using ShoseSport.API.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

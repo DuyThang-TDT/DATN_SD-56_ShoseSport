@@ -1,11 +1,11 @@
-﻿using FurryFriends.API.Settings;
+﻿using ShoseSport.API.Settings;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MailKit.Net.Smtp;
-using FurryFriends.API.Services.IServices;
+using ShoseSport.API.Services.IServices;
 using Microsoft.Extensions.Logging;
 
-namespace FurryFriends.API.Services
+namespace ShoseSport.API.Services
 {
     public class MailService : IMailService
     {

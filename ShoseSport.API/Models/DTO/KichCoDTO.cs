@@ -1,10 +1,10 @@
-﻿using FurryFriends.API.Data;
+﻿using ShoseSport.API.Data;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Collections.Generic; // Added for List
 using System.Linq; // Added for Any
 
-namespace FurryFriends.API.Models.DTO
+namespace ShoseSport.API.Models.DTO
 {
     public class KichCoDTO : IValidatableObject
     {

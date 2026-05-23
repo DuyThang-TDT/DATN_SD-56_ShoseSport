@@ -1,8 +1,8 @@
-﻿// File: FurryFriends.Web/Services/Handlers/AuthHeaderHandler.cs
+﻿// File: ShoseSport.Web/Services/Handlers/AuthHeaderHandler.cs
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Authentication;
 
-namespace FurryFriends.Web.Services.Handlers // Đảm bảo namespace đúng
+namespace ShoseSport.Web.Services.Handlers // Đảm bảo namespace đúng
 {
     public class AuthHeaderHandler : DelegatingHandler
     {

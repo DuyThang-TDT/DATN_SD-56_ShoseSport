@@ -1,7 +1,7 @@
-using FurryFriends.Web.Services.IService;
-using FurryFriends.Web.ViewModels;
+using ShoseSport.Web.Services.IService;
+using ShoseSport.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
-namespace FurryFriends.Web.Controllers
+namespace ShoseSport.Web.Controllers
 {
     public class DonHangController : Controller
     {
@@ -17,7 +17,7 @@ namespace FurryFriends.Web.Controllers
             var khachHangId = HttpContext.Session.GetString("KhachHangId");
             if (string.IsNullOrEmpty(khachHangId))
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("DangNhap", "KhachHangLogin");
             }
 
             var customerGuid = Guid.Parse(khachHangId);
@@ -95,7 +95,7 @@ namespace FurryFriends.Web.Controllers
             var khachHangId = HttpContext.Session.GetString("KhachHangId");
             if (string.IsNullOrEmpty(khachHangId))
             {
-                return RedirectToAction("Login", "Account");
+                return RedirectToAction("DangNhap", "KhachHangLogin");
             }
 
             var customerGuid = Guid.Parse(khachHangId);

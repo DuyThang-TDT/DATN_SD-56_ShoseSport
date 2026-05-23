@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FurryFriends.Web.ViewModels
+namespace ShoseSport.Web.ViewModels
 {
     public class ResetPasswordViewModel
     {

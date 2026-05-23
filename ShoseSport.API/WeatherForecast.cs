@@ -1,4 +1,4 @@
-namespace FurryFriends.API
+namespace ShoseSport.API
 {
     public class WeatherForecast
     {

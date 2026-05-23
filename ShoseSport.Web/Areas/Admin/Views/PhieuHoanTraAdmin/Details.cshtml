@@ -1,0 +1,557 @@
+@model ShoseSport.Web.ViewModels.PhieuHoanTraViewModel
+@{
+    Layout = "_Layout";
+    ViewData["Title"] = "Quản trị - Chi tiết phiếu hoàn trả";
+    var currentTrangThai = Model.TrangThai;
+}
+
+@section Styles {
+    <style>
+        :root {
+            --primary: #6366f1;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --border: #e2e8f0;
+            --text-dark: #1e293b;
+            --text-light: #64748b;
+            --grad: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --grad-success: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            --grad-warning: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            --grad-danger: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+
+        .details-dashboard {
+            max-width: 1100px;
+            margin: 2rem auto;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, .15);
+            overflow: hidden;
+        }
+
+        .dashboard-header {
+            background: var(--grad);
+            color: #fff;
+            padding: 2rem 2.5rem;
+            position: relative;
+        }
+
+        .dashboard-header h2 {
+            margin: 0;
+            font-weight: 800;
+            font-size: 1.75rem;
+        }
+
+        .dashboard-subtitle {
+            opacity: 0.9;
+            font-size: 0.95rem;
+            margin-top: 0.5rem;
+        }
+
+        .section-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid var(--border);
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, .05);
+        }
+
+        .section-title {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 1.5rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .section-title i {
+            color: var(--primary);
+        }
+
+        /* Detail List styling */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .info-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        /* Status Badge */
+        .status-badge {
+            padding: 0.5rem 1.25rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: var(--grad-warning);
+            color: white;
+        }
+
+        .status-approved {
+            background: var(--grad-success);
+            color: white;
+        }
+
+        .status-rejected {
+            background: var(--grad-danger);
+            color: white;
+        }
+
+        /* Product Panel */
+        .product-panel {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            background: #f8fafc;
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--border);
+        }
+
+        .product-img-wrapper {
+            width: 120px;
+            height: 120px;
+            border-radius: 10px;
+            overflow: hidden;
+            background: white;
+            border: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .product-img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-info-details {
+            flex-grow: 1;
+        }
+
+        .product-info-details h4 {
+            margin: 0 0 0.5rem 0;
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 1.25rem;
+        }
+
+        .meta-badges {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.75rem;
+        }
+
+        .meta-badge {
+            font-size: 0.8rem;
+            font-weight: 600;
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        /* Reason section */
+        .reason-box {
+            background: #fdf2f2;
+            border-left: 4px solid var(--danger);
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .reason-title {
+            font-weight: 700;
+            color: #991b1b;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .reason-content {
+            color: #7f1d1d;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding-left: 2rem;
+            margin-top: 1rem;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 5px;
+            bottom: 5px;
+            width: 2px;
+            background: var(--border);
+        }
+
+        .timeline-step {
+            position: relative;
+            margin-bottom: 1.5rem;
+        }
+
+        .timeline-step:last-child {
+            margin-bottom: 0;
+        }
+
+        .timeline-bullet {
+            position: absolute;
+            left: -2rem;
+            top: 4px;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--border);
+        }
+
+        .timeline-bullet.active {
+            border-color: var(--primary);
+            background: var(--primary);
+        }
+
+        .timeline-bullet.success {
+            border-color: var(--success);
+            background: var(--success);
+        }
+
+        .timeline-bullet.danger {
+            border-color: var(--danger);
+            background: var(--danger);
+        }
+
+        .timeline-title {
+            font-weight: 700;
+            color: var(--text-dark);
+            font-size: 0.95rem;
+        }
+
+        .timeline-time {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-bottom: 0.25rem;
+        }
+
+        /* Action Buttons */
+        .action-bar {
+            background: #f8fafc;
+            padding: 1.5rem 2.5rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .btn-premium {
+            border-radius: 10px;
+            padding: 0.65rem 1.5rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            border: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-premium:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0,0,0,.15);
+        }
+
+        .btn-back {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .btn-back:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-approve {
+            background: var(--grad-success);
+            color: white;
+        }
+
+        .btn-reject {
+            background: var(--grad-danger);
+            color: white;
+        }
+
+        /* Responsive */
+        @@media (max-width: 768px) {
+            .product-panel {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+            .dashboard-header {
+                padding: 1.5rem;
+            }
+            .action-bar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .action-bar form {
+                width: 100%;
+            }
+            .btn-premium {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+}
+
+<div class="details-dashboard">
+    <!-- Header -->
+    <div class="dashboard-header">
+        <h2><i class="fas fa-file-invoice me-3"></i>Yêu cầu hoàn trả #@Model.PhieuHoanTraId.ToString().Substring(0, 8).ToUpper()</h2>
+        <div class="dashboard-subtitle">
+            <i class="fas fa-calendar-alt me-2"></i>Ngày gửi yêu cầu: @Model.NgayHoanTra.ToString("dd/MM/yyyy HH:mm")
+        </div>
+    </div>
+
+    <div class="p-4">
+        @if (TempData["Success"] != null)
+        {
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="fas fa-check-circle me-2"></i>@TempData["Success"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+        @if (TempData["Error"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="fas fa-exclamation-circle me-2"></i>@TempData["Error"]
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        }
+
+        <!-- Section 1: General & Status -->
+        <div class="section-card">
+            <div class="section-title">
+                <i class="fas fa-info-circle"></i> Thông tin chung & Trạng thái
+            </div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Trạng thái xử lý</span>
+                    <div>
+                        @switch (currentTrangThai)
+                        {
+                            case 0:
+                                <span class="status-badge status-pending">Chờ xử lý</span>
+                                break;
+                            case 1:
+                                <span class="status-badge status-approved">Đã duyệt (Đã cộng kho)</span>
+                                break;
+                            case 2:
+                                <span class="status-badge status-rejected">Từ chối</span>
+                                break;
+                            default:
+                                <span class="badge bg-secondary">Không xác định</span>
+                                break;
+                        }
+                    </div>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Số lượng hoàn trả</span>
+                    <span class="info-value text-primary fs-5">@Model.SoLuongHoan sản phẩm</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Mã chi tiết hóa đơn</span>
+                    <span class="info-value text-muted" style="font-size: 0.9rem;">@Model.HoaDonChiTietId</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 2: Product Variant -->
+        <div class="section-card">
+            <div class="section-title">
+                <i class="fas fa-box-open"></i> Sản phẩm yêu cầu hoàn trả
+            </div>
+            <div class="product-panel">
+                <div class="product-img-wrapper">
+                    @if (!string.IsNullOrEmpty(Model.AnhSanPham))
+                    {
+                        <img src="@Model.AnhSanPham" alt="@Model.TenSanPham" />
+                    }
+                    else
+                    {
+                        <i class="fas fa-box fa-3x text-muted"></i>
+                    }
+                </div>
+                <div class="product-info-details">
+                    <h4>@Model.TenSanPham</h4>
+                    <div class="meta-badges">
+                        <span class="meta-badge"><i class="fas fa-palette me-1"></i>Màu: @Model.MauSac</span>
+                        <span class="meta-badge"><i class="fas fa-ruler me-1"></i>Kích cỡ: @Model.KichCo</span>
+                        <span class="meta-badge bg-primary text-white"><i class="fas fa-shopping-basket me-1"></i>Số lượng đã mua: @Model.TongSoLuongMua</span>
+                        <span class="meta-badge bg-danger text-white"><i class="fas fa-undo me-1"></i>Số lượng yêu cầu hoàn: @Model.SoLuongHoan</span>
+                    </div>
+                    <small class="text-muted d-block mt-2">
+                        * Tồn kho hiện tại của sản phẩm sẽ được tự động cộng trả tương ứng khi duyệt thành công phiếu hoàn trả này.
+                    </small>
+                </div>
+            </div>
+
+            <!-- Reason Box -->
+            <div class="reason-box">
+                <div class="reason-title">
+                    <i class="fas fa-comment-dots"></i> Lý do hoàn trả của khách hàng:
+                </div>
+                <div class="reason-content">
+                    "@Model.LyDoHoanTra"
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 3: Customer Profile -->
+        <div class="section-card">
+            <div class="section-title">
+                <i class="fas fa-user-tie"></i> Thông tin khách hàng & Giao nhận
+            </div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Họ tên khách hàng</span>
+                    <span class="info-value">@(Model.HoTenKhach ?? "Khách lẻ")</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Số điện thoại</span>
+                    <span class="info-value">@(Model.SdtKhach ?? "Chưa cung cấp")</span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Địa chỉ Email</span>
+                    <span class="info-value">@(Model.EmailKhach ?? "Chưa cung cấp")</span>
+                </div>
+                <div class="info-item" style="grid-column: span 2;">
+                    <span class="info-label">Địa chỉ nhận hàng (Lúc mua)</span>
+                    <span class="info-value">@(Model.DiaChiNhanHang ?? "Bán tại quầy / Chưa có địa chỉ")</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section 4: Process Timeline -->
+        <div class="section-card">
+            <div class="section-title">
+                <i class="fas fa-history"></i> Tiến trình xử lý phiếu hoàn
+            </div>
+            <div class="timeline">
+                <div class="timeline-step">
+                    <div class="timeline-bullet active"></div>
+                    <div class="timeline-title">Khách hàng gửi yêu cầu hoàn hàng</div>
+                    <div class="timeline-time">@Model.NgayHoanTra.ToString("dd/MM/yyyy HH:mm")</div>
+                    <p class="text-muted m-0" style="font-size: 0.9rem;">Yêu cầu được khởi tạo trên hệ thống với số lượng hoàn là @Model.SoLuongHoan.</p>
+                </div>
+
+                @if (currentTrangThai == 1)
+                {
+                    <div class="timeline-step">
+                        <div class="timeline-bullet success"></div>
+                        <div class="timeline-title">Yêu cầu hoàn trả đã được phê duyệt thành công</div>
+                        <div class="timeline-time">Trạng thái: Hoàn tất</div>
+                        <p class="text-success m-0" style="font-size: 0.9rem; font-weight: 600;">
+                            <i class="fas fa-check-double me-1"></i> Số lượng @Model.SoLuongHoan sản phẩm đã được tự động hoàn lại vào số lượng tồn kho.
+                        </p>
+                    </div>
+                }
+                else if (currentTrangThai == 2)
+                {
+                    <div class="timeline-step">
+                        <div class="timeline-bullet danger"></div>
+                        <div class="timeline-title">Yêu cầu hoàn trả bị từ chối</div>
+                        <div class="timeline-time">Trạng thái: Từ chối</div>
+                        <p class="text-danger m-0" style="font-size: 0.9rem; font-weight: 600;">
+                            <i class="fas fa-times-circle me-1"></i> Cửa hàng đã từ chối yêu cầu. Số lượng tồn kho không đổi.
+                        </p>
+                    </div>
+                }
+                else
+                {
+                    <div class="timeline-step">
+                        <div class="timeline-bullet"></div>
+                        <div class="timeline-title">Chờ duyệt phê duyệt yêu cầu</div>
+                        <div class="timeline-time">Trạng thái: Chờ xử lý</div>
+                        <p class="text-muted m-0" style="font-size: 0.9rem;">Quản trị viên cần xem xét lý do hoàn hàng và lựa chọn Phê duyệt hoặc Từ chối.</p>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+
+    <!-- Action Bar -->
+    <div class="action-bar">
+        <a href="/Admin/PhieuHoanTraAdmin" class="btn-premium btn-back">
+            <i class="fas fa-arrow-left"></i> Quay lại danh sách
+        </a>
+
+        <div class="d-flex gap-2 flex-wrap">
+            @if (currentTrangThai != 2)
+            {
+                <form asp-action="UpdateTrangThai" method="post" onsubmit="return confirm('Bạn có chắc chắn muốn TỪ CHỐI yêu cầu hoàn trả này?');">
+                    <input type="hidden" name="id" value="@Model.PhieuHoanTraId" />
+                    <input type="hidden" name="trangThai" value="2" />
+                    <input type="hidden" name="hoaDonId" value="@ViewBag.HoaDonId" />
+                    <button type="submit" class="btn-premium btn-reject">
+                        <i class="fas fa-times-circle"></i> Từ chối yêu cầu
+                    </button>
+                </form>
+            }
+
+            @if (currentTrangThai != 1)
+            {
+                <form asp-action="UpdateTrangThai" method="post" onsubmit="return confirm('Bạn có chắc muốn PHÊ DUYỆT yêu cầu hoàn trả này? Hệ thống sẽ tự động cộng sản phẩm vào tồn kho.');">
+                    <input type="hidden" name="id" value="@Model.PhieuHoanTraId" />
+                    <input type="hidden" name="trangThai" value="1" />
+                    <input type="hidden" name="hoaDonId" value="@ViewBag.HoaDonId" />
+                    <button type="submit" class="btn-premium btn-approve">
+                        <i class="fas fa-check-circle"></i> Phê duyệt & Cộng kho
+                    </button>
+                </form>
+            }
+        </div>
+    </div>
+</div>

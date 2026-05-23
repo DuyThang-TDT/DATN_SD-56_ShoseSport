@@ -1,13 +1,13 @@
-﻿using FurryFriends.API.Data;
-using FurryFriends.API.Models;
-using FurryFriends.API.Repository.IRepository;
+﻿using ShoseSport.API.Data;
+using ShoseSport.API.Models;
+using ShoseSport.API.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FurryFriends.API.Repositories
+namespace ShoseSport.API.Repositories
 {
     public class DotGiamGiaSanPhamRepository : IDotGiamGiaSanPhamRepository
     {

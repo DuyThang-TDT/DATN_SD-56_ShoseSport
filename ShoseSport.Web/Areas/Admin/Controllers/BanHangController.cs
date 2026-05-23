@@ -1,17 +1,17 @@
-﻿using FurryFriends.API.Models;
-using FurryFriends.API.Models.DTO;
-using FurryFriends.API.Models.DTO.BanHang;
-using FurryFriends.API.Models.DTO.BanHang.Requests;
-using FurryFriends.Web.Services;
-using FurryFriends.Web.Services.IService;
-using FurryFriends.Web.Filter;
+﻿using ShoseSport.API.Models;
+using ShoseSport.API.Models.DTO;
+using ShoseSport.API.Models.DTO.BanHang;
+using ShoseSport.API.Models.DTO.BanHang.Requests;
+using ShoseSport.Web.Services;
+using ShoseSport.Web.Services.IService;
+using ShoseSport.Web.Filter;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FurryFriends.Web.Areas.Admin.Controllers
+namespace ShoseSport.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [Route("Admin/BanHang/[action]")] // Định tuyến tập trung, dễ gọi từ JS

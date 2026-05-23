@@ -1,9 +1,9 @@
-﻿using FurryFriends.API.Models;
-using FurryFriends.Web.Services.IService;
+﻿using ShoseSport.API.Models;
+using ShoseSport.Web.Services.IService;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Json;
 
-namespace FurryFriends.Web.Services
+namespace ShoseSport.Web.Services
 {
     public class VoucherService : IVoucherService
     {

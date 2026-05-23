@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using FurryFriends.Web.ViewModels;
-using FurryFriends.API.Models;
-using FurryFriends.Web.Services.IService;
+using ShoseSport.Web.ViewModels;
+using ShoseSport.API.Models;
+using ShoseSport.Web.Services.IService;
 using System.Threading.Tasks;
 using System;
 using System.Linq;
@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Authentication.Google;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authentication.Facebook;
 
-namespace FurryFriends.Web.Controllers
+namespace ShoseSport.Web.Controllers
 {
     public class DangKyController : Controller
     {
@@ -142,7 +142,7 @@ namespace FurryFriends.Web.Controllers
                     new ClaimsPrincipal(claimsIdentity),
                     authProperties);
 
-                TempData["Success"] = "Đăng ký thành công! Chào mừng bạn đến với FurryFriends! 🎉";
+                TempData["Success"] = "Đăng ký thành công! Chào mừng bạn đến với ShoseSport! 🎉";
                 return RedirectToAction("Index", "Home"); // Chuyển hướng về trang chủ
             }
             catch (Exception ex)
@@ -258,7 +258,7 @@ namespace FurryFriends.Web.Controllers
                     // Commit session để đảm bảo được lưu
                     await HttpContext.Session.CommitAsync();
 
-                    TempData["Success"] = $"Đăng ký Google thành công! Chào mừng {khachHang.TenKhachHang} đến với FurryFriends!";
+                    TempData["Success"] = $"Đăng ký Google thành công! Chào mừng {khachHang.TenKhachHang} đến với ShoseSport!";
                     return RedirectToAction("Index", "Home");
                 }
 
@@ -353,7 +353,7 @@ namespace FurryFriends.Web.Controllers
                     HttpContext.Session.SetString("Role", "KhachHang");
                     HttpContext.Session.SetString("HoTen", khachHang.TenKhachHang);
 
-                    var successMessage = $"<img src='{picture}' style='height:40px;border-radius:50%;margin-right:8px;vertical-align:middle;'> Đăng ký Facebook thành công! Chào mừng {khachHang.TenKhachHang} đến với FurryFriends!";
+                    var successMessage = $"<img src='{picture}' style='height:40px;border-radius:50%;margin-right:8px;vertical-align:middle;'> Đăng ký Facebook thành công! Chào mừng {khachHang.TenKhachHang} đến với ShoseSport!";
                     TempData["Success"] = successMessage;
                     return RedirectToAction("Index", "Home");
                 }

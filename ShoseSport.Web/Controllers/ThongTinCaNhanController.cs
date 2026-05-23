@@ -1,14 +1,14 @@
-﻿using FurryFriends.API.Models.DTO;
-using FurryFriends.Web.Models;
-using FurryFriends.Web.Services.IService;
-using FurryFriends.Web.Service.IService;
+﻿using ShoseSport.API.Models.DTO;
+using ShoseSport.Web.Models;
+using ShoseSport.Web.Services.IService;
+using ShoseSport.Web.Service.IService;
 using Microsoft.AspNetCore.Mvc;
 using System.Linq;
 using System;
 using System.Collections.Generic;
-using FurryFriends.API.Services.IServices;
-using WebThongTinCaNhanService = FurryFriends.Web.Services.IService.IThongTinCaNhanService;
-namespace FurryFriends.Web.Controllers
+using ShoseSport.API.Services.IServices;
+using WebThongTinCaNhanService = ShoseSport.Web.Services.IService.IThongTinCaNhanService;
+namespace ShoseSport.Web.Controllers
 {
     public class ThongTinCaNhanController : Controller
     {
@@ -121,7 +121,7 @@ namespace FurryFriends.Web.Controllers
 				TempData["Error"] = "Không tìm thấy thông tin khách hàng!";
 				return RedirectToAction("DanhSachDiaChi");
 			}
-			var diaChi = new FurryFriends.API.Models.DiaChiKhachHang
+			var diaChi = new ShoseSport.API.Models.DiaChiKhachHang
 			{
 				DiaChiId = Guid.NewGuid(),
 				TenDiaChi = model.TenDiaChi,
@@ -177,7 +177,7 @@ namespace FurryFriends.Web.Controllers
 				TempData["Error"] = "Không tìm thấy thông tin khách hàng!";
 				return RedirectToAction("DanhSachDiaChi");
 			}
-			var diaChi = new FurryFriends.API.Models.DiaChiKhachHang
+			var diaChi = new ShoseSport.API.Models.DiaChiKhachHang
 			{
 				DiaChiId = model.DiaChiId,
 				TenDiaChi = model.TenDiaChi,

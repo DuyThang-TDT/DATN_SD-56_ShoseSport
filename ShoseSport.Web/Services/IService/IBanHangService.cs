@@ -1,7 +1,7 @@
-﻿using FurryFriends.API.Models.DTO.BanHang;
-using FurryFriends.API.Models.DTO.BanHang.Requests;
+﻿using ShoseSport.API.Models.DTO.BanHang;
+using ShoseSport.API.Models.DTO.BanHang.Requests;
 
-namespace FurryFriends.Web.Services.IService
+namespace ShoseSport.Web.Services.IService
 {
     public interface IBanHangService
     {

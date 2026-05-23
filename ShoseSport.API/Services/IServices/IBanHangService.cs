@@ -1,10 +1,10 @@
-﻿using FurryFriends.API.Models.DTO.BanHang;
-using FurryFriends.API.Models.DTO.BanHang.Requests;
+﻿using ShoseSport.API.Models.DTO.BanHang;
+using ShoseSport.API.Models.DTO.BanHang.Requests;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace FurryFriends.API.Services.IServices
+namespace ShoseSport.API.Services.IServices
 {
     /// <summary>
     /// Service quản lý các nghiệp vụ của chức năng bán hàng tại quầy.

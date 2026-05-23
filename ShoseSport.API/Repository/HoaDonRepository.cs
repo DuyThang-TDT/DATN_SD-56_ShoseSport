@@ -1,12 +1,12 @@
-﻿using FurryFriends.API.Data;
-using FurryFriends.API.Models;
-using FurryFriends.API.Repository.IRepository;
+using ShoseSport.API.Data;
+using ShoseSport.API.Models;
+using ShoseSport.API.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 using iTextSharp.text;
 using iTextSharp.text.pdf;
 using System.Text;
 
-namespace FurryFriends.API.Repository
+namespace ShoseSport.API.Repository
 {
     public class HoaDonRepository : IHoaDonRepository
     {
@@ -56,7 +56,7 @@ namespace FurryFriends.API.Repository
                     .Include(h => h.Voucher)
                     .Include(h => h.HinhThucThanhToan)
                     .Include(h => h.DiaChiGiaoHang)
-                    .Where(h => h.TrangThai >= 0 && h.TrangThai <= 5) // ✅ Chỉ lấy hóa đơn trạng thái 0-5
+                    .Where(h => h.TrangThai >= 0 && h.TrangThai <= 10) // ✅ Lấy cả hóa đơn online (0-5) và offline (6-10)
                     .OrderByDescending(h => h.NgayTao) // ✅ Sắp xếp theo thời gian gần nhất
                     .AsNoTracking()
                     .ToListAsync();
@@ -175,7 +175,7 @@ namespace FurryFriends.API.Repository
 
                 try
                 {
-                    string webProjectPath = Path.GetFullPath(Path.Combine(_environment.ContentRootPath, "..", "FurryFriends.Web"));
+                    string webProjectPath = Path.GetFullPath(Path.Combine(_environment.ContentRootPath, "..", "ShoseSport.Web"));
                     string logoPath = Path.Combine(webProjectPath, "wwwroot", "images", "hihihi.png");
 
                     if (File.Exists(logoPath))
@@ -211,7 +211,7 @@ namespace FurryFriends.API.Repository
                 companyInfo.Add(new Chunk("142 Nguyễn Đổng Chi , Nam Từ Liêm\n", normalFont));
                 companyInfo.Add(new Chunk("TP. Hà Nội, Việt Nam\n", normalFont));
                 companyInfo.Add(new Chunk("Tel: 0968596808\n", normalFont));
-                companyInfo.Add(new Chunk("Email: info@furryfriends.vn", normalFont));
+                companyInfo.Add(new Chunk("Email: info@ShoseSport.vn", normalFont));
                 companyInfo.Alignment = Element.ALIGN_RIGHT;
                 companyInfoCell.AddElement(companyInfo);
 
@@ -522,7 +522,7 @@ namespace FurryFriends.API.Repository
                 watermarkTable.WidthPercentage = 100;
                 watermarkTable.SpacingBefore = 20f;
 
-                var watermarkCell = new PdfPCell(new Phrase("www.furryfriends.vn | Powered by FurryFriends System",
+                var watermarkCell = new PdfPCell(new Phrase("www.ShoseSport.vn | Powered by ShoseSport System",
                     new Font(baseFont, 8, Font.ITALIC, BaseColor.LIGHT_GRAY)));
                 watermarkCell.Border = Rectangle.TOP_BORDER;
                 watermarkCell.BorderColor = BaseColor.LIGHT_GRAY;
@@ -614,6 +614,7 @@ namespace FurryFriends.API.Repository
                 2 => "Đang giao",
                 3 => "Đã giao",
                 4 => "Đã hủy",
+                5 => "Đã hoàn trả",
                 _ => "Không xác định"
             };
         }
@@ -746,6 +747,8 @@ namespace FurryFriends.API.Repository
             // 0 (Chờ duyệt) → 1 (Đã duyệt) ✓
             // 1 (Đã duyệt) → 2 (Đang giao) ✓
             // 2 (Đang giao) → 3 (Đã giao) ✓
+            // 3 (Đã giao) → 5 (Đã hoàn trả) ✓ - Khi duyệt phiếu hoàn trả
+            // 5 (Đã hoàn trả) → 3 (Đã giao) ✓ - Khi hủy duyệt phiếu hoàn trả
             // 0, 1 → 4 (Đã hủy) ✓ - Cho phép hủy đơn từ trạng thái chờ duyệt và đã duyệt
             // 4 (Đã hủy) → Không thể chuyển sang trạng thái khác
 
@@ -772,7 +775,10 @@ namespace FurryFriends.API.Repository
                     return trangThaiMoi == 3; // Chỉ có thể chuyển thành "Đã giao"
                 
                 case 3: // Đã giao
-                    return false; // Không thể chuyển từ trạng thái đã giao
+                    return trangThaiMoi == 5; // Cho phép sang Đã hoàn trả khi hoàn hàng
+                
+                case 5: // Đã hoàn trả
+                    return trangThaiMoi == 3; // Cho phép quay lại Đã giao nếu hủy duyệt/từ chối hoàn trả
                 
                 default:
                     return false;
@@ -790,7 +796,7 @@ namespace FurryFriends.API.Repository
                 return "Không thể thay đổi trạng thái của đơn hàng đã hủy";
             }
 
-            if (trangThaiHienTai == 3)
+            if (trangThaiHienTai == 3 && trangThaiMoi != 5)
             {
                 return "Không thể thay đổi trạng thái của đơn hàng đã giao thành công";
             }

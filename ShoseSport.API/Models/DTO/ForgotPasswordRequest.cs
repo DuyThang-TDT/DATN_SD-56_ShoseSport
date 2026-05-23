@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace FurryFriends.API.Models.DTO
+namespace ShoseSport.API.Models.DTO
 {
 
     public class ForgotPasswordRequest

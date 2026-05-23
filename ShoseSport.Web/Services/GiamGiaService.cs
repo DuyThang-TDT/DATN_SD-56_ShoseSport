@@ -1,5 +1,5 @@
-﻿using FurryFriends.API.Models.DTO;
-using FurryFriends.Web.Services.IService;
+﻿using ShoseSport.API.Models.DTO;
+using ShoseSport.Web.Services.IService;
 using Microsoft.AspNetCore.Mvc; // Dùng cho ValidationProblemDetails
 using System;
 using System.Collections.Generic;
@@ -8,7 +8,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
-namespace FurryFriends.Web.Services
+namespace ShoseSport.Web.Services
 {
     // Lớp Exception tùy chỉnh để chứa thông tin lỗi từ API
     public class ApiException : Exception

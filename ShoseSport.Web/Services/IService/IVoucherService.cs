@@ -1,9 +1,9 @@
-﻿using FurryFriends.API.Models;
+﻿using ShoseSport.API.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace FurryFriends.Web.Services.IService
+namespace ShoseSport.Web.Services.IService
 {
     public interface IVoucherService
     {

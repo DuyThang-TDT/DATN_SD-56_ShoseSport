@@ -1,10 +1,10 @@
-﻿using FurryFriends.API.Models;
-using FurryFriends.API.Repository.IRepository;
-using FurryFriends.Web.Services.IService;
+﻿using ShoseSport.API.Models;
+using ShoseSport.API.Repository.IRepository;
+using ShoseSport.Web.Services.IService;
 using System.Net.Mail;
 using System.Text.RegularExpressions;
 
-namespace FurryFriends.Web.Services
+namespace ShoseSport.Web.Services
 {
     public class NhanVienService : INhanVienService
     {

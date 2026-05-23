@@ -1,8 +1,6 @@
-﻿using FurryFriends.Web.Services.IService;
-using FurryFriends.Web.ViewModels;
-using Microsoft.AspNetCore.Mvc;
 
-namespace FurryFriends.Web.Controllers
+
+namespace ShoseSport.Web.Controllers
 {
     public class SanPhamKhachHangController : Controller
     {

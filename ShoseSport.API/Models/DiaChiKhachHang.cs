@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace FurryFriends.API.Models
+namespace ShoseSport.API.Models
 {
     public class DiaChiKhachHang
     {

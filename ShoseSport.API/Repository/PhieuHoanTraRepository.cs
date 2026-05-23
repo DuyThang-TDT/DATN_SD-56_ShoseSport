@@ -1,9 +1,9 @@
-﻿using FurryFriends.API.Data;
-using FurryFriends.API.Models;
-using FurryFriends.API.Repository.IRepository;
+using ShoseSport.API.Data;
+using ShoseSport.API.Models;
+using ShoseSport.API.Repository.IRepository;
 using Microsoft.EntityFrameworkCore;
 
-namespace FurryFriends.API.Repository
+namespace ShoseSport.API.Repository
 {
     public class PhieuHoanTraRepository : IPhieuHoanTraRepository
     {
@@ -31,6 +31,8 @@ namespace FurryFriends.API.Repository
             .ThenInclude(ct => ct.HoaDon)
             .Include(p => p.HoaDonChiTiet)
             .ThenInclude(ct => ct.PhieuHoanTras)
+            .Include(p => p.HoaDonChiTiet)
+            .ThenInclude(ct => ct.SanPhamChiTiet)
             .FirstOrDefaultAsync(p => p.PhieuHoanTraId == id);
         }
 
@@ -41,6 +43,8 @@ namespace FurryFriends.API.Repository
             .ThenInclude(ct => ct.HoaDon)
             .Include(p => p.HoaDonChiTiet)
             .ThenInclude(ct => ct.PhieuHoanTras)
+            .Include(p => p.HoaDonChiTiet)
+            .ThenInclude(ct => ct.SanPhamChiTiet)
             .Where(p => p.HoaDonChiTiet.HoaDon.KhachHangId == khachHangId)
             .ToListAsync();
         }

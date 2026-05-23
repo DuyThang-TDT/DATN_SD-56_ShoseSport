@@ -1,4 +1,4 @@
-﻿namespace FurryFriends.API.Settings
+﻿namespace ShoseSport.API.Settings
 {
 
     public class MailSettings

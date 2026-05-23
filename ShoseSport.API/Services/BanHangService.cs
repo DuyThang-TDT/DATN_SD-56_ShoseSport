@@ -1,7 +1,7 @@
-﻿using FurryFriends.API.Models.DTO.BanHang;
-using FurryFriends.API.Models.DTO.BanHang.Requests;
-using FurryFriends.API.Repository.IRepository;
-using FurryFriends.API.Services.IServices;
+﻿using ShoseSport.API.Models.DTO.BanHang;
+using ShoseSport.API.Models.DTO.BanHang.Requests;
+using ShoseSport.API.Repository.IRepository;
+using ShoseSport.API.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 
-namespace FurryFriends.API.Services
+namespace ShoseSport.API.Services
 {
     public class BanHangService : IBanHangService
     {

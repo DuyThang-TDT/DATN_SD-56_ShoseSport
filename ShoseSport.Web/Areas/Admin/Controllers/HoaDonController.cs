@@ -1,12 +1,12 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using FurryFriends.Web.Services.IService;
-using FurryFriends.Web.Services;
-using FurryFriends.API.Models;
-using FurryFriends.Web.ViewModels;
-using FurryFriends.Web.Filter;
+using Microsoft.AspNetCore.Mvc;
+using ShoseSport.Web.Services.IService;
+using ShoseSport.Web.Services;
+using ShoseSport.API.Models;
+using ShoseSport.Web.ViewModels;
+using ShoseSport.Web.Filter;
 using System.Security.Claims;
 
-namespace FurryFriends.Web.Areas.Admin.Controllers
+namespace ShoseSport.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
     [AuthorizeEmployee]
@@ -188,11 +188,23 @@ namespace FurryFriends.Web.Areas.Admin.Controllers
             // 0 (Chờ duyệt) → 1 (Đã duyệt) ✓
             // 1 (Đã duyệt) → 2 (Đang giao) ✓
             // 2 (Đang giao) → 3 (Đã giao) ✓
+            // 3 (Đã giao) → 5 (Đã hoàn trả) ✓
+            // 5 (Đã hoàn trả) → 3 (Đã giao) ✓ (Khi hoàn tác duyệt/từ chối hoàn trả)
             // 4 (Đã hủy) → Không thể chuyển sang trạng thái khác
 
             if (trangThaiHienTai == 4) // Đã hủy
             {
                 return false; // Không thể chuyển từ trạng thái đã hủy
+            }
+
+            if (trangThaiHienTai == 3)
+            {
+                return trangThaiMoi == 5;
+            }
+
+            if (trangThaiHienTai == 5)
+            {
+                return trangThaiMoi == 3;
             }
 
             switch (trangThaiHienTai)
@@ -205,9 +217,6 @@ namespace FurryFriends.Web.Areas.Admin.Controllers
                 
                 case 2: // Đang giao
                     return trangThaiMoi == 3; // Chỉ có thể chuyển thành "Đã giao"
-                
-                case 3: // Đã giao
-                    return false; // Không thể chuyển từ trạng thái đã giao
                 
                 default:
                     return false;
@@ -225,9 +234,14 @@ namespace FurryFriends.Web.Areas.Admin.Controllers
                 return "Không thể thay đổi trạng thái của đơn hàng đã hủy";
             }
 
-            if (trangThaiHienTai == 3)
+            if (trangThaiHienTai == 3 && trangThaiMoi != 5)
             {
                 return "Không thể thay đổi trạng thái của đơn hàng đã giao thành công";
+            }
+
+            if (trangThaiHienTai == 5 && trangThaiMoi != 3)
+            {
+                return "Không thể thay đổi trạng thái của đơn hàng đã hoàn trả";
             }
 
             if (trangThaiHienTai == 1 && trangThaiMoi == 0)
@@ -258,6 +272,7 @@ namespace FurryFriends.Web.Areas.Admin.Controllers
                 2 => "Đang giao",
                 3 => "Đã giao",
                 4 => "Đã hủy",
+                5 => "Đã hoàn trả",
                 _ => "Không xác định"
             };
         }

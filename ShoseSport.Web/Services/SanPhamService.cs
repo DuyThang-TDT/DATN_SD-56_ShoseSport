@@ -1,6 +1,6 @@
-﻿using FurryFriends.API.Models;
-using FurryFriends.API.Models.DTO;
-using FurryFriends.Web.Services.IService;
+﻿using ShoseSport.API.Models;
+using ShoseSport.API.Models.DTO;
+using ShoseSport.Web.Services.IService;
 using Microsoft.AspNetCore.Mvc; // Cần thêm using này để dùng ValidationProblemDetails
 using System;
 using System.Collections.Generic;
@@ -10,7 +10,7 @@ using System.Net.Http;
 using System.Net.Http.Json;
 using System.Threading.Tasks;
 
-namespace FurryFriends.Web.Services
+namespace ShoseSport.Web.Services
 {
     // Lớp này đã được sửa để sử dụng ApiResult<T> giống như SanPhamChiTietService
     public class SanPhamService : ISanPhamService

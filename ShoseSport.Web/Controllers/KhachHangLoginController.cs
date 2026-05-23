@@ -1,8 +1,8 @@
-using FurryFriends.Web.Models;
-using FurryFriends.Web.Services.IService;
+using ShoseSport.Web.Models;
+using ShoseSport.Web.Services.IService;
 using Microsoft.AspNetCore.Mvc;
-using FurryFriends.API.Models;
-using LoginRequest = FurryFriends.API.Models.LoginRequest;
+using ShoseSport.API.Models;
+using LoginRequest = ShoseSport.API.Models.LoginRequest;
 using Microsoft.Extensions.Logging;
 
 public class KhachHangLoginController : Controller

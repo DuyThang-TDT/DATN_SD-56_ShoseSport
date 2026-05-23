@@ -1,17 +1,17 @@
-﻿using FurryFriends.API.Models;
-using FurryFriends.API.Models.DTO;
-using FurryFriends.API.Models.VNPay;
-using FurryFriends.Web.Service.IService;
-using FurryFriends.Web.Services;
-using FurryFriends.Web.Services.IService;
-using FurryFriends.Web.Services.IServices;
-using FurryFriends.Web.ViewModels;
+﻿using ShoseSport.API.Models;
+using ShoseSport.API.Models.DTO;
+using ShoseSport.API.Models.VNPay;
+using ShoseSport.Web.Service.IService;
+using ShoseSport.Web.Services;
+using ShoseSport.Web.Services.IService;
+using ShoseSport.Web.Services.IServices;
+using ShoseSport.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System.Text;
-namespace FurryFriends.Web.Controllers
+namespace ShoseSport.Web.Controllers
 {
     public class GioHangsController : Controller
     {
@@ -164,6 +164,17 @@ namespace FurryFriends.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> AddToCart(AddToCartViewModel model)
         {
+            var role = HttpContext.Session.GetString("Role");
+            if (!string.IsNullOrEmpty(role) && (role.ToLower().Contains("admin") || role.ToLower().Contains("nhanvien")))
+            {
+                if (Request.Headers["X-Requested-With"] == "XMLHttpRequest")
+                {
+                    return BadRequest(new { success = false, message = "Tài khoản quản trị/nhân viên không được phép mua hàng!" });
+                }
+                TempData["Error"] = "Tài khoản quản trị/nhân viên không được phép mua hàng!";
+                return RedirectToAction("Index", "SanPhamKhachHang");
+            }
+
             try
             {
                 if (!ModelState.IsValid)
@@ -324,6 +335,13 @@ namespace FurryFriends.Web.Controllers
         [HttpGet]
         public async Task<IActionResult> ThanhToan(Guid khachHangId, Guid? voucherId)
         {
+             var role = HttpContext.Session.GetString("Role");
+             if (!string.IsNullOrEmpty(role) && (role.ToLower().Contains("admin") || role.ToLower().Contains("nhanvien")))
+             {
+                 TempData["Error"] = "Tài khoản quản trị/nhân viên không được phép thanh toán!";
+                 return RedirectToAction("Index", "SanPhamKhachHang");
+             }
+
              if (khachHangId == Guid.Empty)
              {
                  try { khachHangId = GetKhachHangId(); }
@@ -372,6 +390,13 @@ namespace FurryFriends.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> ThanhToan(ThanhToanDTO dto)
         {
+            var role = HttpContext.Session.GetString("Role");
+            if (!string.IsNullOrEmpty(role) && (role.ToLower().Contains("admin") || role.ToLower().Contains("nhanvien")))
+            {
+                TempData["Error"] = "Tài khoản quản trị/nhân viên không được phép thanh toán!";
+                return RedirectToAction("Index", "SanPhamKhachHang");
+            }
+
             // ✅ Kiểm tra dto có null không
             if (dto == null)
             {
@@ -692,15 +717,8 @@ namespace FurryFriends.Web.Controllers
             
             _logger.LogInformation($"Tổng tiền: {tongTien}");
             
-            // Validation: Không cho phép đặt hàng quá 5 triệu
-            const decimal MAX_ORDER_AMOUNT = 5000000; // 5 triệu VNĐ
-            if (tongTien > MAX_ORDER_AMOUNT)
-            {
-                ViewBag.HinhThucThanhToanList = await _hinhThucThanhToanService.GetAllAsync();
-                TempData["Loi"] = $"Không thể đặt hàng vì tổng tiền vượt quá {MAX_ORDER_AMOUNT:N0} VNĐ. Tổng tiền hiện tại: {tongTien:N0} VNĐ.";
-                return RedirectToAction("Index", "GioHangs");
-            }
-            
+           
+          
             if (isVnPay)
             {
                 _logger.LogInformation("Đang xử lý thanh toán VNPay...");

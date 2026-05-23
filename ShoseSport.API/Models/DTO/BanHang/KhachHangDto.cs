@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FurryFriends.API.Models.DTO.BanHang
+namespace ShoseSport.API.Models.DTO.BanHang
 {
     public class KhachHangDto
     {

@@ -1,6 +1,6 @@
-﻿using FurryFriends.API.Models;
+﻿using ShoseSport.API.Models;
 
-namespace FurryFriends.API.Repository.IRepository
+namespace ShoseSport.API.Repository.IRepository
 {
     public interface IChucVuRepository
     {

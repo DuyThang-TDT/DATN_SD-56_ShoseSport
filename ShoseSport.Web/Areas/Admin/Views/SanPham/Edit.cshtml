@@ -1,4 +1,4 @@
-﻿@model FurryFriends.Web.ViewModels.SanPhamFullCreateViewModel
+﻿@model ShoseSport.Web.ViewModels.SanPhamFullCreateViewModel
 @using Newtonsoft.Json;
 
 @{
@@ -151,7 +151,7 @@
             </div>
             <div class="modal-body">
                 <div class="row" id="anhList">
-                    @foreach (var anh in (IEnumerable<FurryFriends.API.Models.DTO.AnhDTO>)ViewBag.AnhList)
+                    @foreach (var anh in (IEnumerable<ShoseSport.API.Models.DTO.AnhDTO>)ViewBag.AnhList)
                     {
                         <div class="col-3">
                             <div class="card border-0 shadow-sm h-100">

@@ -1,11 +1,11 @@
 using System.Net;
 using System.Net.Mail;
-using FurryFriends.Web.Models;
-using FurryFriends.Web.ViewModels;
+using ShoseSport.Web.Models;
+using ShoseSport.Web.ViewModels;
 using Microsoft.Extensions.Logging;
 using System.Linq;
 
-namespace FurryFriends.Web.Services
+namespace ShoseSport.Web.Services
 {
     public interface IEmailNotificationService
     {
@@ -54,8 +54,8 @@ namespace FurryFriends.Web.Services
                     _logger.LogInformation($"🔍 Admin Debug - ChiTiet: {chiTiet.TenSanPhamLucMua}, SL: {chiTiet.SoLuong}, Gia: {chiTiet.GiaLucMua}");
                 }
 
-                var adminEmail = _configuration["EmailSettings:AdminEmail"] ?? "admin@furryfriends.vn";
-                var subject = $"🆕 Đơn hàng mới #{hoaDonId.Substring(0, 8).ToUpper()} - FurryFriends Store";
+                var adminEmail = _configuration["EmailSettings:AdminEmail"] ?? "admin@ShoseSport.vn";
+                var subject = $"🆕 Đơn hàng mới #{hoaDonId.Substring(0, 8).ToUpper()} - ShoseSport Store";
                 
                 var emailBody = CreateAdminOrderNotificationBody(hoaDonId, tenKhachHang, soDienThoai, emailKhachHang, tongTien, ngayTao, chiTiets);
                 
@@ -166,7 +166,7 @@ namespace FurryFriends.Web.Services
                     return;
                 }
 
-                var subject = $"📦 Cập nhật trạng thái đơn hàng #{hoaDonId.Substring(0, 8).ToUpper()} - FurryFriends Store";
+                var subject = $"📦 Cập nhật trạng thái đơn hàng #{hoaDonId.Substring(0, 8).ToUpper()} - ShoseSport Store";
                 
                 var emailBody = CreateCustomerStatusNotificationBody(hoaDonId, tenKhachHang, oldStatus, newStatus, tongTien, ngayTao);
                 
@@ -187,7 +187,7 @@ namespace FurryFriends.Web.Services
             var smtpPort = int.Parse(_configuration["EmailSettings:SmtpPort"] ?? "587");
             var senderEmail = _configuration["EmailSettings:SenderEmail"] ?? "your-email@gmail.com";
             var senderPassword = _configuration["EmailSettings:SenderPassword"] ?? "your-app-password";
-            var senderName = _configuration["EmailSettings:SenderName"] ?? "FurryFriends Store";
+            var senderName = _configuration["EmailSettings:SenderName"] ?? "ShoseSport Store";
 
             using (var smtpClient = new SmtpClient(smtpServer))
             {
@@ -267,7 +267,7 @@ namespace FurryFriends.Web.Services
                 <body>
                     <div class='container'>
                         <div class='header'>
-                            <h1>🐾 FurryFriends Store</h1>
+                            <h1>👟 ShoseSport Store</h1>
                             <p>Hệ thống quản lý đơn hàng</p>
                         </div>
                         
@@ -338,7 +338,7 @@ namespace FurryFriends.Web.Services
                         
                         <div class='footer'>
                             <p>Trân trọng,</p>
-                            <p><strong>Hệ thống FurryFriends Store</strong> 🐾</p>
+                            <p><strong>Hệ thống ShoseSport Store</strong> 👟</p>
                         </div>
                     </div>
                 </body>
@@ -417,13 +417,13 @@ namespace FurryFriends.Web.Services
                             <p>Nếu bạn có bất kỳ câu hỏi nào, vui lòng liên hệ với chúng tôi:</p>
                             <ul>
                                 <li>📞 Hotline: <strong>0968596808</strong></li>
-                                <li>📧 Email: <strong>info@furryfriends.vn</strong></li>
+                                <li>📧 Email: <strong>info@ShoseSport.vn</strong></li>
                             </ul>
                             
-                            <p>Cảm ơn bạn đã tin tưởng FurryFriends!</p>
+                            <p>Cảm ơn bạn đã tin tưởng ShoseSport!</p>
                             
                             <p>Trân trọng,<br>
-                            <strong>Đội ngũ FurryFriends Store</strong> 🐾</p>
+                            <strong>Đội ngũ ShoseSport Store</strong> 👟</p>
                         </div>
                     </div>
                 </body>
@@ -448,7 +448,7 @@ namespace FurryFriends.Web.Services
                 "Đã giao hàng" => @"
                     <div style='background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 8px; margin: 20px 0;'>
                         <strong>🎉 Đơn hàng đã được giao thành công!</strong><br>
-                        Cảm ơn bạn đã mua sắm tại FurryFriends Store. Chúng tôi mong được phục vụ bạn lần sau!
+                        Cảm ơn bạn đã mua sắm tại ShoseSport Store. Chúng tôi mong được phục vụ bạn lần sau!
                     </div>",
                 "Đã hủy" => @"
                     <div style='background: #f8d7da; border: 1px solid #f5c6cb; color: #721c24; padding: 15px; border-radius: 8px; margin: 20px 0;'>

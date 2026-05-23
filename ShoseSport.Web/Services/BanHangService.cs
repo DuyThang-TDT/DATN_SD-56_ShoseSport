@@ -1,11 +1,11 @@
-﻿using FurryFriends.API.Models.DTO.BanHang;
-using FurryFriends.API.Models.DTO.BanHang.Requests;
-using FurryFriends.Web.Services.IService;
+﻿using ShoseSport.API.Models.DTO.BanHang;
+using ShoseSport.API.Models.DTO.BanHang.Requests;
+using ShoseSport.Web.Services.IService;
 using System.Net;
 using System.Net.Http.Json;
 using Newtonsoft.Json;
 
-namespace FurryFriends.Web.Services
+namespace ShoseSport.Web.Services
 {
     public class BanHangService : IBanHangService
     {

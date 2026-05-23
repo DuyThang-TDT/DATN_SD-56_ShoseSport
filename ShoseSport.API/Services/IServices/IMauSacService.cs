@@ -1,6 +1,6 @@
-﻿using FurryFriends.API.Models.DTO;
+﻿using ShoseSport.API.Models.DTO;
 
-namespace FurryFriends.API.Services.IServices
+namespace ShoseSport.API.Services.IServices
 {
     public interface IMauSacService
     {

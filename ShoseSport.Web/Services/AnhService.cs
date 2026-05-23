@@ -1,10 +1,10 @@
-﻿using FurryFriends.API.Models.DTO;
-using FurryFriends.Web.Services.IService;
+﻿using ShoseSport.API.Models.DTO;
+using ShoseSport.Web.Services.IService;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http;
 using System.Net.Http.Json;
 
-namespace FurryFriends.Web.Services
+namespace ShoseSport.Web.Services
 {
     public class AnhService : IAnhService
     {

@@ -1,11 +1,11 @@
-﻿using FurryFriends.API.Models.DTO;
-using FurryFriends.API.Services.IServices;
+﻿using ShoseSport.API.Models.DTO;
+using ShoseSport.API.Services.IServices;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Threading.Tasks;
 using System.Linq; // Added for LastOrDefault
 
-namespace FurryFriends.API.Controllers
+namespace ShoseSport.API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

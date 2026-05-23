@@ -1,7 +1,7 @@
-﻿using FurryFriends.API.Models;
-using FurryFriends.API.Models.DTO;
+﻿using ShoseSport.API.Models;
+using ShoseSport.API.Models.DTO;
 
-namespace FurryFriends.Web.Services.IService
+namespace ShoseSport.Web.Services.IService
 {
     public interface IChatLieuService
     {

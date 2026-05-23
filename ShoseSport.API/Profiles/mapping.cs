@@ -1,12 +1,12 @@
 ﻿// Profiles/GiamGiaProfile.cs
 using AutoMapper;
-using FurryFriends.API.Models;
-using FurryFriends.API.Models.DTO;
-using FurryFriends.API.Models.DTO.BanHang;
-using FurryFriends.API.Models.DTO.BanHang.Requests;
-using FurryFriends.API.Repository;
+using ShoseSport.API.Models;
+using ShoseSport.API.Models.DTO;
+using ShoseSport.API.Models.DTO.BanHang;
+using ShoseSport.API.Models.DTO.BanHang.Requests;
+using ShoseSport.API.Repository;
 
-namespace FurryFriends.API.Profiles
+namespace ShoseSport.API.Profiles
 {
     public class SanPhamProfile : Profile
     {

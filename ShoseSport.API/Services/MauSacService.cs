@@ -1,9 +1,9 @@
-﻿using FurryFriends.API.Models;
-using FurryFriends.API.Models.DTO;
-using FurryFriends.API.Repository.IRepository;
-using FurryFriends.API.Services.IServices;
+﻿using ShoseSport.API.Models;
+using ShoseSport.API.Models.DTO;
+using ShoseSport.API.Repository.IRepository;
+using ShoseSport.API.Services.IServices;
 
-namespace FurryFriends.API.Services
+namespace ShoseSport.API.Services
 {
     public class MauSacService : IMauSacService
     {

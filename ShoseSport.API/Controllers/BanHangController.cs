@@ -1,7 +1,7 @@
-﻿using FurryFriends.API.Models.DTO.BanHang;
-using FurryFriends.API.Models.DTO.BanHang.Requests;
-using FurryFriends.API.Services.IServices;
-using FurryFriends.API.Data;
+﻿using ShoseSport.API.Models.DTO.BanHang;
+using ShoseSport.API.Models.DTO.BanHang.Requests;
+using ShoseSport.API.Services.IServices;
+using ShoseSport.API.Data;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -12,7 +12,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using System.Linq;
 
-namespace FurryFriends.API.Controllers
+namespace ShoseSport.API.Controllers
 {
     /// <summary>
     /// API quản lý các nghiệp vụ của chức năng bán hàng.
@@ -548,7 +548,7 @@ namespace FurryFriends.API.Controllers
                 }
 
                 // Tạo QR code URL với thông tin hóa đơn
-                var qrCodeUrl = $"https://img.vietqr.io/image/acb-40070087-compact2.jpg?amount={hoaDon.ThanhTien}&addInfo=Chuyen%20tien%20mua%20hang%20FurryFriends&accountName=Nguyen%20Minh%20Quan";
+                var qrCodeUrl = $"https://img.vietqr.io/image/acb-40070087-compact2.jpg?amount={hoaDon.ThanhTien}&addInfo=Chuyen%20tien%20mua%20hang%20ShoseSport&accountName=Nguyen%20Minh%20Quan";
                 
                 var result = new
                 {

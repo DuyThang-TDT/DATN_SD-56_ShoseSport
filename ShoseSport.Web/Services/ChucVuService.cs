@@ -1,9 +1,9 @@
-﻿using FurryFriends.API.Models;
-using FurryFriends.API.Repository.IRepository;
-using FurryFriends.Web.Services.IService;
+﻿using ShoseSport.API.Models;
+using ShoseSport.API.Repository.IRepository;
+using ShoseSport.Web.Services.IService;
 using System.ComponentModel.DataAnnotations;
 
-namespace FurryFriends.Web.Services
+namespace ShoseSport.Web.Services
 {
     public class ChucVuService : IChucVuService
     {

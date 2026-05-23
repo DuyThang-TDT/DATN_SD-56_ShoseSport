@@ -1,23 +1,24 @@
-﻿using FurryFriends.Web.Services.IService;
-using FurryFriends.Web.ViewModels;
+using ShoseSport.Web.Services.IService;
+using ShoseSport.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FurryFriends.Web.Areas.Admin.Controllers
+namespace ShoseSport.Web.Areas.Admin.Controllers
 {
     [Area("Admin")]
-    public class PhieuHoanTraController : Controller
+    public class PhieuHoanTraAdminController : Controller
     {
         private readonly IPhieuHoanTraService _service;
 
-        public PhieuHoanTraController(IPhieuHoanTraService service)
+        public PhieuHoanTraAdminController(IPhieuHoanTraService service)
         {
             _service = service;
         }
 
         // Danh sách phiếu hoàn
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(Guid? hoaDonId)
         {
             var list = await _service.GetAllAsync();
+            ViewBag.HoaDonId = hoaDonId ?? Guid.Empty;
             return View(list);
         }
 
@@ -76,7 +77,87 @@ namespace FurryFriends.Web.Areas.Admin.Controllers
             return View(request);
         }
 
-        // ❌ Không có Delete. Nếu lỡ có route cũ gọi vào, có thể trả 404:
-        // public IActionResult Delete(Guid id) => NotFound();
+        // ✅ Action AJAX duyệt phiếu hoàn trả và cộng tồn kho
+        [HttpPost]
+        public async Task<IActionResult> ToggleStatus(Guid id)
+        {
+            var phieu = await _service.GetByIdAsync(id);
+            if (phieu == null)
+            {
+                return Json(new { success = false, message = "Không tìm thấy phiếu hoàn trả." });
+            }
+
+            // Duyệt phiếu: nếu trạng thái khác 1 (đã duyệt) thì chuyển sang 1 (đã duyệt)
+            int newTrangThai = phieu.TrangThai == 1 ? 0 : 1; 
+
+            var updateRequest = new PhieuHoanTraUpdateRequest
+            {
+                SoLuongHoan = phieu.SoLuongHoan,
+                LyDoHoanTra = phieu.LyDoHoanTra,
+                TrangThai = newTrangThai
+            };
+
+            var ok = await _service.UpdateAsync(id, updateRequest);
+            if (ok)
+            {
+                bool isApproved = newTrangThai == 1;
+                return Json(new
+                {
+                    success = true,
+                    newStatus = isApproved,
+                    statusClass = isApproved ? "status-badge status-approved" : "status-badge status-pending",
+                    statusText = isApproved ? "Đã duyệt" : "Chờ xử lý",
+                    message = isApproved ? "Phê duyệt phiếu hoàn thành công! Số lượng sản phẩm đã được cộng trả lại vào kho." : "Đã chuyển phiếu về trạng thái chờ xử lý."
+                });
+            }
+
+            return Json(new { success = false, message = "Không thể cập nhật trạng thái phiếu hoàn trả." });
+        }
+
+        // ✅ Cập nhật trạng thái phiếu (từ chối, duyệt...) từ Form
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateTrangThai(Guid id, int trangThai, Guid? hoaDonId)
+        {
+            var phieu = await _service.GetByIdAsync(id);
+            if (phieu == null) return NotFound();
+
+            var updateRequest = new PhieuHoanTraUpdateRequest
+            {
+                SoLuongHoan = phieu.SoLuongHoan,
+                LyDoHoanTra = phieu.LyDoHoanTra,
+                TrangThai = trangThai
+            };
+
+            var ok = await _service.UpdateAsync(id, updateRequest);
+            if (ok)
+            {
+                TempData["Success"] = "Cập nhật trạng thái phiếu hoàn thành công.";
+            }
+            else
+            {
+                TempData["Error"] = "Cập nhật trạng thái phiếu hoàn thất bại.";
+            }
+
+            return RedirectToAction(nameof(Index), new { hoaDonId = hoaDonId });
+        }
+
+        // ✅ Xóa phiếu hoàn trả
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Delete(Guid id, Guid? hoaDonId)
+        {
+            var ok = await _service.DeleteAsync(id);
+            if (ok)
+            {
+                TempData["Success"] = "Xóa phiếu hoàn trả thành công.";
+            }
+            else
+            {
+                TempData["Error"] = "Xóa phiếu hoàn trả thất bại.";
+            }
+
+            return RedirectToAction(nameof(Index), new { hoaDonId = hoaDonId });
+        }
     }
 }

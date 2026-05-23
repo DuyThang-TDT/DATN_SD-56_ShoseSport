@@ -1,9 +1,9 @@
-using FurryFriends.API.Data;
+using ShoseSport.API.Data;
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace FurryFriends.API.Models.DTO
+namespace ShoseSport.API.Models.DTO
 {
     public class SanPhamDTO : IValidatableObject
     {

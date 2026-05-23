@@ -1,12 +1,12 @@
-﻿using FurryFriends.API.Data;
-using FurryFriends.API.Models;
-using FurryFriends.API.Models.DTO;
-using FurryFriends.API.Services.IServices;
+﻿using ShoseSport.API.Data;
+using ShoseSport.API.Models;
+using ShoseSport.API.Models.DTO;
+using ShoseSport.API.Services.IServices;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace FurryFriends.API.Controllers
+namespace ShoseSport.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

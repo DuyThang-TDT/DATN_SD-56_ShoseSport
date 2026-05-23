@@ -1,7 +1,7 @@
-﻿using FurryFriends.API.Models.DTO;
-using FurryFriends.Web.ViewModels;
+﻿using ShoseSport.API.Models.DTO;
+using ShoseSport.Web.ViewModels;
 
-namespace FurryFriends.Web.Services.IService
+namespace ShoseSport.Web.Services.IService
 {
     public class VoucherPreviewResult
     {

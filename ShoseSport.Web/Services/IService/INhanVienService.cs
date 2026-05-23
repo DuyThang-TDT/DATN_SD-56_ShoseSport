@@ -1,8 +1,8 @@
-﻿using FurryFriends.API.Models;
+﻿using ShoseSport.API.Models;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace FurryFriends.Web.Services.IService
+namespace ShoseSport.Web.Services.IService
 {
     public interface INhanVienService
     {

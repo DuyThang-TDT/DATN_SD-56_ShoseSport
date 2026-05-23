@@ -1,11 +1,11 @@
-﻿using FurryFriends.API.Models.DTO;
-using FurryFriends.Web.Services.IService;
-using FurryFriends.Web.ViewModels;
+﻿using ShoseSport.API.Models.DTO;
+using ShoseSport.Web.Services.IService;
+using ShoseSport.Web.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering; // Thêm using này
-using FurryFriends.Web.Filter;
+using ShoseSport.Web.Filter;
 
-namespace FurryFriends.Web.Areas.Admin.Controllers 
+namespace ShoseSport.Web.Areas.Admin.Controllers 
 { 
 
 [Area("Admin")]
