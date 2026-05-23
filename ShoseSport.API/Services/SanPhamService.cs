@@ -24,14 +24,33 @@ namespace ShoseSport.API.Services
 
         public async Task<IEnumerable<SanPhamDTO>> GetAllAsync()
         {
-            var list = await _repository.GetAllAsync();
+            var list = await _context.SanPhams
+                .Include(x => x.ThuongHieu)
+                .Include(x => x.SanPhamChiTiets)
+                    .ThenInclude(ct => ct.Anh)
+                .Include(x => x.SanPhamThanhPhans)
+                    .ThenInclude(tp => tp.ThanhPhan)
+                .Include(x => x.SanPhamChatLieus)
+                    .ThenInclude(cl => cl.ChatLieu)
+                .ToListAsync();
+
             return list.Select(MapToDTO);
         }
 
         public async Task<SanPhamDTO> GetByIdAsync(Guid id)
         {
-            var sp = await _repository.GetByIdAsync(id)
-                ?? throw new KeyNotFoundException($"Không tìm thấy sản phẩm với ID {id}");
+            var sp = await _context.SanPhams
+                .Include(x => x.ThuongHieu)
+                .Include(x => x.SanPhamChiTiets)
+                    .ThenInclude(ct => ct.Anh)
+                .Include(x => x.SanPhamThanhPhans)
+                    .ThenInclude(tp => tp.ThanhPhan)
+                .Include(x => x.SanPhamChatLieus)
+                    .ThenInclude(cl => cl.ChatLieu)
+                .FirstOrDefaultAsync(x => x.SanPhamId == id);
+
+            if (sp == null)
+                throw new KeyNotFoundException($"Không tìm thấy sản phẩm với ID {id}");
 
             return MapToDTO(sp);
         }
@@ -48,80 +67,55 @@ namespace ShoseSport.API.Services
                 ThuongHieuId = dto.ThuongHieuId,
                 TrangThai = true,
                 HanSuDung = dto.HanSuDung,
-                Loai = dto.LoaiSanPham
-            };
 
-            await _repository.AddAsync(sanPham);
-            await _repository.SaveAsync();
-
-            // 🔥 LẤY SIZE + MÀU TỪ DB
-            var sizes = await _context.KichCos.ToListAsync();
-            var colors = await _context.MauSacs.ToListAsync();
-
-            if (!sizes.Any() || !colors.Any())
-                throw new Exception("Chưa có dữ liệu Size hoặc Màu trong DB");
-
-            var listChiTiet = new List<SanPhamChiTiet>();
-
-            foreach (var size in sizes)
             {
                 foreach (var color in colors)
                 {
-                    listChiTiet.Add(new SanPhamChiTiet
-                    {
-                        SanPhamChiTietId = Guid.NewGuid(),
-                        SanPhamId = sanPham.SanPhamId,
-                        KichCoId = size.KichCoId,
-                        MauSacId = color.MauSacId,
-                        SoLuong = 10,            // 👉 mặc định
-                        Gia = 1000000,           // 👉 mặc định
-                        GiaNhap = 800000,
-                        NgayTao = DateTime.Now,
-                        TrangThai = 1
-                    });
-                }
-            }
 
-            await _context.SanPhamChiTiets.AddRangeAsync(listChiTiet);
-            await _context.SaveChangesAsync();
 
             dto.SanPhamId = sanPham.SanPhamId;
+
             return dto;
         }
 
         public async Task UpdateAsync(Guid id, SanPhamDTO dto)
         {
             var existing = await _context.SanPhams
-                .FirstOrDefaultAsync(sp => sp.SanPhamId == id)
-                ?? throw new KeyNotFoundException("Không tìm thấy sản phẩm");
+
 
             existing.TenSanPham = dto.TenSanPham;
             existing.ThuongHieuId = dto.ThuongHieuId;
             existing.TrangThai = dto.TrangThai;
             existing.HanSuDung = dto.HanSuDung;
             existing.Loai = dto.LoaiSanPham;
+<
 
             await _context.SaveChangesAsync();
         }
 
         public async Task DeleteAsync(Guid id)
         {
-            var sanPham = await _repository.GetByIdAsync(id)
-                ?? throw new KeyNotFoundException("Không tìm thấy");
 
-            sanPham.TrangThai = false;
-            _repository.Update(sanPham);
-            await _repository.SaveAsync();
         }
 
-        public async Task<(IEnumerable<SanPhamDTO> Data, int TotalCount)> GetFilteredAsync(string? loaiSanPham, int page, int pageSize)
+        public async Task<(IEnumerable<SanPhamDTO> Data, int TotalCount)> GetFilteredAsync(
+            string? loaiSanPham,
+            int page,
+            int pageSize)
         {
-            var all = await _repository.GetAllAsync();
+            var all = await _context.SanPhams
+                .Include(x => x.ThuongHieu)
+                .Include(x => x.SanPhamChiTiets)
+                    .ThenInclude(ct => ct.Anh)
+                .Include(x => x.SanPhamThanhPhans)
+                    .ThenInclude(tp => tp.ThanhPhan)
+                .Include(x => x.SanPhamChatLieus)
+                    .ThenInclude(cl => cl.ChatLieu)
+                .ToListAsync();
 
             var filtered = all.Where(sp =>
                 string.IsNullOrEmpty(loaiSanPham) ||
-                sp.Loai == loaiSanPham
-            );
+
 
             var totalCount = filtered.Count();
 
@@ -135,8 +129,7 @@ namespace ShoseSport.API.Services
 
         public async Task<int> GetTotalProductsAsync()
         {
-            var all = await _repository.GetAllAsync();
-            return all.Count();
+            return await _context.SanPhams.CountAsync();
         }
 
         public async Task<IEnumerable<SanPhamDTO>> GetTopSellingProductsAsync(int top)
@@ -152,9 +145,7 @@ namespace ShoseSport.API.Services
                 .Take(top)
                 .ToListAsync();
 
-            var ids = data.Select(x => x.SanPhamId).ToList();
 
-            var all = await _repository.GetAllAsync();
 
             return all.Where(x => ids.Contains(x.SanPhamId))
                       .Select(MapToDTO);
@@ -162,15 +153,29 @@ namespace ShoseSport.API.Services
 
         private static SanPhamDTO MapToDTO(SanPham x)
         {
+
             return new SanPhamDTO
             {
                 SanPhamId = x.SanPhamId,
                 TenSanPham = x.TenSanPham,
                 ThuongHieuId = x.ThuongHieuId ?? Guid.Empty,
                 TenThuongHieu = x.ThuongHieu?.TenThuongHieu,
-                LoaiSanPham = x.Loai,
+
                 TrangThai = x.TrangThai,
-                HanSuDung = x.HanSuDung
+                HanSuDung = x.HanSuDung,
+
+                SanPhamChiTiets = x.SanPhamChiTiets?
+                    .Select(spct => new SanPhamChiTietDTO
+                    {
+                        SanPhamChiTietId = spct.SanPhamChiTietId,
+                        SanPhamId = spct.SanPhamId,
+                        Gia = spct.Gia,
+                        SoLuong = spct.SoLuong,
+                        DuongDan = spct.Anh != null
+                            ? spct.Anh.DuongDan
+                            : ""
+                    })
+                    .ToList()
             };
         }
     }

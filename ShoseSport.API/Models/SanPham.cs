@@ -31,7 +31,7 @@ namespace ShoseSport.API.Models
         public virtual ThuongHieu? ThuongHieu { get; set; }
 
         // Navigation properties
-        [JsonIgnore]
+     
         public virtual ICollection<SanPhamChiTiet> SanPhamChiTiets { get; set; }
         public virtual ICollection<SanPhamThanhPhan> SanPhamThanhPhans { get; set; }
         public virtual ICollection<SanPhamChatLieu> SanPhamChatLieus { get; set; }

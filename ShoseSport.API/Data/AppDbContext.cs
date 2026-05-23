@@ -9,15 +9,8 @@ namespace ShoseSport.API.Data
 
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options) { }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer("Server=DESKTOP-DVAKCTN;Database=datn07;Trusted_Connection=True;TrustServerCertificate=True");
-            }
-        }
+       
 
-        // DbSets
         public DbSet<TaiKhoan> TaiKhoans { get; set; }
         public DbSet<NhanVien> NhanViens { get; set; }
         public DbSet<ChucVu> ChucVus { get; set; }
@@ -43,14 +36,12 @@ namespace ShoseSport.API.Data
         public DbSet<SanPhamChatLieu> SanPhamChatLieus { get; set; }
         public DbSet<LichSuTrangThaiHoaDon> LichSuTrangThaiHoaDons { get; set; }
         public DbSet<ThongBao> ThongBaos { get; set; }
-		public DbSet<PhieuHoanTra> PhieuHoanTras { get; set; }
+        public DbSet<PhieuHoanTra> PhieuHoanTras { get; set; }
 
-
-		protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Gọi các hàm cấu hình chi tiết
             ConfigureTaiKhoan(modelBuilder);
             ConfigureSanPham(modelBuilder);
             ConfigureGioHang(modelBuilder);
@@ -59,22 +50,20 @@ namespace ShoseSport.API.Data
             ConfigureSanPhamThanhPhanChatLieu(modelBuilder);
             ConfigurePhieuHoanTra(modelBuilder);
 
-			// Seed admin account
             var adminKhachHangId = Guid.Parse("99999999-9999-9999-9999-999999999999");
 
-            // Seed Customer Profile for Admin
             modelBuilder.Entity<KhachHang>().HasData(new KhachHang
             {
                 KhachHangId = adminKhachHangId,
                 TenKhachHang = "Admin Customer",
                 SDT = "0123456789",
                 EmailCuaKhachHang = "admin@store.com",
-                TrangThai = 1, // 1: Active
+                TrangThai = 1,
                 NgayTaoTaiKhoan = DateTime.UtcNow,
                 NgayCapNhatCuoiCung = DateTime.UtcNow
             });
 
-			modelBuilder.Entity<TaiKhoan>().HasData(new TaiKhoan
+            modelBuilder.Entity<TaiKhoan>().HasData(new TaiKhoan
             {
                 TaiKhoanId = Guid.Parse("11111111-1111-1111-1111-111111111111"),
                 UserName = "admin",
@@ -84,7 +73,6 @@ namespace ShoseSport.API.Data
                 KhachHangId = adminKhachHangId
             });
 
-            // Seed nhân viên account
             modelBuilder.Entity<TaiKhoan>().HasData(new TaiKhoan
             {
                 TaiKhoanId = Guid.Parse("55555555-5555-5555-5555-555555555555"),
@@ -94,7 +82,6 @@ namespace ShoseSport.API.Data
                 TrangThai = true
             });
 
-            // Seed admin role
             modelBuilder.Entity<ChucVu>().HasData(new ChucVu
             {
                 ChucVuId = Guid.Parse("22222222-2222-2222-2222-222222222222"),
@@ -105,7 +92,6 @@ namespace ShoseSport.API.Data
                 NgayCapNhat = DateTime.UtcNow
             });
 
-            // Seed nhân viên role
             modelBuilder.Entity<ChucVu>().HasData(new ChucVu
             {
                 ChucVuId = Guid.Parse("44444444-4444-4444-4444-444444444444"),
@@ -116,7 +102,6 @@ namespace ShoseSport.API.Data
                 NgayCapNhat = DateTime.UtcNow
             });
 
-            // Seed admin employee
             modelBuilder.Entity<NhanVien>().HasData(new NhanVien
             {
                 NhanVienId = Guid.Parse("33333333-3333-3333-3333-333333333333"),
@@ -133,7 +118,6 @@ namespace ShoseSport.API.Data
                 NgayCapNhat = DateTime.UtcNow
             });
 
-            // Seed nhân viên employee
             modelBuilder.Entity<NhanVien>().HasData(new NhanVien
             {
                 NhanVienId = Guid.Parse("66666666-6666-6666-6666-666666666666"),
@@ -150,7 +134,6 @@ namespace ShoseSport.API.Data
                 NgayCapNhat = DateTime.UtcNow
             });
 
-            // Seed HinhThucThanhToan mặc định
             modelBuilder.Entity<HinhThucThanhToan>().HasData(
                 new HinhThucThanhToan
                 {
@@ -165,17 +148,17 @@ namespace ShoseSport.API.Data
                     MoTa = "Thanh toán trực tuyến qua cổng thanh toán VNPay"
                 }
             );
-		}
+        }
 
         private void ConfigurePhieuHoanTra(ModelBuilder modelBuilder)
-		{
-			modelBuilder.Entity<PhieuHoanTra>()
-		   .HasOne(p => p.HoaDonChiTiet)
-		   .WithMany(hdct => hdct.PhieuHoanTras)
-		   .HasForeignKey(p => p.HoaDonChiTietId);
-		}
+        {
+            modelBuilder.Entity<PhieuHoanTra>()
+                .HasOne(p => p.HoaDonChiTiet)
+                .WithMany(hdct => hdct.PhieuHoanTras)
+                .HasForeignKey(p => p.HoaDonChiTietId);
+        }
 
-		private void ConfigureTaiKhoan(ModelBuilder modelBuilder)
+        private void ConfigureTaiKhoan(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<NhanVien>()
                 .HasOne(nv => nv.TaiKhoan)
@@ -265,14 +248,14 @@ namespace ShoseSport.API.Data
                 .HasOne(hdct => hdct.HoaDon)
                 .WithMany(hd => hd.HoaDonChiTiets)
                 .HasForeignKey(hdct => hdct.HoaDonId)
-
                 .OnDelete(DeleteBehavior.Cascade);
+
             modelBuilder.Entity<HoaDon>()
-      .HasOne<NhanVien>() // Mỗi Hóa đơn có thể có MỘT Nhân viên
-      .WithMany()        // Một Nhân viên có thể có NHIỀU Hóa đơn
-      .HasForeignKey(hd => hd.NhanVienId) // Khóa ngoại là NhanVienId
-      .IsRequired(false)
-      .OnDelete(DeleteBehavior.SetNull);
+                .HasOne<NhanVien>()
+                .WithMany()
+                .HasForeignKey(hd => hd.NhanVienId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.SetNull);
         }
 
         private void ConfigureDotGiamGiaSanPham(ModelBuilder modelBuilder)
