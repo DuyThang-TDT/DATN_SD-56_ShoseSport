@@ -1,4 +1,4 @@
-﻿using ShoseSport.API.Models;
+using ShoseSport.API.Models;
 using ShoseSport.API.Models.DTO;
 using ShoseSport.API.Models.VNPay;
 using ShoseSport.Web.Service.IService;
@@ -957,5 +957,44 @@ namespace ShoseSport.Web.Controllers
                 return RedirectToAction("Index", "GioHangs");
             }
         }
+
+        [HttpPost]
+        public async Task<IActionResult> ValidateVoucher([FromBody] ValidateVoucherAjaxRequest request)
+        {
+            try
+            {
+                if (request == null || string.IsNullOrEmpty(request.VoucherCode))
+                {
+                    return BadRequest(new { success = false, message = "Dữ liệu không hợp lệ" });
+                }
+
+                var resultJson = await _voucherService.ValidateVoucherAsync(request.VoucherCode, request.TongTienHang);
+                return Content(resultJson, "application/json");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "Có lỗi xảy ra: " + ex.Message });
+            }
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetAvailableVouchers(Guid khachHangId, decimal tongTienHang)
+        {
+            try
+            {
+                var resultJson = await _voucherService.GetAvailableVouchersAsync(khachHangId, tongTienHang);
+                return Content(resultJson, "application/json");
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { success = false, message = "Có lỗi xảy ra: " + ex.Message });
+            }
+        }
+    }
+
+    public class ValidateVoucherAjaxRequest
+    {
+        public string VoucherCode { get; set; } = "";
+        public decimal TongTienHang { get; set; }
     }
 }
