@@ -1,4 +1,4 @@
-﻿using ShoseSport.API.Data;
+using ShoseSport.API.Data;
 using ShoseSport.API.Models.DTO;
 using ShoseSport.API.Repository.IRepository;
 using Microsoft.AspNetCore.Mvc;
@@ -183,7 +183,68 @@ namespace ShoseSport.API.Controllers
             return Ok(new { count });
         }
 
+        [HttpPost("ap-dung-voucher")]
+        public async Task<IActionResult> ApDungVoucher([FromBody] GioHangVoucherRequestDTO request)
+        {
+            try
+            {
+                if (request == null || request.KhachHangId == Guid.Empty || request.VoucherId == Guid.Empty)
+                {
+                    return BadRequest("Dữ liệu không hợp lệ.");
+                }
 
+                // 1. Lấy thông tin giỏ hàng để tính tổng tiền hàng
+                var gioHang = await _repo.GetGioHangByKhachHangIdAsync(request.KhachHangId);
+                if (gioHang == null || gioHang.GioHangChiTiets == null || !gioHang.GioHangChiTiets.Any())
+                {
+                    return BadRequest("Giỏ hàng trống.");
+                }
+
+                decimal tongTienHang = gioHang.GioHangChiTiets.Sum(x => x.ThanhTien);
+
+                // 2. Lấy thông tin voucher
+                var voucher = await _context.Vouchers.FindAsync(request.VoucherId);
+                if (voucher == null)
+                {
+                    return BadRequest("Voucher không tồn tại.");
+                }
+
+                // 3. Tính toán phí vận chuyển
+                decimal phiVanChuyen = _voucherCalc.CalculateShippingFee(tongTienHang);
+                decimal tongDonHang = tongTienHang + phiVanChuyen;
+
+                // 4. Áp dụng voucher
+                var result = _voucherCalc.GetVoucherApplication(voucher, tongTienHang, phiVanChuyen);
+                if (!result.IsValid)
+                {
+                    return BadRequest(result.LyDoKhongHopLe);
+                }
+
+                decimal tienSauGiam = tongDonHang - result.SoTienGiam;
+
+                return Ok(new
+                {
+                    tongTienHang = tongTienHang,
+                    phiVanChuyen = phiVanChuyen,
+                    tongDonHang = tongDonHang,
+                    giamGia = result.SoTienGiam,
+                    tienSauGiam = tienSauGiam,
+                    phanTramGiam = voucher.PhanTramGiam,
+                    tenVoucher = voucher.TenVoucher,
+                    maVoucher = voucher.MaVoucher
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+    }
+
+    public class GioHangVoucherRequestDTO
+    {
+        public Guid KhachHangId { get; set; }
+        public Guid VoucherId { get; set; }
     }
 
     public class AddToCartDTO

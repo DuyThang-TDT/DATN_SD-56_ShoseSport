@@ -1,4 +1,4 @@
-﻿using ShoseSport.API.Models;
+using ShoseSport.API.Models;
 using ShoseSport.Web.Services.IService;
 using System.ComponentModel.DataAnnotations;
 using System.Net.Http.Json;
@@ -77,6 +77,18 @@ namespace ShoseSport.Web.Services
                 // Log error here if needed
                 return false;
             }
+        }
+
+        public async Task<string> ValidateVoucherAsync(string voucherCode, decimal tongTienHang)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/VoucherValidation/validate", new { VoucherCode = voucherCode, TongTienHang = tongTienHang });
+            return await response.Content.ReadAsStringAsync();
+        }
+
+        public async Task<string> GetAvailableVouchersAsync(Guid khachHangId, decimal tongTienHang)
+        {
+            var response = await _httpClient.GetAsync($"api/VoucherValidation/available/{khachHangId}?tongTienHang={tongTienHang}");
+            return await response.Content.ReadAsStringAsync();
         }
     }
 }
