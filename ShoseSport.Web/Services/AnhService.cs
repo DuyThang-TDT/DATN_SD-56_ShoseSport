@@ -1,4 +1,4 @@
-﻿using ShoseSport.API.Models.DTO;
+using ShoseSport.API.Models.DTO;
 using ShoseSport.Web.Services.IService;
 using Microsoft.AspNetCore.Http;
 using System.Net.Http;
@@ -36,18 +36,29 @@ namespace ShoseSport.Web.Services
             if (file == null || file.Length == 0)
                 return null;
 
-            using var content = new MultipartFormDataContent();
-            var streamContent = new StreamContent(file.OpenReadStream());
-            streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
+            try
+            {
+                using var content = new MultipartFormDataContent();
+                var streamContent = new StreamContent(file.OpenReadStream());
+                streamContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(file.ContentType);
 
-            content.Add(streamContent, "file", file.FileName);
-            if (sanPhamChiTietId != null)
-                content.Add(new StringContent(sanPhamChiTietId.ToString()), "sanPhamChiTietId");
+                content.Add(streamContent, "file", file.FileName);
+                if (sanPhamChiTietId != null)
+                    content.Add(new StringContent(sanPhamChiTietId.ToString()), "sanPhamChiTietId");
 
-            var response = await _httpClient.PostAsync($"{BaseUrl}/upload", content);
-            if (!response.IsSuccessStatusCode) return null;
+                var response = await _httpClient.PostAsync($"{BaseUrl}/upload", content);
+                if (!response.IsSuccessStatusCode)
+                {
+                    var errText = await response.Content.ReadAsStringAsync();
+                    throw new HttpRequestException($"API trả về lỗi {response.StatusCode}: {errText}");
+                }
 
-            return await response.Content.ReadFromJsonAsync<AnhDTO>();
+                return await response.Content.ReadFromJsonAsync<AnhDTO>();
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Lỗi kết nối API thanh toán/ảnh: {ex.Message}", ex);
+            }
         }
 
         public async Task<bool> UpdateAsync(Guid id, AnhDTO dto)
