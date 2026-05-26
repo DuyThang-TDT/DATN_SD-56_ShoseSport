@@ -1,4 +1,4 @@
-﻿using ShoseSport.API.Models.DTO;
+using ShoseSport.API.Models.DTO;
 using ShoseSport.Web.Services.IService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -60,35 +60,47 @@ namespace ShoseSport.Web.Areas.Admin.Controllers
                 });
             }
 
-            var result = await _anhService.UploadAsync(file, null);
-
-            if (result == null)
+            try
             {
-                Console.WriteLine("❌ Upload thất bại hoặc định dạng không hỗ trợ.");
+                var result = await _anhService.UploadAsync(file, null);
+
+                if (result == null)
+                {
+                    Console.WriteLine("❌ Upload thất bại.");
+                    return BadRequest(new
+                    {
+                        success = false,
+                        message = "❌ Tải ảnh thất bại!"
+                    });
+                }
+
+                Console.WriteLine("✅ Upload ảnh thành công!");
+                var tenNhanVien = HttpContext.Session.GetString("HoTen") ?? "Unknown";
+                await _thongBaoService.CreateAsync(new ThongBaoDTO
+                {
+                    TieuDe = "Thêm ảnh mới",
+                    NoiDung = $"Ảnh '{result.TenAnh}' đã được tải lên hệ thống.",
+                    Loai = "Anh",
+                    UserName = tenNhanVien,
+                    NgayTao = DateTime.Now,
+                    DaDoc = false
+                });
+                return Ok(new
+                {
+                    success = true,
+                    message = "✅ Ảnh đã được tải lên thành công!",
+                    data = result
+                });
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"❌ [Anh/Upload] Exception: {ex.Message}");
                 return BadRequest(new
                 {
                     success = false,
-                    message = "❌ Tải ảnh thất bại hoặc định dạng không hỗ trợ!"
+                    message = $"❌ Lỗi: {ex.Message}"
                 });
             }
-
-            Console.WriteLine("✅ Upload ảnh thành công!");
-            var tenNhanVien = HttpContext.Session.GetString("HoTen") ?? "Unknown";
-            await _thongBaoService.CreateAsync(new ThongBaoDTO
-            {
-                TieuDe = "Thêm ảnh mới",
-                NoiDung = $"Ảnh '{result.TenAnh}' đã được tải lên hệ thống.",
-                Loai = "Anh",
-                UserName = tenNhanVien,
-                NgayTao = DateTime.Now,
-                DaDoc = false
-            });
-            return Ok(new
-            {
-                success = true,
-                message = "✅ Ảnh đã được tải lên thành công!",
-                data = result
-            });
         }
 
         // POST: /Anh/ToggleStatus/{id}
