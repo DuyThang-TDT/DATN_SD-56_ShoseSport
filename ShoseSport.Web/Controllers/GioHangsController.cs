@@ -145,8 +145,13 @@ namespace ShoseSport.Web.Controllers
             }
 
             var allMethods = await _hinhThucThanhToanService.GetAllAsync();
+            var allowedPaymentMethodIds = new[]
+            {
+                Guid.Parse("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"), // Thanh toán khi nhận hàng
+                Guid.Parse("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb")  // Thanh toán VNPay
+            };
             ViewBag.HinhThucThanhToanList = allMethods
-                .Where(x => x.TenHinhThuc == "Thanh toán khi nhận hàng")
+                .Where(x => allowedPaymentMethodIds.Contains(x.HinhThucThanhToanId))
                 .ToList();
 
             if (khachHangId != Guid.Empty)
